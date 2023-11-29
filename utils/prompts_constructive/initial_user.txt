@@ -1,1 +1,1 @@
-The Python environment is {task_obs_code_string}. Write a reward function for the following task: {task_description}.
+Write a scoring function for the following problem: {problem_description}.

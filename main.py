@@ -18,7 +18,6 @@ from utils.create_task import create_task
 from utils.extract_task_code import *
 
 ROOT_DIR = os.getcwd()
-# ISAAC_ROOT_DIR = f"{ROOT_DIR}/../isaacgymenvs/isaacgymenvs"
 
 @hydra.main(config_path="cfg", config_name="config", version_base="1.1")
 def main(cfg):
@@ -28,42 +27,41 @@ def main(cfg):
 
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
-    task = cfg.env.task
-    task_description = cfg.env.description
+    problem = cfg.env.problem
+    problem_description = cfg.env.description
     suffix = cfg.suffix
     model = cfg.model
     logging.info(f"Using LLM: {model}")
-    logging.info("Task: " + task)
-    logging.info("Task description: " + task_description)
+    logging.info("Problem: " + problem)
+    logging.info("Problem description: " + problem_description)
 
-    env_name = cfg.env.env_name.lower()
+    # env_name = cfg.env.env_name.lower()
     # env_parent = 'isaac' if f'{env_name}.py' in os.listdir(f'{ROOT_DIR}/envs/isaac') else 'dexterity'
     # task_file = f'{ROOT_DIR}/envs/{env_parent}/{env_name}.py'
     # task_obs_file = f'{ROOT_DIR}/envs/{env_parent}/{env_name}_obs.py'
     # shutil.copy(task_obs_file, f"env_init_obs.py")
     # task_code_string  = file_to_string(task_file)
     # task_obs_code_string  = file_to_string(task_obs_file)
-    # output_file = f"{ISAAC_ROOT_DIR}/tasks/{env_name}{suffix.lower()}.py"
+    output_file = f"{ROOT_DIR}/problems/{problem}/{suffix.lower()}.py"
 
     # Loading all text prompts
-    prompt_dir = f'{ROOT_DIR}/utils/prompts'
+    prompt_dir = f'{ROOT_DIR}/utils/prompts_{cfg.problem_type}'
+    problem_dir = f"{ROOT_DIR}/problems/{problem}"
     initial_system = file_to_string(f'{prompt_dir}/initial_system.txt')
     code_output_tip = file_to_string(f'{prompt_dir}/code_output_tip.txt')
     code_feedback = file_to_string(f'{prompt_dir}/code_feedback.txt')
     initial_user = file_to_string(f'{prompt_dir}/initial_user.txt')
-    reward_signature = file_to_string(f'{prompt_dir}/reward_signature.txt')
+    func_signature = file_to_string(f'{problem_dir}/func_signature.txt')
     policy_feedback = file_to_string(f'{prompt_dir}/policy_feedback.txt')
     execution_error_feedback = file_to_string(f'{prompt_dir}/execution_error_feedback.txt')
 
-    initial_system = initial_system.format(task_reward_signature_string=reward_signature) + code_output_tip
-    # initial_user = initial_user.format(task_obs_code_string=task_obs_code_string, task_description=task_description)
+    initial_system = initial_system.format(func_signature=func_signature) + code_output_tip
+    initial_user = initial_user.format(problem_description=problem_description)
     messages = [{"role": "system", "content": initial_system}, {"role": "user", "content": initial_user}]
     
-    print('########')
+    print('######## Prompts: ########')
     pprint(messages[0])
-    print('########')
     pprint(messages[1])
-    print('########')
 
     # task_code_string = task_code_string.replace(task, task+suffix)
     # Create Task YAML files
@@ -78,9 +76,9 @@ def main(cfg):
     max_success_reward_correlation_overall = DUMMY_FAILURE
     max_reward_code_path = None 
     
-    # Eureka generation loop
+    # Generation loop
     for iter in range(cfg.iteration):
-        # Get Eureka response
+        # Get response
         responses = []
         response_cur = None
         total_samples = 0
@@ -145,53 +143,19 @@ def main(cfg):
                     break
             code_string = response_cur if not code_string else code_string
 
-            # Remove unnecessary imports
-            lines = code_string.split("\n")
-            for i, line in enumerate(lines):
-                if line.strip().startswith("def "):
-                    code_string = "\n".join(lines[i:])
-                    
-            # Add the Eureka Reward Signature to the environment code
-            try:
-                gpt_reward_signature, input_lst = get_function_signature(code_string)
-            except Exception as e:
-                logging.info(f"Iteration {iter}: Code Run {response_id} cannot parse function signature!")
-                continue
+
 
             code_runs.append(code_string)
-            reward_signature = [
-                f"self.rew_buf[:], self.rew_dict = {gpt_reward_signature}",
-                f"self.extras['gpt_reward'] = self.rew_buf.mean()",
-                f"for rew_state in self.rew_dict: self.extras[rew_state] = self.rew_dict[rew_state].mean()",
-            ]
-            indent = " " * 8
-            reward_signature = "\n".join([indent + line for line in reward_signature])
-            if "def compute_reward(self)" in task_code_string:
-                task_code_string_iter = task_code_string.replace("def compute_reward(self):", "def compute_reward(self):\n" + reward_signature)
-            elif "def compute_reward(self, actions)" in task_code_string:
-                task_code_string_iter = task_code_string.replace("def compute_reward(self, actions):", "def compute_reward(self, actions):\n" + reward_signature)
-            else:
-                raise NotImplementedError
 
-            # Save the new environment code when the output contains valid code string!
             with open(output_file, 'w') as file:
-                file.writelines(task_code_string_iter + '\n')
-                file.writelines("from typing import Tuple, Dict" + '\n')
-                file.writelines("import math" + '\n')
-                file.writelines("import torch" + '\n')
-                file.writelines("from torch import Tensor" + '\n')
-                if "@torch.jit.script" not in code_string:
-                    code_string = "@torch.jit.script\n" + code_string
-                file.writelines(code_string + '\n')
-
-            with open(f"env_iter{iter}_response{response_id}_rewardonly.py", 'w') as file:
                 file.writelines(code_string + '\n')
 
             # Copy the generated environment code to hydra output directory for bookkeeping
             shutil.copy(output_file, f"env_iter{iter}_response{response_id}.py")
+            exit()
 
             # Find the freest GPU to run GPU-accelerated RL
-            set_freest_gpu()
+            # set_freest_gpu()
             
             # Execute the python file with flags
             rl_filepath = f"env_iter{iter}_response{response_id}.txt"

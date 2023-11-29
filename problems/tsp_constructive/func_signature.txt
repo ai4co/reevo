@@ -1,0 +1,13 @@
+def compute_score(pos: np.ndarray, pre_pos: np.ndarray) -> float:
+    """
+    Compute the score node with position `pos` for TSP.
+
+    Parameters:
+    pos (np.ndarray): A numpy array of shape (2,), representing the position of the node whose score to compute.
+    pre_pos (np.ndarray): A numpy array of shape (2,), representing the position of the last visted node.
+
+    Returns:
+    float: A score of visiting node with position `pos`. The higher the better.
+    """
+    ...
+    return score

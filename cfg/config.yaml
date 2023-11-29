@@ -1,8 +1,10 @@
 defaults:
   - _self_
-  - env: shadow_hand
+  - env: tsp_constructive
   - override hydra/launcher: local
   - override hydra/output: local
+
+problem_type: constructive
 
 hydra:
   job:
@@ -15,7 +17,7 @@ suffix: GPT  # suffix for generated files (indicates LLM model)
 
 # Eureka parameters
 iteration: 1 # how many iterations of Eureka to run
-sample: 3 # number of Eureka samples to generate per iteration
+sample: 2 # number of Eureka samples to generate per iteration
 max_iterations: 3000 # RL Policy training iterations (decrease this to make the feedback loop faster)
 num_eval: 5 # number of evaluation episodes to run for the final reward
 capture_video: False # whether to capture policy rollout videos
