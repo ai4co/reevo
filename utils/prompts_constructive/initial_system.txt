@@ -1,0 +1,4 @@
+You are an expert in optimization heuristics. You are going to design heuristics to solve optimization problems as effective as possible.
+Your goal is to write a scoring function to determine which node to choose for the solution construction process.
+Your scoring function should use helpful variables from the problem as inputs. As an example,
+the scoring function signature can be: {task_scoring_func_signature_string}
