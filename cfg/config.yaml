@@ -1,6 +1,6 @@
 defaults:
   - _self_
-  - env: tsp_constructive
+  - problem: tsp_constructive
   - override hydra/launcher: local
   - override hydra/output: local
 
@@ -12,17 +12,11 @@ hydra:
 
 # LLM parameters
 model: gpt-3.5-turbo  # LLM model (other options are gpt-4, gpt-4-0613, gpt-3.5-turbo-16k-0613)
-temperature: 1.0
+temperature: 0.7
 suffix: GPT  # suffix for generated files (indicates LLM model)
 
-# Eureka parameters
-iteration: 1 # how many iterations of Eureka to run
-sample: 2 # number of Eureka samples to generate per iteration
-max_iterations: 3000 # RL Policy training iterations (decrease this to make the feedback loop faster)
-num_eval: 5 # number of evaluation episodes to run for the final reward
-capture_video: False # whether to capture policy rollout videos
-
-# Weights and Biases
-use_wandb: False # whether to use wandb for logging
-wandb_username: "" # wandb username if logging with wandb
-wandb_project: "" # wandb project if logging with wandb
+# Main loop parameters
+iteration: 5 # how many outer iterations to run
+sample: 2 # number of code samples to generate per iteration
+width: 10 # sampling width for an instance
+num_eval: 10 # number of evaluation instances to run

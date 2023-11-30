@@ -1,13 +1,20 @@
-def compute_score(pos: np.ndarray, pre_pos: np.ndarray) -> float:
+def select_next_node(current_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
     """
-    Compute the score node with position `pos` for TSP.
-
-    Parameters:
-    pos (np.ndarray): A numpy array of shape (2,), representing the position of the node whose score to compute.
-    pre_pos (np.ndarray): A numpy array of shape (2,), representing the position of the last visted node.
-
-    Returns:
-    float: A score of visiting node with position `pos`. The higher the better.
+    Select the next node to visit from the unvisited nodes.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
     """
     ...
-    return score
+    return nxt_node

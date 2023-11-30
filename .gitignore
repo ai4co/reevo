@@ -162,3 +162,5 @@ cython_debug/
 
 outputs/
 gpt.py
+*.npy
+test.ipynb
