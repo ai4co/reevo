@@ -1,0 +1,30 @@
+import numpy as np
+
+def select_next_node(current_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    """
+    Select the next node to visit from the unvisited nodes using the Nearest Neighbor heuristic.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    # Calculate the distances from the current node to all unvisited nodes
+    distances = distance_matrix[current_node, list(unvisited_nodes)]
+    
+    # Find the index of the node with the minimum distance
+    min_distance_index = np.argmin(distances)
+    
+    # Find the corresponding node
+    nxt_node = list(unvisited_nodes)[min_distance_index]
+    
+    return nxt_node
