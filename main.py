@@ -40,25 +40,23 @@ def main(cfg):
     problem_dir = f"{ROOT_DIR}/problems/{problem}"
     initial_system = file_to_string(f'{prompt_dir}/initial_system.txt')
     code_output_tip = file_to_string(f'{prompt_dir}/code_output_tip.txt')
-    code_feedback = file_to_string(f'{prompt_dir}/code_feedback.txt')
     initial_user = file_to_string(f'{prompt_dir}/initial_user.txt')
     func_signature = file_to_string(f'{problem_dir}/func_signature.txt')
-    policy_feedback = file_to_string(f'{prompt_dir}/policy_feedback.txt')
+    example = file_to_string(f'{problem_dir}/example.txt')
+    optimization_feedback = file_to_string(f'{prompt_dir}/optimization_feedback.txt')
     execution_error_feedback = file_to_string(f'{prompt_dir}/execution_error_feedback.txt')
 
     initial_system = initial_system.format(func_signature=func_signature) + code_output_tip
-    initial_user = initial_user.format(problem_description=problem_description)
+    initial_user = initial_user.format(problem_description=problem_description, example=example)
     messages = [{"role": "system", "content": initial_system}, {"role": "user", "content": initial_user}]
-    
-    print('######## Prompts: ########')
-    pprint(messages[0])
-    pprint(messages[1])
 
     
     best_obj_overall = float('inf')
     
     # Generation loop
     for iter in range(cfg.iteration):
+        pprint(messages)
+        
         # Get response
         responses = []
         response_cur = None
@@ -132,6 +130,7 @@ def main(cfg):
             inner_runs.append(process)
         
         # Gather results
+        contents = []
         code_paths = []
         objs = []
         exec_success = False 
@@ -143,19 +142,29 @@ def main(cfg):
             with open(stdout_filepath, 'r') as f:
                 stdout_str = f.read() 
 
-            # content = ''
-            # traceback_msg = filter_traceback(stdout_str)
+            content = ''
+            traceback_msg = filter_traceback(stdout_str)
             
-            # read the last line of stdout_str
-            try:
+            if traceback_msg == '':
+                # If execution has no error, provide statistics feedback
+                exec_success = True
                 obj = float(stdout_str.split('\n')[-2])
                 objs.append(obj) # the smaller the better
-            except:
-                pass
+                content += optimization_feedback.format(obj=obj)
+                
+            else:
+                # Otherwise, provide execution traceback error feedback
+                objs.append(float('inf'))
+                content += execution_error_feedback.format(traceback_msg=traceback_msg)
+
+            content += code_output_tip
+            contents.append(content) 
+            
 
         # Select the best code sample
         best_obj, best_sample_idx = min(objs), np.argmin(np.array(objs))
         best_code = code_runs[best_sample_idx]
+        best_content = contents[best_sample_idx]
         
         # Update the overall best
         if best_obj < best_obj_overall:
@@ -164,33 +173,15 @@ def main(cfg):
 
 
         logging.info(f"Iteration {iter}: Min obj: {best_obj}, Best Code Path: {best_code_path}")
-        logging.info(f"Iteration {iter}: GPT Output Content:\n" +  responses[best_sample_idx]["message"]["content"] + "\n")
+        # logging.info(f"Iteration {iter}: GPT Output Content:\n" +  responses[best_sample_idx]["message"]["content"] + "\n")
             
-        # Plot the success rate
-        # fig, axs = plt.subplots(2, figsize=(6, 6))
-        # fig.suptitle(f'{cfg.env.task}')
-
-        # x_axis = np.arange(len(max_successes))
-
-        # axs[0].plot(x_axis, np.array(max_successes))
-        # axs[0].set_title("Max Success")
-        # axs[0].set_xlabel("Iteration")
-
-        # axs[1].plot(x_axis, np.array(execute_rates))
-        # axs[1].set_title("Execute Rate")
-        # axs[1].set_xlabel("Iteration")
-
-        # fig.tight_layout(pad=3.0)
-        # plt.savefig('summary.png')
-        # np.savez('summary.npz', max_successes=max_successes, execute_rates=execute_rates, best_code_paths=best_code_paths, max_successes_reward_correlation=max_successes_reward_correlation)
-
-        # if len(messages) == 2:
-        #     messages += [{"role": "assistant", "content": responses[best_sample_idx]["message"]["content"]}]
-        #     messages += [{"role": "user", "content": best_content}]
-        # else:
-        #     assert len(messages) == 4
-        #     messages[-2] = {"role": "assistant", "content": responses[best_sample_idx]["message"]["content"]}
-        #     messages[-1] = {"role": "user", "content": best_content}
+        if len(messages) == 2:
+            messages += [{"role": "assistant", "content": responses[best_sample_idx]["message"]["content"]}]
+            messages += [{"role": "user", "content": best_content}]
+        else:
+            assert len(messages) == 4
+            messages[-2] = {"role": "assistant", "content": responses[best_sample_idx]["message"]["content"]}
+            messages[-1] = {"role": "user", "content": best_content}
 
         # # Save dictionary as JSON file
         # with open('messages.json', 'w') as file:

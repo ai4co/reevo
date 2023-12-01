@@ -1,1 +1,0 @@
-We use your scoring function to construct solutions for some problem instances: the average objective value is (the smaller the better):

@@ -1,8 +1,6 @@
 Output code only and nothing else. The code should be formatted as a Python code string: "```python ... ```"
 
 Some helpful tips for writing the scoring function code:
-(1) Under no circumstances can you modify the function signature.
-(2) Import necessary packages.
-(3) Be as creative as possible.
-(4) You may introduce new constants into the scoring function if needed.
-(5) Under no circumstances can you modify the function signature.
+(1) Under no circumstances can you modify the function signature. Import necessary packages.
+(2) Be creative and use the knowledge about the problem, if it is available.
+(3) You may introduce new constants and IF statements into the scoring function if needed.

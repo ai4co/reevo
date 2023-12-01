@@ -2,4 +2,4 @@ Write a scoring function for the following problem: {problem_description}.
 An example function is given below:
 {example}
 
-Write a function that generates better solutions than this example.
+Write a function that can generate better solutions than this example.

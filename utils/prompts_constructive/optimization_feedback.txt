@@ -1,0 +1,2 @@
+We use your scoring function to construct solutions for some problem instances: the average objective value is (the smaller the better): {obj}
+Please provide a new, improved scoring function that can better guide the solution construction process.

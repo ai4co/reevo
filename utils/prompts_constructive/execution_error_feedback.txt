@@ -1,1 +1,1 @@
-Executing the scoring function code above has the following error: {traceback_msg}. Please fix the bug and provide a new, improved scoring function!
+Executing your code has the following error: {traceback_msg}. Please fix the bug and provide a new, improved function!
