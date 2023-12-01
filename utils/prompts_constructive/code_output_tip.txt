@@ -4,3 +4,4 @@ Some helpful tips for writing the scoring function code:
 (1) Under no circumstances can you modify the function signature. Import necessary packages.
 (2) Be creative and use the knowledge about the problem, if it is available.
 (3) You may introduce new constants and IF statements into the scoring function if needed.
+(4) You may avoid always acting greedily.

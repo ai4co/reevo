@@ -1,4 +1,4 @@
-def select_next_node(current_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
     """
     Select the next node to visit from the unvisited nodes.
     
@@ -6,6 +6,8 @@ def select_next_node(current_node: int, unvisited_nodes: set, distance_matrix: n
     ----------
     current_node : int
         The current node.
+    destination_node : int
+        The destination node to return to.
     unvisited_nodes : set
         The set of unvisited nodes.
     distance_matrix : np.ndarray

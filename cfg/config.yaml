@@ -16,7 +16,6 @@ temperature: 1
 suffix: GPT  # suffix for generated files (indicates LLM model)
 
 # Main loop parameters
-iteration: 5 # how many outer iterations to run
-sample: 2 # number of code samples to generate per iteration
+iteration: 4 # how many outer iterations to run
+sample: 4 # number of code samples to generate per iteration
 width: 10 # sampling width for an instance
-num_eval: 10 # number of evaluation instances to run

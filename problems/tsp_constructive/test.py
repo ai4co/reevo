@@ -36,6 +36,7 @@ def test_heuristic(node_positions: np.ndarray) -> float:
     for _ in range(problem_size - 1):
         next_node = select_next_node(
             current_node=solution[-1],
+            destination_node=start_node,
             unvisited_nodes=unvisited,
             distance_matrix=dist_mat,
         )
