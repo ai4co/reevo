@@ -98,11 +98,12 @@ def main(cfg):
         # Logging Token Information
         logging.info(f"Iteration {iter}: Prompt Tokens: {prompt_tokens}, Completion Tokens: {total_completion_token}, Total Tokens: {total_token}")
         
-        code_runs = [] 
+        code_runs = []
+        response_runs = []
         inner_runs = []
         for response_id in range(cfg.sample):
             response_cur = responses[response_id]["message"]["content"]
-            # logging.info(f"Iteration {iter}: GPT Output:\n " + response_cur)
+            logging.info(f"Iteration {iter}: GPT Output:\n " + response_cur)
             logging.info(f"Iteration {iter}: Processing Code Run {response_id}")
 
             # Regex patterns to extract python code enclosed in GPT response
@@ -111,8 +112,8 @@ def main(cfg):
             if code_string is not None:
                 code_string = code_string.group(1).strip()
             
-            code_string = response_cur if not code_string else code_string
             code_runs.append(code_string)
+            response_runs.append(response_cur)
 
             with open(output_file, 'w') as file:
                 file.writelines(code_string + '\n')
@@ -123,7 +124,7 @@ def main(cfg):
             # Execute the python file with flags
             stdout_filepath = f"problem_iter{iter}_response{response_id}.txt"
             with open(stdout_filepath, 'w') as f:
-                process = subprocess.Popen(['python', '-u', f'{ROOT_DIR}/problems/{problem}/test.py', f'{problem_size}', ROOT_DIR],
+                process = subprocess.Popen(['python', '-u', f'{ROOT_DIR}/problems/{problem}/eval.py', f'{problem_size}', ROOT_DIR],
                                             stdout=f, stderr=f)
 
             block_until_running(stdout_filepath, log_status=True, iter_num=iter, response_id=response_id)
@@ -150,7 +151,7 @@ def main(cfg):
                 exec_success = True
                 obj = float(stdout_str.split('\n')[-2])
                 objs.append(obj) # the smaller the better
-                content += optimization_feedback.format(obj=obj)
+                content += optimization_feedback
                 
             else:
                 # Otherwise, provide execution traceback error feedback
