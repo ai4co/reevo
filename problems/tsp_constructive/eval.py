@@ -7,8 +7,8 @@ from scipy.spatial import distance_matrix
 
 from gpt import select_next_node
 
-# TSP test
-def test_heuristic(node_positions: np.ndarray) -> float:
+# TSP evaluation
+def eval_heuristic(node_positions: np.ndarray) -> float:
     '''
     Generate solution for TSP problem using the GPT-generated heuristic algorithm.
     
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     
     objs = []
     for i in range(n_instances):
-        obj = test_heuristic(node_positions[i])
+        obj = eval_heuristic(node_positions[i])
         print(f"[*] Instance {i}: {obj}")
         objs.append(obj)
     

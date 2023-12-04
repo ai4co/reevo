@@ -2,25 +2,27 @@
 import sys
 import argparse
 from pathlib import Path
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 
 def paraphrase(string, num=1):
     messages = [
-        {"role": "system", "content": "Please paraphrase the following instructions while preserving their meaning. Any words surrounded by {} should also appear in your result with a similar context."},
+        {"role": "system", "content": "Please paraphrase the following instructions while strictly adhering to their meaning. Any words surrounded by {} should also appear in your result with a similar context."},
         {"role": "user", "content": string}
     ]
-    responses = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-16k-0613",
+    response = client.chat.completions.create(
+        model="gpt-4-1106-preview",
         messages=messages,
         temperature=0.7,
         n=num,
     )
-    return [choice["message"]["content"] for choice in responses["choices"]]
+    return [choice.message.content for choice in response.choices]
 
 if __name__ == "__main__":
     """
     Example usage:
-    python paraphrase.py initial_system.txt -n 3
+    python paraphrase.py prompts_constructive/initial_system.txt -n 3
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("filename", type=str, help="Path to file containing content to paraphrase")
