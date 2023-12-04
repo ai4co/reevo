@@ -4,7 +4,7 @@ import json
 import logging 
 import matplotlib.pyplot as plt
 import os
-import openai
+from openai import OpenAI
 import re
 import subprocess
 from pathlib import Path
@@ -14,6 +14,7 @@ from pprint import pprint
 
 from utils.utils import * 
 
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 ROOT_DIR = os.getcwd()
 
 @hydra.main(config_path="cfg", config_name="config", version_base="1.1")
@@ -21,8 +22,6 @@ def main(cfg):
     workspace_dir = Path.cwd()
     logging.info(f"Workspace: {workspace_dir}")
     logging.info(f"Project Root: {ROOT_DIR}")
-
-    openai.api_key = os.getenv("OPENAI_API_KEY")
 
     problem = cfg.problem.problem_name
     problem_size = cfg.problem.problem_size
@@ -72,12 +71,7 @@ def main(cfg):
                 break
             for attempt in range(1000):
                 try:
-                    response_cur = openai.ChatCompletion.create(
-                        model=model,
-                        messages=messages,
-                        temperature=cfg.temperature,
-                        n=chunk_size
-                    )
+                    response_cur = client.chat.completions.create(model=model, messages=messages, temperature=cfg.temperature, n=chunk_size)
                     total_samples += chunk_size
                     break
                 except Exception as e:
@@ -90,10 +84,10 @@ def main(cfg):
                 logging.info("Code terminated due to too many failed attempts!")
                 exit()
 
-            responses.extend(response_cur["choices"])
-            prompt_tokens = response_cur["usage"]["prompt_tokens"]
-            total_completion_token += response_cur["usage"]["completion_tokens"]
-            total_token += response_cur["usage"]["total_tokens"]
+            responses.extend(response_cur.choices)
+            prompt_tokens = response_cur.usage.prompt_tokens
+            total_completion_token += response_cur.usage.completion_tokens
+            total_token += response_cur.usage.total_tokens
 
         # Logging Token Information
         logging.info(f"Iteration {iter}: Prompt Tokens: {prompt_tokens}, Completion Tokens: {total_completion_token}, Total Tokens: {total_token}")
@@ -102,7 +96,7 @@ def main(cfg):
         response_runs = []
         inner_runs = []
         for response_id in range(cfg.sample):
-            response_cur = responses[response_id]["message"]["content"]
+            response_cur = responses[response_id].message.content
             logging.info(f"Iteration {iter}: GPT Output:\n " + response_cur)
             logging.info(f"Iteration {iter}: Processing Code Run {response_id}")
 
@@ -176,13 +170,13 @@ def main(cfg):
         logging.info(f"Iteration {iter}: Min obj: {best_obj}, Best Code Path: {best_code_path}")
         # logging.info(f"Iteration {iter}: GPT Output Content:\n" +  responses[best_sample_idx]["message"]["content"] + "\n")
             
-        if len(messages) == 2:
-            messages += [{"role": "assistant", "content": responses[best_sample_idx]["message"]["content"]}]
-            messages += [{"role": "user", "content": best_content}]
-        else:
-            assert len(messages) == 4
-            messages[-2] = {"role": "assistant", "content": responses[best_sample_idx]["message"]["content"]}
-            messages[-1] = {"role": "user", "content": best_content}
+        # if len(messages) == 2:
+        #     messages += [{"role": "assistant", "content": responses[best_sample_idx]["message"]["content"]}]
+        #     messages += [{"role": "user", "content": best_content}]
+        # else:
+        #     assert len(messages) == 4
+        #     messages[-2] = {"role": "assistant", "content": responses[best_sample_idx]["message"]["content"]}
+        #     messages[-1] = {"role": "user", "content": best_content}
 
 if __name__ == "__main__":
     main()
