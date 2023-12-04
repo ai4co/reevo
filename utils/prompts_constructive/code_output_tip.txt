@@ -1,9 +1,15 @@
-Output code only and nothing else. The code should be formatted as a Python code string: "```python ... ```"
+Begin by giving a concise and clear description of your code, followed by the code itself. Your code should be formatted as a Python code string: "```python ... ```"
+An example is given below:
 
-Some helpful tips for writing the scoring function code:
+Code description: This is the code description of your code.
+
+```python
+This is your Python code
+```
+
+Some helpful tips:
 (1) Import necessary packages and do not modify the function signature.
-(2) Be very creative and use the knowledge about the problem, if it is available.
-(3) You may avoid always acting greedily.
-(4) You may introduce new constants and IF statements into the scoring function if needed.
-(5) You may modify the values of the constants.
-(6) You may introduce sophisticated mechanisms into the function if necessary.
+(2) You may avoid always acting greedily.
+(3) You may introduce new constants and IF statements into the scoring function if needed.
+(4) You may modify the values of the constants.
+(5) You may introduce sophisticated mechanisms into the function if necessary.

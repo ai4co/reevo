@@ -1,1 +1,1 @@
-Write a scoring function for the following problem: {problem_description}.
+Write a selecting-next-node function for the following problem: {problem_description}.
