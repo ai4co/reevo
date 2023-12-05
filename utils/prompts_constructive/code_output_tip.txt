@@ -13,3 +13,4 @@ Some helpful tips:
 (3) You may introduce new constants and IF statements into the scoring function if needed.
 (4) You may modify the values of the constants.
 (5) You may introduce sophisticated mechanisms into the function if necessary.
+(6) You should be very creative.
