@@ -1,16 +1,16 @@
 Begin by giving a concise and clear description of your code, followed by the code itself. Your code should be formatted as a Python code string: "```python ... ```"
 An example is given below:
 
-Code description: This is the code description of your code.
+Code description: This is a concise code description of your code.
 
 ```python
 This is your Python code
 ```
 
 Some helpful tips:
-(1) Import necessary packages and do not modify the function signature.
+(1) Import necessary packages.
 (2) You may avoid always acting greedily.
 (3) You may introduce new constants and IF statements into the scoring function if needed.
 (4) You may modify the values of the constants.
 (5) You may introduce sophisticated mechanisms into the function if necessary.
-(6) You should be very creative.
+(6) Do not modify the function signature.
