@@ -1,6 +1,11 @@
-# Large Language Models as Hyperheuristics
+# Large Language Models as Meta-Optimizers
 
-Run `openai migrate` if your openai version < 1.0.0.
+
+
+### Dependency
+
+- Python >= 3.9
+- openai >= 1.0.0
 
 ### Acknowledgements
 
