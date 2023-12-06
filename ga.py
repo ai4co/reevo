@@ -78,6 +78,7 @@ class GA_LLM:
                 "code_path": f"problem_iter{self.iteration}_code{response_id}.py",
                 "description": desc_string,
                 "code": code_string,
+                "response": response,
             }
             population.append(individual)
         return population
@@ -122,11 +123,9 @@ class GA_LLM:
         code_string = re.search(pattern_code, response, re.DOTALL)
         code_string = code_string.group(1).strip() if code_string is not None else None
         # Regex patterns to extract code description enclosed in GPT response
-        pattern_desc = r'Code description: (.*)\n'
-        desc_string = re.search(pattern_desc, response)
+        pattern_desc = r'Code description: (.*?)```python'
+        desc_string = re.search(pattern_desc, response, re.DOTALL)
         desc_string = desc_string.group(1).strip() if desc_string is not None else None
-        assert code_string is not None, "Code string is None"
-        assert desc_string is not None, "Description string is None"
         return code_string, desc_string
 
 
@@ -143,8 +142,8 @@ class GA_LLM:
         shutil.copy(self.output_file, f"problem_iter{self.iteration}_code{response_id}.py")
         
         # Write description to file
-        with open(f"problem_iter{self.iteration}_desc{response_id}.txt", 'w') as file:
-            file.writelines(individual["description"] + '\n')
+        with open(f"problem_iter{self.iteration}_response{response_id}.txt", 'w') as file:
+            file.writelines(individual["response"] + '\n')
 
         # Execute the python file with flags
         with open(individual["stdout_filepath"], 'w') as f:
@@ -252,30 +251,34 @@ class GA_LLM:
         
         fitness_sum = sum(fitness)
         fitness_prob = [f / fitness_sum for f in fitness]
-        selected_population = np.random.choice(population, size=2*len(population), p=fitness_prob, replace=True) # 2x population size for crossover
+        selected_population = []
+        for _ in range(self.cfg.pop_size):
+            parents = np.random.choice(population, size=2, p=fitness_prob, replace=False) # 2x population size for crossover
+            selected_population.extend(parents)
+        
         assert len(selected_population) == 2*self.cfg.pop_size
         return selected_population
 
 
     def crossover(self, population: list[dict]) -> list[dict]:
-        population = []
+        crossed_population = []
         for i in range(0, len(population), 2):
             # Select two individuals
-            individual_1 = population[i]
-            individual_2 = population[i+1]
+            parent_1 = population[i]
+            parent_2 = population[i+1]
             # Crossover
             crossover_prompt = self.ga_crossover_prompt.format(
-                code1=individual_1["code"], code2=individual_2["code"],
-                description1=individual_1["description"], description2=individual_2["description"],
+                code1=parent_1["code"], code2=parent_2["code"],
+                description1=parent_1["description"], description2=parent_2["description"],
                 )
             messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": crossover_prompt}]
             responses = self.chat_completion(1, self.cfg, messages)
             # Response to individual
             individual = self.responses_to_population(responses)
-            population.extend(individual)
+            crossed_population.extend(individual)
         logging.info("Crossover user prompt: \n" + crossover_prompt)
-        assert len(population) == self.cfg.pop_size
-        return population
+        assert len(crossed_population) == self.cfg.pop_size
+        return crossed_population
 
 
     def mutate(self, population: list[dict]) -> list[dict]:
@@ -288,9 +291,9 @@ class GA_LLM:
                 messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": mutate_prompt}]
                 responses = self.chat_completion(1, self.cfg, messages)
                 # Response to individual
-                individual = self.responses_to_population(responses)
-                population[i] = individual[0]
-        logging.debug("Mutate user prompt: \n" + mutate_prompt)
+                mutated_individual = self.responses_to_population(responses)
+                population[i] = mutated_individual[0]
+                logging.info("Mutate user prompt: \n" + mutate_prompt)
         assert len(population) == self.cfg.pop_size
         return population
 
