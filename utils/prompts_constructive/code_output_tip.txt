@@ -9,8 +9,9 @@ This is your Python code
 
 Some helpful tips:
 (1) Import necessary packages.
-(2) You may introduce new constants and IF statements into the scoring function if needed.
-(3) You may modify the values of the constants.
-(4) You may introduce sophisticated mechanisms into the function if necessary.
-(5) Do not modify the function signature.
+(2) You may introduce sophisticated mechanisms into the function if necessary.
+(3) Do not modify the function signature.
+(4) Except for importing packages, you should write everything inside the function.
+(5) We only construct a solution once, so introducing stochasticity is not helpful.
+(6) You DO NOT update the input variables. For example, you DO NOT remove the selected node from the unvisited nodes.
 (6) Your code must do better than the algorithms that always act greedily. For example, DO NOT implement Nearest Neighbor heuristics.

@@ -21,7 +21,7 @@ def filter_traceback(s):
     return ''  # Return an empty string if no Traceback is found
 
 def block_until_running(stdout_filepath, log_status=False, iter_num=-1, response_id=-1):
-    # Ensure that the RL training has started before moving on
+    # Ensure that the evaluation has started before moving on
     while True:
         log = file_to_string(stdout_filepath)
         if "[*] Running ..." in log or "Traceback" in log:
