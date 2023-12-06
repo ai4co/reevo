@@ -41,8 +41,8 @@ class GA_LLM:
         initial_user = file_to_string(f'{prompt_dir}/initial_user.txt')
         self.code_output_tip = file_to_string(f'{prompt_dir}/code_output_tip.txt')
         func_signature = file_to_string(f'{problem_dir}/func_signature.txt')
-        self.system_prompt = system.format(func_signature=func_signature) + self.code_output_tip
-        initial_user = initial_user.format(problem_description=self.problem_description)
+        self.system_prompt = system.format(func_signature=func_signature)
+        initial_user = initial_user.format(problem_description=self.problem_description) + self.code_output_tip
 
         # Generate responses
         messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": initial_user}]
@@ -70,17 +70,23 @@ class GA_LLM:
         Convert responses to population
         """
         population = []
-        for response_id in range(len(responses)):
-            response = responses[response_id].message.content
-            code_string, desc_string = self.extract_code_description(response)
-            individual = {
-                "stdout_filepath": f"problem_iter{self.iteration}_stdout{response_id}.txt",
-                "code_path": f"problem_iter{self.iteration}_code{response_id}.py",
-                "description": desc_string,
-                "code": code_string,
-                "response": response,
-            }
-            population.append(individual)
+        response_id = 0
+        for response in responses:
+            content = response.message.content
+            code_string, desc_string = self.extract_code_description(content)
+            if code_string and desc_string:
+                individual = {
+                    "stdout_filepath": f"problem_iter{self.iteration}_stdout{response_id}.txt",
+                    "code_path": f"problem_iter{self.iteration}_code{response_id}.py",
+                    "description": desc_string,
+                    "code": code_string,
+                    "response": content,
+                }
+                population.append(individual)
+                # Write response to file for bookkeeping
+                with open(f"problem_iter{self.iteration}_response{response_id}.txt", 'w') as file:
+                    file.writelines(individual["response"] + '\n')
+                response_id += 1
         return population
 
     def evaluate_population(self, population) -> list[float]:
@@ -90,12 +96,23 @@ class GA_LLM:
         inner_runs = []
         # Run code and evaluate population
         for response_id in range(len(population)):
-            process = self.run_code(population[response_id], response_id)
-            inner_runs.append(process)
+            try:
+                process = self.run_code(population[response_id], response_id)
+                inner_runs.append(process)
+            except Exception as e: # If code execution fails
+                logging.info(f"Error for response_id {response_id}: {e}")
+                individual = population[response_id]
+                individual["exec_success"] = False
+                individual["obj"] = float("inf")
+                individual["fitness"] = 0
+                individual["traceback_msg"] = str(e)
+                inner_runs.append(None)
         
         # Update population with objective values and fitness
         for response_id, inner_run in enumerate(inner_runs):
-            inner_run.communicate()
+            if inner_run is None: # If code execution fails, skip
+                continue
+            inner_run.communicate() # Wait for code execution to finish
             individual = population[response_id]
             stdout_filepath = individual["stdout_filepath"]
             with open(stdout_filepath, 'r') as f:  # read the stdout file
@@ -106,10 +123,13 @@ class GA_LLM:
             # Store objective value and fitness for each individual
             if traceback_msg == '': # If execution has no error
                 individual["exec_success"] = True
-                individual["obj"] = float(stdout_str.split('\n')[-2])
-                assert individual["obj"] != 0, "Objective value <= 0 is not supported."
+                try:
+                    individual["obj"] = float(stdout_str.split('\n')[-2])
+                    assert individual["obj"] != 0, "Objective value <= 0 is not supported."
+                except:
+                    individual["obj"] = float("inf")
                 individual["fitness"] = 1 / individual["obj"]
-            else:                   # Otherwise, also provide execution traceback error feedback
+            else: # Otherwise, also provide execution traceback error feedback
                 individual["traceback_msg"] = traceback_msg
                 individual["exec_success"] = False
                 individual["obj"] = float("inf")
@@ -140,10 +160,6 @@ class GA_LLM:
             
         # Copy the generated code to hydra output directory for bookkeeping
         shutil.copy(self.output_file, f"problem_iter{self.iteration}_code{response_id}.py")
-        
-        # Write description to file
-        with open(f"problem_iter{self.iteration}_response{response_id}.txt", 'w') as file:
-            file.writelines(individual["response"] + '\n')
 
         # Execute the python file with flags
         with open(individual["stdout_filepath"], 'w') as f:
@@ -234,20 +250,35 @@ class GA_LLM:
             adjusted_fitness[i] = fitness[i] / m_i if m_i != 0 else fitness[i]
 
         return adjusted_fitness.tolist()
+    
+    
+    def random_select(self, population: list[dict]) -> list[dict]:
+        """
+        Random selection, select individuals with equal probability
+        """
+        selected_population = []
+        for _ in range(self.cfg.pop_size):
+            parents = np.random.choice(population, size=2, replace=False)
+            selected_population.extend(parents)
+        assert len(selected_population) == 2*self.cfg.pop_size
+        return selected_population
 
 
     def select(self, population: list[dict]) -> list[dict]:
         """
         Roulette selection, select individuals with probability proportional to their fitness
         """
+        # Eliminate those without description (description is None or "")
+        population = [individual for individual in population if individual["description"] is not None and individual["description"] != ""]
+        
         similarity_matrix = self.compute_similarity([individual["description"] for individual in population], self.client)
-        logging.debug("Similarity Matrix: \n" + str(similarity_matrix))
+        logging.info("Similarity Matrix: \n" + str(similarity_matrix))
         
         fitness = [individual["fitness"] for individual in population]
-        logging.debug("Fitness before sharing: \n" + str(fitness))
+        logging.info("Fitness before sharing: \n" + str(fitness))
         
         fitness = self.fitness_sharing(similarity_matrix, fitness)
-        logging.debug("Fitness after sharing: \n" + str(fitness))
+        logging.info("Fitness after sharing: \n" + str(fitness))
         
         fitness_sum = sum(fitness)
         fitness_prob = [f / fitness_sum for f in fitness]
@@ -270,13 +301,13 @@ class GA_LLM:
             crossover_prompt = self.ga_crossover_prompt.format(
                 code1=parent_1["code"], code2=parent_2["code"],
                 description1=parent_1["description"], description2=parent_2["description"],
-                )
+                ) + self.code_output_tip
             messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": crossover_prompt}]
             responses = self.chat_completion(1, self.cfg, messages)
             # Response to individual
             individual = self.responses_to_population(responses)
             crossed_population.extend(individual)
-        logging.info("Crossover user prompt: \n" + crossover_prompt)
+        # logging.info("Crossover user prompt: \n" + crossover_prompt)
         assert len(crossed_population) == self.cfg.pop_size
         return crossed_population
 
@@ -287,13 +318,13 @@ class GA_LLM:
             individual = population[i]
             # Mutate
             if np.random.uniform() < mutation_rate:
-                mutate_prompt = self.ga_mutate_prompt.format(code=individual["code"], description=individual["description"])
+                mutate_prompt = self.ga_mutate_prompt.format(code=individual["code"], description=individual["description"]) + self.code_output_tip
                 messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": mutate_prompt}]
                 responses = self.chat_completion(1, self.cfg, messages)
                 # Response to individual
                 mutated_individual = self.responses_to_population(responses)
                 population[i] = mutated_individual[0]
-                logging.info("Mutate user prompt: \n" + mutate_prompt)
+                # logging.info("Mutate user prompt: \n" + mutate_prompt)
         assert len(population) == self.cfg.pop_size
         return population
 
@@ -301,7 +332,7 @@ class GA_LLM:
     def evolve(self):
         while self.iteration < self.cfg.max_iter:
             # Select
-            selected_population = self.select(self.population)
+            selected_population = self.random_select(self.population)
             # Crossover
             crossed_population = self.crossover(selected_population)
             # Mutate
