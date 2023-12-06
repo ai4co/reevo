@@ -174,7 +174,7 @@ class GA_LLM:
 
         # Execute the python file with flags
         with open(individual["stdout_filepath"], 'w') as f:
-            process = subprocess.Popen(['python', '-u', f'{self.root_dir}/problems/{self.cfg.problem.problem_name}/eval.py', f'{self.problem_size}', self.root_dir],
+            process = subprocess.Popen(['python', '-u', f'{self.root_dir}/problems/{self.problem}/eval.py', f'{self.problem_size}', self.root_dir],
                                         stdout=f, stderr=f)
 
         block_until_running(individual["stdout_filepath"], log_status=True, iter_num=self.iteration, response_id=response_id)
@@ -345,7 +345,7 @@ class GA_LLM:
     def evolve(self):
         while self.iteration < self.cfg.max_iter:
             # Select
-            selected_population = self.select(self.population)
+            selected_population = self.random_select(self.population)
             # Crossover
             crossed_population = self.crossover(selected_population)
             # Mutate
@@ -355,6 +355,7 @@ class GA_LLM:
             # Update
             self.population = population
             self.update_iter()
+        return self.best_code_overall, self.best_desc_overall, self.best_code_path_overall
 
 
     @staticmethod

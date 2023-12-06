@@ -3,6 +3,7 @@ import logging
 import matplotlib.pyplot as plt
 import os
 from pathlib import Path
+import subprocess
 
 from ga import GA_LLM
 
@@ -18,7 +19,23 @@ def main(cfg):
     logging.info(f"Using LLM: {cfg.model}")
     
     ga = GA_LLM(cfg, ROOT_DIR)
-    ga.evolve()
+    best_code_overall, best_desc_overall, best_code_path_overall = ga.evolve()
+    logging.info(f"Best Code Overall: {best_code_overall}")
+    logging.info(f"Best Description Overall: {best_desc_overall}")
+    logging.info(f"Best Code Path Overall: {best_code_path_overall}")
+    
+    with open(f"{ROOT_DIR}/problems/{cfg.problem.problem_name}/{cfg.suffix.lower()}.py", 'w') as file:
+        file.writelines(best_code_overall + '\n')
+    # run test script and redirect stdout to a file "best_code_overall_stdout.txt"
+    test_script = f"{ROOT_DIR}/problems/{cfg.problem.problem_name}/test.py"
+    test_script_stdout = "best_code_overall_stdout.txt"
+    with open(test_script_stdout, 'w') as stdout:
+        subprocess.run(["python", test_script, ROOT_DIR], stdout=stdout)
+    # read the stdout file
+    with open(test_script_stdout, 'r') as file:
+        stdout = file.read()
+    logging.info("\n" + stdout)
+        
     
 
 if __name__ == "__main__":
