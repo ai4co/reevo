@@ -5,6 +5,7 @@ from scipy.spatial import distance_matrix
 
 from gpt import scoring_function
 
+from tqdm import tqdm
 
 N_ITERATIONS = 100
 N_ANTS = 30

@@ -384,7 +384,7 @@ class GA_LLM:
 
 
     def evolve(self):
-        while self.iteration < self.cfg.max_iter:
+        while self.function_evals < self.cfg.max_fe:
             # Diversify
             self.population = self.diversify(self.population) if self.cfg.diversify else self.population
             # Select
