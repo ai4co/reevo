@@ -6,8 +6,8 @@ from scipy.spatial import distance_matrix
 from gpt import scoring_function
 
 
-N_ITERATIONS = 200
-N_ANTS = 20
+N_ITERATIONS = 100
+N_ANTS = 30
 
 
 if __name__ == "__main__":
@@ -24,6 +24,7 @@ if __name__ == "__main__":
     objs = []
     for i, node_pos in enumerate(node_positions):
         dist_mat = distance_matrix(node_pos, node_pos)
+        dist_mat[np.diag_indices_from(dist_mat)] = np.inf # Note: Set diagonal to inf
         heuristics = scoring_function(dist_mat)
         aco = ACO(dist_mat, heuristics, n_ants=N_ANTS)
         obj = aco.run(N_ITERATIONS)
