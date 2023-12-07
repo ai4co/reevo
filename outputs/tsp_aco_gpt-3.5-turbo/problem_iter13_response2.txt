@@ -1,0 +1,60 @@
+Code description: In this improved scoring function, I will combine the ideas from both Algorithm 1 and Algorithm 2 to create a better scoring function. The scoring function will calculate the inverse distances of each edge, similar to Algorithm 2. Additionally, I will include the degree centrality of both the source and destination nodes, analogous to the degree centrality measure in Algorithm 1. The degree centrality measure indicates how well-connected a node is to other nodes, and we will use it to prioritize edges with nodes that have a high degree centrality.
+
+```python
+import numpy as np
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+    
+    # Compute the shortest path lengths between all nodes using Floyd-Warshall algorithm
+    shortest_paths = np.copy(distance_matrix)
+    for k in range(n_nodes):
+        for i in range(n_nodes):
+            for j in range(n_nodes):
+                shortest_paths[i, j] = min(shortest_paths[i, j], shortest_paths[i, k] + shortest_paths[k, j])
+                
+    # Compute the degree centrality of each node
+    degree_centrality = np.sum(1 / shortest_paths, axis=0) / n_nodes
+    
+    # Calculate the inverse distances
+    inverse_distances = 1 / distance_matrix
+    np.fill_diagonal(inverse_distances, 0)
+    
+    # Initialize the heuristic measures matrix
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    # Calculate the heuristic measure for each edge
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            if i != j:
+                heuristics[i, j] = inverse_distances[i, j] * (degree_centrality[i] + degree_centrality[j])
+    
+    # Normalize the heuristic measures so that they sum up to 1
+    heuristics /= np.sum(heuristics)
+    
+    return heuristics
+```
+
+In this improved scoring function, I have modified the way the heuristic measures are calculated. The degree centrality of both the source and destination nodes is included as a factor in the calculation. The degree centrality indicates how well-connected a node is to other nodes in the graph. By considering the degree centrality of both the source and destination nodes, we can capture the importance of both distance and connectivity in determining the quality of each edge.
+
+The algorithm first computes the shortest path lengths between all nodes using the Floyd-Warshall algorithm. This allows us to calculate the degree centrality for each node by summing the inverse distances of all other nodes from that node and dividing by the total number of nodes. 
+
+Next, the inverse distances are calculated as 1 / distance_matrix, with the diagonal elements set to 0. This is followed by the initialization of the heuristic measures matrix.
+
+Finally, the heuristic measure for each edge is calculated using the formula: inverse distance * (degree centrality of source node + degree centrality of destination node). This calculation captures the importance of both distance and connectivity.
+
+The heuristic measures are then normalized so that they sum up to 1, ensuring that the heuristic measures can be interpreted as probabilities.

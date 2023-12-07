@@ -1,0 +1,48 @@
+Code description: In this improved scoring function, I will incorporate the concept of edge centrality from Algorithm 1 into Algorithm 2. This will capture both local and global properties of the TSP instance, leading to a more effective scoring function. Specifically, I will compute the edge centrality measure by dividing the sum of the inverse distances by the sum of all inverse distances. Then, I will multiply the edge centrality measure with the node scores to calculate the heuristic measures. This modified scoring function will provide better estimates of the edge quality.
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+
+    # Compute the sum of the inverse distances
+    sum_inverse_distances = np.sum(inverse_distance_matrix)
+
+    # Compute the edge centrality measure
+    edge_centrality = np.sum(inverse_distance_matrix, axis=1) / sum_inverse_distances
+
+    # Compute the average distance to other nodes for each node
+    average_distance = np.sum(inverse_distance_matrix, axis=1) / (n_nodes - 1)
+
+    # Repeat the average distances for each edge
+    edge_average_distance = np.repeat(average_distance[:, np.newaxis], n_nodes, axis=1)
+
+    # Compute the node scores by summing the average distances
+    node_scores = np.sum(edge_average_distance, axis=1)
+
+    # Repeat the node scores for each edge
+    edge_scores = np.repeat(node_scores[:, np.newaxis], n_nodes, axis=1)
+
+    # Multiply the edge centrality measure with the node scores
+    heuristics = edge_centrality[:, np.newaxis] * edge_scores * edge_average_distance
+
+    return heuristics
+```
+

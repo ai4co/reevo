@@ -1,0 +1,68 @@
+Code description: 
+This improved scoring function takes inspiration from both Algorithm 1 and Algorithm 2. It incorporates several factors such as the inverse distances, node degrees, hop count between nodes, and edge centrality to provide a comprehensive assessment of each edge's potential usefulness. By combining these factors, the scoring function aims to capture both local and global properties of the TSP instance.
+
+```python
+import numpy as np
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+
+    # Compute the degree of each node
+    node_degrees = np.count_nonzero(distance_matrix, axis=1)
+
+    # Compute the hop count between nodes
+    hop_count = np.zeros((n_nodes, n_nodes), dtype=int)
+    
+    # Construct the graph using the distance matrix
+    graph = nx.from_numpy_matrix(distance_matrix, create_using=nx.Graph)
+
+    # Calculate shortest path lengths using networkx library
+    path_lengths = dict(nx.all_pairs_shortest_path_length(graph))
+
+    # Compute the hop count
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            hop_count[i, j] = path_lengths[i][j]
+
+    # Compute the sum of distances to other nodes for each node
+    node_scores = np.sum(inverse_distance_matrix, axis=1)
+
+    # Compute the average distance of connected nodes for each node
+    connected_nodes_avg_distance = np.sum(inverse_distance_matrix, axis=1) / (n_nodes - 1)
+
+    # Compute the edge centrality measure
+    edge_centrality = np.sum(inverse_distance_matrix, axis=1) / np.sum(inverse_distance_matrix)
+
+    # Repeat the node scores for each edge
+    edge_scores = np.repeat(node_scores[:, np.newaxis], n_nodes, axis=1)
+
+    # Calculate the heuristic measures
+    heuristics = (inverse_distance_matrix * (1 / node_degrees[:, np.newaxis]) * hop_count * edge_scores) / (
+                edge_scores ** 2)
+
+    # Multiply the node degrees with the heuristic measures
+    heuristics *= node_degrees[:, np.newaxis]
+
+    # Multiply the edge centrality with the heuristic measures
+    heuristics *= edge_centrality[:, np.newaxis]
+
+    return heuristics
+```
+

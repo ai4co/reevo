@@ -1,0 +1,88 @@
+Code description: The improved scoring function combines the measures from Algorithm 1 and Algorithm 2. It considers the shortest path lengths, degree centrality, edge density, clustering coefficient, edge importance, edge similarity, connectivity information, inverse distances, node degrees, and total centrality. Additionally, it normalizes the measures to ensure that all values are in the same range. By combining these measures and normalizing them, the scoring function can provide a more comprehensive and effective ranking of the edges.
+
+```python
+import numpy as np
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+
+    def normalize(matrix: np.ndarray) -> np.ndarray:
+        # Normalize matrix to [0, 1]
+        return (matrix - np.min(matrix)) / (np.max(matrix) - np.min(matrix))
+
+    n_nodes = distance_matrix.shape[0]
+
+    # Compute the shortest path lengths between all nodes using Floyd-Warshall algorithm
+    shortest_paths = np.copy(distance_matrix)
+    for k in range(n_nodes):
+        for i in range(n_nodes):
+            for j in range(n_nodes):
+                shortest_paths[i, j] = min(shortest_paths[i, j], shortest_paths[i, k] + shortest_paths[k, j])
+
+    # Normalize the shortest path lengths
+    shortest_paths = normalize(shortest_paths)
+
+    # Calculate the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+
+    # Compute the degree centrality of each node
+    degree_centrality = np.sum(1 / shortest_paths, axis=0) / n_nodes
+
+    # Create a graph from the distance matrix
+    graph = nx.from_numpy_array(distance_matrix)
+
+    # Compute edge density and clustering coefficient
+    edge_density = np.mean([graph.degree[node] for node in graph]) / (n_nodes - 1)
+    clustering_coefficient = np.array([nx.clustering(graph, node) for node in range(n_nodes)])
+
+    # Compute the degree of each node
+    node_degrees = np.count_nonzero(distance_matrix, axis=1) - 1  # Subtract 1 to exclude self-loop
+
+    # Compute the number of common neighbors for each edge
+    common_neighbors = np.zeros((n_nodes, n_nodes), dtype=int)
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            common_neighbors[i, j] = len(list(nx.common_neighbors(graph, i, j)))
+
+    # Compute the edge importance measure
+    edge_importance = node_degrees[:, np.newaxis] + node_degrees + inverse_distance_matrix
+    edge_importance[distance_matrix == np.inf] = 0
+
+    # Normalize the edge importance measure
+    edge_importance = normalize(edge_importance)
+
+    # Compute the edge similarity measure
+    edge_similarity = common_neighbors / np.sqrt(node_degrees[:, np.newaxis] * node_degrees)
+
+    # Normalize the edge similarity measure
+    edge_similarity = normalize(edge_similarity)
+
+    # Calculate the connectivity information
+    connectivity = np.zeros((n_nodes, n_nodes))
+    degrees = np.sum(distance_matrix > 0, axis=1)
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            common_neighbors = len(set(np.where(distance_matrix[i] > 0)[0]) & set(np.where(distance_matrix[j] > 0)[0]))
+            connectivity[i, j] = 1 / ((degrees[i] + degrees[j]) * (common_neighbors + 1))
+
+    # Normalize the connectivity information
+    connectivity = normalize(connectivity)
+
+    # Calculate the heuristic measures
+    heuristics = shortest_paths * degree_centrality * edge_density * clustering_coefficient * edge_importance * edge_similarity * connectivity
+
+    return heuristics
+```

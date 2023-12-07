@@ -1,0 +1,36 @@
+Code description: In this improved scoring function, I will combine the ideas from Algorithm 1 and Algorithm 2 to create a better scoring function. The scoring function will first calculate the inverse distances of each edge, similar to Algorithm 2. Then, instead of generating random permutations of nodes, I will use the heuristic measures calculated in Algorithm 1. The heuristic measures will now be obtained by multiplying the inverse distances with the heuristic measure of the destination node - the product of the inverse distance and the inverse number of connections. This way, I can take into account both the distance and the number of connections of the destination node, prioritizing edges that have a close destination node with fewer connections.
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+    
+    # Calculate the inverse distances
+    inverse_distances = 1 / distance_matrix
+    np.fill_diagonal(inverse_distances, 0)
+    
+    # Initialize the node scores and node degrees matrices
+    node_scores = np.zeros(n_nodes, dtype=float)
+    node_degrees = np.zeros(n_nodes, dtype=int)
+    
+    # Compute the sum of inverse distances and node degrees for each node
+    node_scores = np.sum(inverse_distances, axis=1)
+    node_degrees = np.sum(distance_matrix != np.inf, axis=1)
+    
+    # Repeat node scores and node degrees for each edge
+    edge_scores = np.repeat(node_scores[:, np.newaxis], n_nodes, axis=1)
+    edge_degrees = np.repeat(node_degrees[:, np.newaxis], n_nodes, axis=1)
+    
+    # Compute the heuristic measures for each edge
+    heuristics = inverse_distances * (edge_scores / (distance_matrix * (1 + edge_degrees)))
+    
+    return heuristics
+```
+The code starts by calculating the inverse distances of each edge in the distance matrix. The diagonal elements are set to 0 to avoid division by zero later on. 
+
+Next, we initialize two arrays, `node_scores` and `node_degrees`, to store the sum of inverse distances and the number of connections for each node, respectively. `node_scores` is computed by summing up the inverse distances for each node, while `node_degrees` is computed by counting the number of non-infinite elements in each row of the distance matrix.
+
+To compute the heuristic measures for each edge, we repeat the `node_scores` and `node_degrees` arrays for each edge using numpy's `repeat` function. We then calculate the heuristic measure for each edge by multiplying the inverse distance with the ratio of `node_scores` to (`distance_matrix` multiplied by `(1 + edge_degrees)`). This ratio incorporates both the inverse distance and the inverse number of connections of the destination node.
+
+Finally, the calculated heuristic measures are returned as the output.

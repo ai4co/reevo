@@ -1,0 +1,44 @@
+Code description: In this improved scoring function, I will combine the edge importance concept from Algorithm 1 with the hop count and edge centrality measures from Algorithm 2. The edge importance is determined by the inverse of the edge distance, which captures the significance of each edge. The hop count measures the number of edges in the shortest path between two nodes, while edge centrality measures the importance of an edge in the overall graph structure. By considering these factors, the scoring function aims to provide a comprehensive assessment of each edge's potential usefulness in the TSP instance.
+
+```python
+import numpy as np
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+
+    # Compute the hop count between nodes
+    hop_count = np.zeros((n_nodes, n_nodes), dtype=int)
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            if i != j:
+                hop_count[i, j] = nx.shortest_path_length(nx.from_numpy_matrix(distance_matrix), i, j)
+
+    # Compute the edge importance measure
+    edge_importance = inverse_distance_matrix
+
+    # Compute the edge centrality measure
+    edge_centrality = np.sum(inverse_distance_matrix, axis=1) / np.sum(inverse_distance_matrix)
+
+    # Calculate the heuristic measures
+    heuristics = edge_importance * hop_count * edge_centrality
+
+    return heuristics
+```
+

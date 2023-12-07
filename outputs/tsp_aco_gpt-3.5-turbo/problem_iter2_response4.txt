@@ -1,0 +1,38 @@
+Code description: In this novel scoring function, I propose to incorporate a combination of the two existing algorithms. The idea behind this combination is to leverage both the hop count and the nearest neighbor rule to determine the heuristic values for each edge. The hop count takes into account the number of edges between nodes, while the nearest neighbor rule prioritizes edges that are closer to the nearest neighbor. By combining these two measures, we aim to identify edges that connect nodes that are both close in terms of hops and have a shorter distance to their nearest neighbor.
+
+```python
+import numpy as np
+from scipy.spatial.distance import squareform
+
+def scoring_function(distance_matrix):
+    n_nodes = distance_matrix.shape[0]
+
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+    
+    # Compute the average distance of connected nodes for each node
+    connected_nodes_avg_distance = np.sum(inverse_distance_matrix, axis=1) / (n_nodes - 1)
+    
+    # Compute the hop count between nodes
+    hop_count = np.zeros((n_nodes, n_nodes), dtype=int)
+    for hop in range(1, n_nodes):
+        hop_count += (distance_matrix <= hop)
+    
+    # Compute the sum of distances to other nodes for each node
+    node_scores = np.sum(inverse_distance_matrix, axis=1)
+    
+    # Repeat the node scores for each edge
+    edge_scores = np.repeat(node_scores[:, np.newaxis], n_nodes, axis=1)
+    
+    # Find the nearest neighbor for each node
+    nearest_neighbors = np.argmin(distance_matrix, axis=1)
+    
+    # Compute the heuristic measures for each edge
+    heuristics = (inverse_distance_matrix * connected_nodes_avg_distance[:, np.newaxis] * hop_count * (1 / distance_matrix)) / edge_scores
+    
+    # Set infinity to diagonal elements
+    np.fill_diagonal(heuristics, np.inf)
+
+    return heuristics
+```
+Note: I modified the computation of the heuristic measures by including the nearest neighbor rule using (1 / distance_matrix). I also set the diagonal elements of the heuristics matrix to infinity, as they don't represent edges in the TSP problem.

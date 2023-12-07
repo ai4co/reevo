@@ -1,0 +1,131 @@
+Code description: In this improved scoring function, I will combine the ideas from both Algorithm 1 and Algorithm 2 to create a better scoring function. The scoring function will calculate the inverse distances of each edge, similar to Algorithm 2. Additionally, I will include the degree centrality of the destination node, analogous to the degree centrality measure in Algorithm 1. The degree centrality measure indicates how well-connected the destination node is to other nodes, and we will use it to prioritize edges with destination nodes that have a high degree centrality.
+
+```python
+import numpy as np
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+    
+    # Compute the shortest path lengths between all nodes using Floyd-Warshall algorithm
+    shortest_paths = np.copy(distance_matrix)
+    for k in range(n_nodes):
+        for i in range(n_nodes):
+            for j in range(n_nodes):
+                shortest_paths[i, j] = min(shortest_paths[i, j], shortest_paths[i, k] + shortest_paths[k, j])
+                
+    # Compute the degree centrality of each node
+    degree_centrality = np.sum(1 / shortest_paths, axis=0) / n_nodes
+    
+    # Calculate the inverse distances
+    inverse_distances = 1 / distance_matrix
+    np.fill_diagonal(inverse_distances, 0)
+    
+    # Initialize the heuristic measures matrix
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    # Calculate the heuristic measure for each edge
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            if i != j:
+                heuristics[i, j] = inverse_distances[i, j] * degree_centrality[j]
+    
+    # Normalize the heuristic measures so that they sum up to 1
+    heuristics /= np.sum(heuristics)
+    
+    return heuristics
+```
+
+```python
+import numpy as np
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+
+    # Compute the degree centrality of each node
+    degree_centrality = np.sum(distance_matrix != np.inf, axis=0) / (n_nodes - 1)
+
+    # Calculate the inverse distances
+    inverse_distances = 1 / distance_matrix
+    np.fill_diagonal(inverse_distances, 0)
+
+    # Initialize the heuristic measures matrix
+    heuristics = np.zeros((n_nodes, n_nodes))
+
+    # Calculate the heuristic measure for each edge using vectorization
+    heuristics = inverse_distances * (degree_centrality + degree_centrality[:, np.newaxis])
+
+    # Normalize the heuristic measures so that they sum up to 1
+    heuristics /= np.sum(heuristics)
+
+    return heuristics
+```
+
+-----
+
+The code below is a novel static scoring function that combines the improvements from both Algorithm 1 and Algorithm 2. It calculates the inverse distances of each edge and includes the degree centrality of both the source and destination nodes.
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+    
+    # Compute the inverse distances
+    inverse_distances = 1 / distance_matrix
+    np.fill_diagonal(inverse_distances, 0)
+    
+    # Calculate the degree centrality of source and destination nodes
+    degree_centrality_source = np.sum(inverse_distances != 0, axis=0) / n_nodes
+    degree_centrality_destination = np.sum(inverse_distances != 0, axis=1) / n_nodes
+    
+    # Calculate the heuristic measures using degree centrality and inverse distances
+    heuristics = np.outer(degree_centrality_source, degree_centrality_destination) * inverse_distances
+    
+    # Normalize the heuristic measures so that they sum up to 1
+    heuristics /= np.sum(heuristics)
+    
+    return heuristics
+```
+
+The improved scoring function takes as input a distance matrix, where the diagonal elements are set to infinity. It first calculates the inverse distances of each edge in the distance matrix and sets the diagonal elements to zero. Then, it calculates the degree centrality of both the source and destination nodes by counting the number of non-zero distances connected to each node and averaging it by the total number of nodes. Next, it calculates the heuristic measures by taking the outer product of the degree centrality vectors and multiplying it by the inverse distances. Finally, it normalizes the heuristic measures so that they sum up to 1 and returns the resulting matrix.

@@ -1,0 +1,60 @@
+Code description: The crossover code integrates elements from both Algorithm 1 and Algorithm 2 to create a novel scoring function. It incorporates the inverse distances, the degree centrality, and the clustering coefficient of nodes to calculate the heuristic measures for each edge. Furthermore, it considers the edge importance measure and the closeness centrality of nodes. The edge importance measure combines the node degrees and the distance between nodes, while the closeness centrality measures how close a node is to all other nodes. The heuristics are computed by combining these measures and normalizing them to sum up to 1.
+
+```python
+import numpy as np
+import networkx as nx
+from scipy.sparse import csgraph
+from sklearn.preprocessing import normalize
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+    
+    # Compute the inverse of the distance matrix
+    inverse_distances = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+    
+    # Compute the degree centrality of each node
+    degree_centrality = np.sum(inverse_distances, axis=0) / (n_nodes - 1)
+    
+    # Compute the number of connections for each node
+    node_degrees = np.count_nonzero(distance_matrix, axis=1) - 1  # Subtract 1 to exclude self-loop
+    
+    # Create a graph from the distance matrix
+    graph = nx.from_numpy_array(distance_matrix)
+    
+    # Compute the clustering coefficient of each node
+    clustering_coefficient = np.array([nx.clustering(graph, node) for node in range(n_nodes)])
+    
+    # Compute the closeness centrality of each node
+    closeness_centrality = csgraph.shortest_path(distance_matrix, directed=False)
+    closeness_centrality = 1 / np.average(closeness_centrality, axis=1)
+    
+    # Compute the edge importance measure
+    edge_importance = np.zeros((n_nodes, n_nodes))
+    max_node_score = np.max(node_degrees)
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            distance_score = 1 / (distance_matrix[i,j] + 1)
+            edge_importance[i, j] = (node_degrees[i] + node_degrees[j]) / (2 * max_node_score) * distance_score
+    
+    # Calculate the heuristic measures
+    heuristics = inverse_distances * degree_centrality * clustering_coefficient[:, np.newaxis] * closeness_centrality[np.newaxis, :]
+    
+    # Normalize the heuristic measures so that they sum up to 1
+    heuristics = normalize(heuristics, norm='l1', axis=1)
+    
+    return heuristics
+```
+

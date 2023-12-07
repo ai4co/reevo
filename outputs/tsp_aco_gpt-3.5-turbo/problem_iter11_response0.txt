@@ -1,0 +1,54 @@
+Code description: In this improved scoring function, I will incorporate both the edge importance measure and the edge similarity measure from Algorithm 1. The edge importance measure captures the significance of each edge based on the importance of its endpoints, while the edge similarity measure captures the similarity between the endpoints based on their common neighbors. By combining these measures, the scoring function aims to provide a comprehensive evaluation of each edge's potential usefulness in the TSP instance.
+
+```python
+import numpy as np
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+
+    # Compute the degree of each node
+    node_degrees = np.count_nonzero(distance_matrix, axis=1) - 1  # Subtract 1 to exclude self-loop
+
+    # Construct the graph using the distance matrix
+    graph = nx.from_numpy_array(distance_matrix)
+
+    # Compute the number of common neighbors for each edge
+    common_neighbors = np.zeros((n_nodes, n_nodes), dtype=int)
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            common_neighbors[i, j] = len(list(nx.common_neighbors(graph, i, j)))
+
+    # Compute the edge importance measure
+    edge_importance = np.zeros((n_nodes, n_nodes))
+    max_node_score = np.max(node_degrees)
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            edge_importance[i, j] = (node_degrees[i] + node_degrees[j]) / (2 * max_node_score)
+
+    # Compute the edge similarity measure
+    edge_similarity = common_neighbors / np.sqrt(node_degrees[:, np.newaxis] * node_degrees)
+
+    # Calculate the heuristic measures
+    heuristics = edge_importance * edge_similarity
+
+    return heuristics
+```
+
+The resulting code is a combination of the edge importance measure from Algorithm 1 and the edge similarity measure from Algorithm 2. It computes the inverse distance matrix, node degrees, and common neighbors for each edge. It then uses these values to calculate the edge importance measure and the edge similarity measure. Finally, it combines these measures to obtain the heuristic measures for all edges. The resulting heuristic measures provide a comprehensive evaluation of each edge's potential usefulness in the TSP instance.

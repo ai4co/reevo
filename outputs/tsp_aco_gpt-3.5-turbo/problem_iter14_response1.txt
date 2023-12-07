@@ -1,0 +1,55 @@
+Code description: 
+In this improved scoring function, I will incorporate the idea of node centrality to assign higher scores to edges leading to nodes that are more central in the graph. To calculate node centrality, I will use the eigenvector centrality measure. Eigenvector centrality considers not only the number of connections a node has but also the importance of those connections. By combining the eigenvector centrality with the inverse distance between nodes, I will obtain a more comprehensive scoring measure.
+
+```python
+import numpy as np
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+    
+    # Compute the shortest path lengths between all nodes using Floyd-Warshall algorithm
+    shortest_paths = np.copy(distance_matrix)
+    for k in range(n_nodes):
+        for i in range(n_nodes):
+            for j in range(n_nodes):
+                shortest_paths[i, j] = min(shortest_paths[i, j], shortest_paths[i, k] + shortest_paths[k, j])
+                
+    # Create the graph from the distance matrix
+    G = nx.from_numpy_array(distance_matrix)
+    
+    # Calculate the eigenvector centrality of each node
+    eig_centrality = nx.eigenvector_centrality_numpy(G)
+    
+    # Calculate the inverse distances
+    inverse_distances = 1 / distance_matrix
+    np.fill_diagonal(inverse_distances, 0)
+    
+    # Initialize the heuristic measures matrix
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    # Calculate the heuristic measure for each edge
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            if i != j:
+                heuristics[i, j] = inverse_distances[i, j] * eig_centrality[j]
+    
+    # Normalize the heuristic measures so that they sum up to 1
+    heuristics /= np.sum(heuristics)
+    
+    return heuristics
+```
+

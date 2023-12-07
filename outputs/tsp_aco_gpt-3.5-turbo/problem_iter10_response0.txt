@@ -1,0 +1,74 @@
+Code description: I will combine the ideas from Algorithm 1 and Algorithm 2 to create a better scoring function. The scoring function will incorporate the average distance between nodes and the clustering coefficient of each node from Algorithm 1, as well as the inverse distance of each edge and the number of connections of the destination node from Algorithm 2. The heuristic measures will be obtained by multiplying these factors with appropriate weights, similar to Algorithm 1.
+
+```python
+import numpy as np
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges.
+    """
+    n_nodes = distance_matrix.shape[0]
+
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+
+    # Compute the degree of each node
+    node_degrees = np.count_nonzero(distance_matrix, axis=1)
+
+    # Compute the hop count between nodes
+    hop_count = np.zeros((n_nodes, n_nodes), dtype=int)
+
+    # Construct the graph using the distance matrix
+    graph = nx.from_numpy_matrix(distance_matrix, create_using=nx.Graph)
+
+    # Calculate shortest path lengths using networkx library
+    path_lengths = dict(nx.all_pairs_shortest_path_length(graph))
+
+    # Compute the hop count
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            hop_count[i, j] = path_lengths[i][j]
+
+    # Compute the sum of distances to other nodes for each node
+    node_scores = np.sum(inverse_distance_matrix, axis=1)
+
+    # Compute the average distance between nodes
+    average_distance = np.mean(distance_matrix)
+
+    # Compute the centroid of the graph
+    centroid = np.mean(distance_matrix, axis=0)
+
+    # Compute the clustering coefficient of each node
+    clustering_coefficients = np.array(list(nx.clustering(graph).values()))
+
+    # Define weights for the factors
+    weight_distance = 0.4
+    weight_degree = 0.2
+    weight_hop = 0.1
+    weight_average_distance = 0.15
+    weight_centroid = 0.1
+    weight_clustering = 0.05
+
+    # Calculate the heuristic measures
+    heuristics = (weight_distance * inverse_distance_matrix / (distance_matrix * node_degrees[:, np.newaxis])) \
+        + (weight_degree * node_degrees / np.max(node_degrees)) \
+        + (weight_hop * hop_count / np.max(hop_count)) \
+        + (weight_average_distance * inverse_distance_matrix / average_distance) \
+        + (weight_centroid * inverse_distance_matrix / centroid) \
+        + (weight_clustering * clustering_coefficients[:, np.newaxis])
+
+    return heuristics
+```
+
+Note: I have modified the weights for each factor to better balance their contributions.

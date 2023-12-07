@@ -1,0 +1,50 @@
+Code description: My modified code aims to improve the accuracy of the heuristic measures by incorporating additional information into the calculation. 
+
+The modified code takes the following steps:
+
+1. Compute the inverse of the distance matrix.
+2. Compute the edge importance measure as the product of the inverse distance and a scaling factor.
+3. Compute the degree centrality of each node by calculating the sum of the inverse distances for all edges connected to the node and dividing by the sum of the inverse distances for all edges.
+4. Compute the total centrality of each node by calculating the sum of the inverse distances for all edges connected to the node and dividing by the sum of the inverse distances for all edges.
+5. Compute the combined heuristic measures as the product of edge importance, degree centrality, and total centrality.
+
+The modifications improve the accuracy of the heuristic measures by incorporating additional information about the edges and nodes in the calculation.
+
+```python
+import numpy as np
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+
+    # Compute the edge importance measure
+    edge_importance = inverse_distance_matrix * np.mean(inverse_distance_matrix)
+
+    # Compute the degree centrality of each node
+    degree_centrality = np.sum(inverse_distance_matrix, axis=0) / np.sum(inverse_distance_matrix)
+
+    # Compute the total centrality of each node
+    total_centrality = np.sum(inverse_distance_matrix, axis=1) / np.sum(inverse_distance_matrix)
+
+    # Compute the combined heuristic measures
+    heuristics = edge_importance * degree_centrality * total_centrality[:, np.newaxis]
+
+    return heuristics
+```
+-----

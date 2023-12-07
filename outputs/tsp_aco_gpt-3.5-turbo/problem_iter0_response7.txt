@@ -1,0 +1,6 @@
+Code description: 
+The scoring function I propose is based on the concept of edge centrality. The idea is to assign higher scores to the edges that connect nodes with high centrality, which are more likely to belong to the optimal tour. 
+
+To calculate the edge centrality, I use the concept of eigenvector centrality. First, I calculate the adjacency matrix of the input distance matrix by converting the distances to similarities. Then, I compute the eigenvector centrality of each node, which represents its centrality in the network. Finally, I calculate the edge centrality as the product of the centrality scores of the nodes connected by each edge. The higher the edge centrality, the higher the score assigned to that edge.
+
+Here is the code:

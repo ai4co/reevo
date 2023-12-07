@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_aco/eval.py", line 6, in <module>
+    from gpt import scoring_function
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_aco/gpt.py", line 4, in <module>
+    from scipy.sparse.csgraph import centrality
+ImportError: cannot import name 'centrality' from 'scipy.sparse.csgraph' (/Users/yhr/anaconda3/lib/python3.11/site-packages/scipy/sparse/csgraph/__init__.py)

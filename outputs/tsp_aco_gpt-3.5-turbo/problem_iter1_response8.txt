@@ -1,0 +1,35 @@
+Code description: In this modified algorithm, I propose to incorporate a new heuristic measure that considers the "hop count" or the number of edges between nodes in addition to the distance of the corresponding nodes and the average distance of the nodes connected to each node. The idea behind including the hop count is to give higher priority to edges that connect nodes that are closer in terms of hops, as it may result in shorter sub-tours. 
+
+```python
+import numpy as np
+from scipy.spatial.distance import squareform
+
+def scoring_function(distance_matrix):
+    n_nodes = distance_matrix.shape[0]
+    
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+    
+    # Compute the average distance of connected nodes for each node
+    connected_nodes_avg_distance = np.sum(inverse_distance_matrix, axis=1) / (n_nodes - 1)
+    
+    # Compute the hop count between nodes
+    hop_count = np.zeros((n_nodes, n_nodes), dtype=int)
+    for hop in range(1, n_nodes):
+        hop_count += (distance_matrix <= hop)
+    
+    # Compute the sum of distances to other nodes for each node
+    node_scores = np.sum(inverse_distance_matrix, axis=1)
+    
+    # Repeat the node scores for each edge
+    edge_scores = np.repeat(node_scores[:, np.newaxis], n_nodes, axis=1)
+    
+    # Compute the heuristic measures for each edge
+    heuristics = (inverse_distance_matrix * connected_nodes_avg_distance[:, np.newaxis] * hop_count) / edge_scores
+    
+    return heuristics
+```
+-----
+```python
+This is your Python code
+```

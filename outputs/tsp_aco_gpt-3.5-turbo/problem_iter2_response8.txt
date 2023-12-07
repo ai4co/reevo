@@ -1,0 +1,60 @@
+Code description: 
+
+The modification of the original algorithm will incorporate three new features:
+1. The degree of nodes: Nodes with higher degree are more likely to be visited earlier, as they have more connections to other nodes. We will incorporate this information by including a term proportional to the inverse of the degree of the destination node.
+2. The hop count between nodes: It represents the shortest number of edges that must be traversed to go from one node to another. Lower hop counts indicate easier accessibility between nodes and will be accounted for in the heuristic measures.
+3. The normalization of the scoring function: To ensure that the scoring function outputs values that sum up to 1, we will divide each heuristic measure by the sum of all heuristic measures.
+
+```python
+import numpy as np
+from scipy.spatial.distance import squareform
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    
+    n_nodes = distance_matrix.shape[0]
+
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+
+    # Initialize the node connections matrix
+    node_connections = np.zeros(n_nodes, dtype=int)
+    
+    # Compute the degree of each node
+    for i in range(n_nodes):
+        node_connections[i] = np.count_nonzero(distance_matrix[i])
+    
+    # Compute the hop count between nodes
+    hop_count = np.zeros((n_nodes, n_nodes), dtype=int)
+    for hop in range(1, n_nodes):
+        hop_count += (distance_matrix <= hop)
+    
+    # Initialize the heuristic measures matrix
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    # Calculate the heuristic measure for each edge
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            if i != j:
+                heuristics[i, j] = (inverse_distance_matrix[i, j] * 
+                                    (1 + node_connections[j]) * 
+                                    hop_count[i, j])
+    
+    # Normalize the heuristic measures so that they sum up to 1
+    heuristics /= np.sum(heuristics)
+    
+    return heuristics
+```
+

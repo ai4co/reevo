@@ -1,0 +1,17 @@
+[*] Running ...
+[*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_aco/dataset/val20_dataset.npy with 5 instances.
+Traceback (most recent call last):
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_aco/eval.py", line 28, in <module>
+    heuristics = scoring_function(dist_mat)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_aco/gpt.py", line 35, in scoring_function
+    min_edge_weight = np.min(distance_matrix[np.nonzero(distance_matrix)], axis=1)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<__array_function__ internals>", line 200, in amin
+  File "/Users/yhr/anaconda3/lib/python3.11/site-packages/numpy/core/fromnumeric.py", line 2946, in amin
+    return _wrapreduction(a, np.minimum, 'min', axis, None, out,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/anaconda3/lib/python3.11/site-packages/numpy/core/fromnumeric.py", line 86, in _wrapreduction
+    return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+numpy.AxisError: axis 1 is out of bounds for array of dimension 1

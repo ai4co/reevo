@@ -1,0 +1,44 @@
+Code description: In this modified scoring function, I will combine the ideas from Algorithm 1 and Algorithm 2 to create a better scoring function. The scoring function will consider the distance between nodes, the degree centrality of nodes, and the edge importance measure. The goal is to prioritize edges that have a close destination node with high degree centrality and high edge importance.
+
+```python
+import numpy as np
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+   
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+    
+    # Compute the degree centrality of each node
+    degree_centrality = np.sum(inverse_distance_matrix, axis=1) / (n_nodes - 1)
+    
+    # Compute the edge importance measure
+    edge_importance = np.zeros((n_nodes, n_nodes))
+    max_degree_centrality = np.max(degree_centrality)
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            edge_importance[i, j] = (degree_centrality[i] + degree_centrality[j]) / (2 * max_degree_centrality)
+    
+    # Calculate the heuristic measures
+    heuristics = inverse_distance_matrix * edge_importance
+    
+    # Normalize the heuristic measures so that they sum up to 1
+    heuristics /= np.sum(heuristics)
+    
+    return heuristics
+```
+

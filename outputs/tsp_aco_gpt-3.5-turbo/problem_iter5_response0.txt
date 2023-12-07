@@ -1,0 +1,40 @@
+Code description: In this improved scoring function, I will incorporate the ideas from both Algorithm 1 and Algorithm 2. The scoring function will calculate the inverse distances of each edge, similar to Algorithm 2. Additionally, it will consider the degrees of the source and destination nodes, as well as the centrality score of the destination node. The heuristic measure for each edge will be calculated as the product of the inverse distance, the inverse source node degree, and the centrality score of the destination node. This way, edges with shorter distances, lower source node degrees, and higher centrality scores of the destination node will be prioritized.
+
+```python
+import numpy as np
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import floyd_warshall
+from scipy.sparse.csgraph import centrality
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+    
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+    
+    # Compute the degree of each node
+    source_node_degrees = np.count_nonzero(distance_matrix, axis=1)
+    destination_node_degrees = np.count_nonzero(distance_matrix, axis=0)
+    
+    # Compute the centrality score of the destination nodes
+    centrality_scores = centrality.betweenness_centrality(csr_matrix(distance_matrix, dtype=np.float64))[1]
+    
+    # Compute the heuristic measures
+    heuristics = (inverse_distance_matrix * (1 / source_node_degrees[:, np.newaxis]) * centrality_scores) / np.sum(inverse_distance_matrix)
+    
+    return heuristics
+```
+

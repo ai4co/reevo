@@ -1,0 +1,44 @@
+Code description: The crossover of the two algorithms aims to combine the strengths of both approaches. It calculates the inverse distances and uses them to compute edge importance measures, similar to Algorithm 2. It also incorporates the degree centrality and total centrality of each node, as done in Algorithm 2. The edge importance measures, degree centrality, and total centrality are combined to obtain the final heuristic measures. This scoring function takes into account both the distance and the centrality measures of the nodes and edges, providing a more comprehensive estimate of their promisingness.
+
+```python
+import numpy as np
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges.
+    """
+    n_nodes = distance_matrix.shape[0]
+
+    # Calculate the inverse distances
+    inverse_distances = 1 / distance_matrix
+    np.fill_diagonal(inverse_distances, 0)
+
+    # Compute the degree centrality of each node
+    degree_centrality = np.sum(inverse_distances, axis=0) / np.sum(inverse_distances)
+
+    # Compute the total centrality of each node
+    total_centrality = np.sum(inverse_distances, axis=1) / np.sum(inverse_distances)
+
+    # Compute the edge importance measure
+    edge_importance = inverse_distances * np.mean(inverse_distances)
+
+    # Compute the combined heuristic measures
+    heuristics = edge_importance * degree_centrality * total_centrality[:, np.newaxis]
+
+    # Normalize the heuristic measures so that they sum up to 1
+    heuristics /= np.sum(heuristics)
+
+    return heuristics
+```
+

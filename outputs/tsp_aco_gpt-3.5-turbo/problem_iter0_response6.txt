@@ -1,0 +1,27 @@
+Code description: 
+This code computes the heuristic measures for the edges of a TSP instance based on the distance matrix.
+
+- First, the code computes the sum of the distances for each node, which represents the "degree" of each node in the TSP tour.
+- Then, the code computes the average degree for each node by dividing the sum of distances by the number of nodes minus 2.
+- Finally, the code computes the heuristic measures for each edge by subtracting the average degree of both incident nodes from the sum of their distances.
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+    
+    # Compute the sum of distances for each node
+    sum_distances = np.sum(distance_matrix, axis=1)
+    
+    # Compute the average degree for each node
+    average_degrees = sum_distances / (n_nodes - 2)
+    
+    # Compute the heuristic measures for each edge
+    heuristics = np.zeros((n_nodes, n_nodes))
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            heuristics[i, j] = sum_distances[i] + sum_distances[j] - average_degrees[i] - average_degrees[j]
+    
+    return heuristics
+```

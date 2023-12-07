@@ -1,0 +1,14 @@
+Code description: 
+
+In this code, I will design a novel static scoring function for the TSP problem. The scoring function will assign heuristic measures to each edge in the distance matrix based on the distances between the nodes. The heuristic measures will indicate how promising each edge is in terms of potentially being part of the shortest path.
+
+The scoring function will use the following logic:
+1. Initialize an empty array of heuristic measures with the same shape as the distance matrix.
+2. For each edge (i, j) in the distance matrix:
+   a. If the distance between nodes i and j is not infinity:
+      i. Calculate the heuristic measure as the reciprocal of the distance between nodes i and j.
+      ii. Assign the calculated heuristic measure to the corresponding entry in the array.
+   b. If the distance between nodes i and j is infinity, assign a heuristic measure of 0 to the corresponding entry in the array.
+3. Return the array of heuristic measures.
+
+This scoring function will consider shorter distances between nodes as more promising, assigning higher heuristic measures to such edges.

@@ -1,0 +1,35 @@
+Code description: 
+The novel scoring function I am going to design is called Nearest Neighbor Scoring. It assigns heuristic values to each edge in the distance matrix based on the nearest neighbor rule. The heuristic value for each edge is determined by the inverse of the distance to the nearest neighbor of the starting node. The idea is to prioritize edges that are closer to the nearest neighbor, as they are more likely to be part of the optimal solution.
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    # Find the nearest neighbor for each node
+    nearest_neighbors = np.argmin(distance_matrix, axis=1)
+    
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            if i != j:
+                neighbor = nearest_neighbors[i]
+                heuristics[i][j] = 1 / distance_matrix[i][neighbor]
+    
+    return heuristics
+```
+

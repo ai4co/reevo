@@ -1,0 +1,37 @@
+Code description: 
+This code calculates the heuristic measures for all edges in the TSP problem based on the distance matrix. The heuristic measure for each edge is calculated by dividing the inverse of the distance between the two nodes by the sum of all inverse distances in the row of the distance matrix. This scoring function aims to prioritize edges with smaller distances and lower average distances to other nodes.
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    # Get the number of nodes
+    n_nodes = distance_matrix.shape[0]
+    
+    # Initialize heuristics matrix
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    # Iterate over the distance matrix
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            # Calculate the heuristic measure for each edge
+            heuristics[i, j] = 1 / distance_matrix[i, j]
+    
+    # Normalize the heuristic measures
+    heuristics /= np.sum(heuristics, axis=1, keepdims=True)
+    
+    return heuristics
+```

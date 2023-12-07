@@ -1,0 +1,51 @@
+Code description: This improved scoring function combines the ideas from Algorithm 1 and Algorithm 2, and incorporates additional modifications to enhance the effectiveness of the heuristics. The modified algorithm considers the degree of nodes, hop count between nodes, centrality score, and distance between nodes.
+
+The code calculates the inverse distance matrix to account for priority based on distance. It also computes the degree of each node, hop count between nodes using the Floyd-Warshall algorithm, and the sum of distances to other nodes for each node. Additionally, it computes the centrality score as the sum of distances to other nodes minus the sum of distances from other nodes.
+
+Finally, the code computes the heuristic measure for each edge by multiplying the inverse distance matrix, the inverse of the degree of the destination node, the hop count, and the centrality score. It normalizes the heuristic measures by dividing each measure by the sum of all heuristic measures.
+
+```python
+import numpy as np
+import networkx as nx
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import floyd_warshall
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges.
+    """
+
+    n_nodes = distance_matrix.shape[0]
+
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+
+    # Compute the degree of each node
+    node_degrees = np.count_nonzero(distance_matrix, axis=1)
+
+    # Compute the hop count between nodes
+    hop_count = floyd_warshall(csr_matrix(distance_matrix, dtype=np.float64))
+
+    # Compute the sum of distances to other nodes for each node
+    node_scores = np.sum(inverse_distance_matrix, axis=1)
+    
+    # Compute the centrality score as the sum of distances to other nodes
+    centrality_score = node_scores - np.sum(distance_matrix, axis=1)
+
+    # Compute the heuristic measures
+    heuristics = (inverse_distance_matrix * (1 / node_degrees[:, np.newaxis]) * hop_count * centrality_score[:, np.newaxis]) / np.sum(inverse_distance_matrix)
+
+    return heuristics
+```
+
+The modified code incorporates the degree of nodes, hop count between nodes, centrality score, and distance between nodes into the scoring function to provide more effective heuristic measures.

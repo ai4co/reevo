@@ -1,0 +1,53 @@
+Code description: 
+In this modified scoring_function, I will introduce a new measure called "edge diversity" which captures the diversity of edges in the TSP instance. Edge diversity is computed as the average number of unique edges connected to each node. I will combine this measure with the existing edge centrality and average distance measures by taking a weighted average to obtain the final heuristic measures.
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+
+    # Compute the sum of the inverse distances
+    sum_inverse_distances = np.sum(inverse_distance_matrix)
+
+    # Compute the edge centrality measure
+    edge_centrality = np.sum(inverse_distance_matrix, axis=1) / sum_inverse_distances
+
+    # Compute the average distance to other nodes for each node
+    average_distance = np.sum(inverse_distance_matrix, axis=1) / (n_nodes - 1)
+
+    # Compute the edge diversity measure
+    edge_diversity = np.sum((distance_matrix != 0), axis=1) / (n_nodes - 1)
+
+    # Normalize the edge diversity measure
+    normalized_edge_diversity = edge_diversity / np.max(edge_diversity)
+
+    # Repeat the average distances for each edge
+    edge_average_distance = np.repeat(average_distance[:, np.newaxis], n_nodes, axis=1)
+
+    # Multiply the edge centrality measure with the average distance measure
+    heuristics = edge_centrality[:, np.newaxis] * edge_average_distance
+
+    # Add the weighted average of edge diversity to the heuristic measures
+    alpha = 0.2
+    heuristics += alpha * normalized_edge_diversity[:, np.newaxis]
+
+    return heuristics
+```
+

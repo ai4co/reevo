@@ -1,0 +1,61 @@
+Code description: For the crossover of Algorithm 1 and Algorithm 2, I will incorporate both the edge importance measure and the edge similarity measure into the scoring function. This combined approach aims to capture the significance of each edge based on the importance of its endpoints and the similarity between the endpoints' common neighbors. 
+
+The modified code takes the following steps:
+
+1. Compute the inverse of the distance matrix.
+2. Compute the edge importance measure as the product of the inverse distance and a scaling factor.
+3. Compute the degree centrality of each node by calculating the sum of the inverse distances for all edges connected to the node and dividing by the sum of the inverse distances for all edges.
+4. Compute the total centrality of each node by calculating the sum of the inverse distances for all edges connected to the node and dividing by the sum of the inverse distances for all edges.
+5. Compute the number of common neighbors for each edge.
+6. Compute the edge similarity measure as the common neighbors divided by the square root of the product of the node degrees.
+7. Compute the combined heuristic measures as the product of edge importance and edge similarity.
+
+The modifications combine the edge importance measure from Algorithm 1 with the edge similarity measure from Algorithm 2 to provide a comprehensive evaluation of each edge's potential usefulness in the TSP instance.
+
+```python
+import numpy as np
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+
+    # Compute the edge importance measure
+    edge_importance = inverse_distance_matrix * np.mean(inverse_distance_matrix)
+
+    # Compute the degree centrality of each node
+    degree_centrality = np.sum(inverse_distance_matrix, axis=0) / np.sum(inverse_distance_matrix)
+
+    # Compute the total centrality of each node
+    total_centrality = np.sum(inverse_distance_matrix, axis=1) / np.sum(inverse_distance_matrix)
+
+    # Compute the number of common neighbors for each edge
+    common_neighbors = np.zeros((n_nodes, n_nodes), dtype=int)
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            common_neighbors[i, j] = len(list(nx.common_neighbors(graph, i, j)))
+
+    # Compute the edge similarity measure
+    edge_similarity = common_neighbors / np.sqrt(degree_centrality[:, np.newaxis] * degree_centrality)
+
+    # Compute the combined heuristic measures
+    heuristics = edge_importance * edge_similarity
+
+    return heuristics
+```
+

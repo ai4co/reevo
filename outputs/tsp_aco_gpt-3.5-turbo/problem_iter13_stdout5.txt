@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_aco/eval.py", line 6, in <module>
+    from gpt import scoring_function
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_aco/gpt.py", line 31
+    common_neighbors[i, j] = len(list(nx.common_neighbors(graph, i, j))))
+                                                                        ^
+SyntaxError: unmatched ')'

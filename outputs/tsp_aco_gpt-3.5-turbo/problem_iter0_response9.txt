@@ -1,0 +1,44 @@
+Code description: 
+In this code, I will generate random permutations of the nodes and calculate the cost of each permutation using the provided distance_matrix. The heuristic measures will be inversely proportional to the cost of each permutation.
+
+Plan:
+1. Import necessary packages.
+2. Get the number of nodes from the distance_matrix.
+3. Create an empty np.ndarray called heuristics of shape (n_nodes, n_nodes).
+4. Iterate over all possible edges (i, j) in the distance_matrix.
+5. Generate random permutations of the nodes using np.random.permutation.
+6. Calculate the cost of each permutation by summing the distances between consecutive nodes in the permutation.
+7. Calculate the heuristic measure for edge (i, j) as 1/cost.
+8. Set the value of heuristics[i, j] to the calculated heuristic measure.
+9. Return the heuristics matrix.
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            if i != j:
+                permutations = np.random.permutation(n_nodes)
+                cost = np.sum(distance_matrix[permutations[:-1], permutations[1:]])
+                heuristic = 1 / cost
+                heuristics[i, j] = heuristic
+    
+    return heuristics
+```

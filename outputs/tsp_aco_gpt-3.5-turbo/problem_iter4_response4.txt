@@ -1,0 +1,52 @@
+Code description: 
+
+I propose a novel scoring function that combines the node degree measure, the edge centrality measure, and the average hop distance measure from the given algorithm. The goal is to further enhance the effectiveness of the scoring function in capturing both local and global information about the nodes and edges.
+
+The modification I will make is to introduce a normalization step in the computation of the average hop distance. This will ensure that the range of values for the average hop distance measure is consistent with the other measures. 
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+    
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+    
+    # Compute the node degree measure
+    node_degree = np.count_nonzero(distance_matrix, axis=1)
+    
+    # Compute the average hop distance
+    avg_hop_distance = np.zeros((n_nodes, n_nodes), dtype=float)
+    for hop in range(1, n_nodes):
+        avg_hop_distance += hop * (distance_matrix <= hop)
+    avg_hop_distance /= (n_nodes - 1)
+    
+    # Normalize the average hop distance
+    max_hop_distance = np.max(avg_hop_distance)
+    avg_hop_distance /= max_hop_distance
+    
+    # Compute the edge centrality measure
+    edge_centrality = np.sum(inverse_distance_matrix, axis=1) / np.sum(inverse_distance_matrix)
+    
+    # Repeat the node degrees for each edge
+    node_degrees = np.repeat(node_degree[:, np.newaxis], n_nodes, axis=1)
+    
+    # Compute the heuristic measures for each edge
+    heuristics = (node_degrees / avg_hop_distance) * edge_centrality[:, np.newaxis]
+    
+    return heuristics
+```

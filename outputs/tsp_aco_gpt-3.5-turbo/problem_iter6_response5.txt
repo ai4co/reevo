@@ -1,0 +1,48 @@
+Code description: 
+
+I will combine the features from both Algorithm 1 and Algorithm 2 to create a novel scoring function. The new scoring function will consider the degree of nodes, hop count between nodes, centrality score, normalization, and the sum of distances to other nodes for each node. Additionally, I will optimize the calculation of the hop count using the scipy library to compute the shortest path lengths between nodes.
+
+```python
+import numpy as np
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import floyd_warshall
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    
+    n_nodes = distance_matrix.shape[0]
+    
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+    
+    # Compute the degree of each node
+    node_degrees = np.count_nonzero(distance_matrix, axis=1)
+    
+    # Compute the hop count between nodes
+    hop_count = floyd_warshall(csr_matrix(distance_matrix, dtype=np.float64))
+    
+    # Compute the sum of distances to other nodes for each node
+    node_scores = np.sum(inverse_distance_matrix, axis=1)
+
+    # Compute the average distance of connected nodes for each node
+    connected_nodes_avg_distance = np.sum(inverse_distance_matrix, axis=1) / (n_nodes - 1)
+    
+    # Compute the heuristic measures
+    heuristics = (inverse_distance_matrix * (1 / node_degrees[:, np.newaxis]) * hop_count * connected_nodes_avg_distance[:, np.newaxis]) / np.sum(inverse_distance_matrix)
+    
+    return heuristics
+```
+

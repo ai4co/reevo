@@ -1,0 +1,50 @@
+Code description: In this improved scoring function, I will combine the techniques from Algorithm 1 and Algorithm 2 to calculate the heuristic measures. I will use the inverse distances as in Algorithm 1 to prioritize shorter distances. Additionally, I will incorporate the edge attractiveness concept from Algorithm 2 by multiplying the inverse distance with a factor that increases with the number of connections of the destination node. This way, edges between nodes with shorter distances and fewer connections will have higher heuristic measures.
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+    
+    # Calculate the inverse distances
+    inverse_distances = 1 / distance_matrix
+    np.fill_diagonal(inverse_distances, 0)
+    
+    # Initialize the node connections matrix
+    node_connections = np.zeros(n_nodes, dtype=int)
+    
+    # Count the number of connections for each node
+    for i in range(n_nodes):
+        node_connections[i] = np.count_nonzero(distance_matrix[i])
+    
+    # Calculate the inverse number of connections
+    inverse_connections = 1 / node_connections
+    
+    # Initialize the heuristic measures matrix
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    # Calculate the heuristic measure for each edge
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            if i != j:
+                heuristics[i, j] = inverse_distances[i, j] * (1 + inverse_connections[j])
+    
+    # Normalize the heuristic measures so that they sum up to 1
+    heuristics /= np.sum(heuristics)
+    
+    return heuristics
+```
+

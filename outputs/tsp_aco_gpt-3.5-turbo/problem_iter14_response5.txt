@@ -1,0 +1,49 @@
+Code description: The crossover algorithm combines the edge importance measure from Algorithm 1 with the modification factor based on the number of connections from Algorithm 2. The edge importance measure captures the significance of each edge based on the importance of its endpoints, while the modification factor adjusts the importance based on the number of connections of the destination node. The scoring function aims to provide a comprehensive evaluation of each edge's potential usefulness in the TSP instance by combining these measures.
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+    
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+    
+    # Compute the degree centrality of each node
+    degree_centrality = np.sum(inverse_distance_matrix, axis=1) / (n_nodes - 1)
+    
+    # Compute the total centrality of each node
+    total_centrality = np.sum(inverse_distance_matrix, axis=1) / np.sum(inverse_distance_matrix)
+    
+    # Compute the edge importance measure
+    edge_importance = inverse_distance_matrix * (degree_centrality[:, np.newaxis] + degree_centrality[np.newaxis, :])
+    
+    # Compute the number of connections for each node
+    node_degrees = np.count_nonzero(distance_matrix, axis=1)
+    
+    # Calculate the modification factor based on the number of connections
+    mod_factor = np.zeros((n_nodes, n_nodes))
+    for j in range(n_nodes):
+        mod_factor[:, j] = inverse_distance_matrix[:, j] / (1 + node_degrees[j])
+    
+    # Calculate the heuristic measures
+    heuristics = edge_importance * mod_factor
+    
+    # Normalize the heuristic measures so that they sum up to 1
+    heuristics /= np.sum(heuristics)
+    
+    return heuristics
+```

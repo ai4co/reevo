@@ -1,0 +1,52 @@
+Code description: In this improved scoring function, I will combine the ideas from Algorithm 1 and Algorithm 2 to design a new scoring function that incorporates both the hop count and node degree information. The key modifications include:
+
+1. Degree of nodes: Incorporate the sum of the inverse of node degrees to capture the connectivity and importance of each node in the heuristic measures.
+
+2. Hop count between nodes: Calculate the hop count between nodes using the Floyd-Warshall algorithm. This will efficiently compute the shortest path lengths between all pairs of nodes and allow us to capture the accessibility between nodes in the heuristic measures.
+
+3. Normalization: Divide each heuristic measure by the sum of all heuristic measures to normalize the output values.
+
+4. Compute inverse distance matrix: Compute the inverse distance matrix to consider the distance as a measure of priority.
+
+```python
+import numpy as np
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import floyd_warshall
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+    
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+    
+    # Compute the degree of each node
+    node_degrees = np.sum(distance_matrix != np.inf, axis=1)
+    
+    # Compute the hop count between nodes using Floyd-Warshall algorithm
+    hop_count = floyd_warshall(csr_matrix(distance_matrix, dtype=np.float64))
+    
+    # Compute the sum of inverse of degrees for each node
+    node_degree_scores = np.sum(1 / node_degrees)
+    
+    # Compute the heuristic measures
+    heuristics = (inverse_distance_matrix * hop_count) / node_degree_scores
+    
+    # Divide each heuristic measure by the sum of all heuristic measures to normalize
+    heuristics = heuristics / np.sum(heuristics)
+    
+    return heuristics
+```
+

@@ -1,0 +1,56 @@
+Code description: 
+
+In this scoring function, I will incorporate the concepts of edge importance and edge similarity to create a more effective measure of each edge's potential usefulness. Edge importance is determined by the inverse of the edge distance, while edge similarity is measured by the number of common neighbors between the edge's endpoints. By considering both these factors, the scoring function aims to capture the significance of each edge in the TSP instance.
+
+```python
+import numpy as np
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    n_nodes = distance_matrix.shape[0]
+
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+
+    # Compute the degree of each node
+    node_degrees = np.count_nonzero(distance_matrix, axis=1) - 1  # Subtract 1 to exclude self-loop
+
+    # Construct the graph using the distance matrix
+    graph = nx.from_numpy_matrix(distance_matrix, create_using=nx.Graph)
+
+    # Compute the number of common neighbors for each edge
+    common_neighbors = np.zeros((n_nodes, n_nodes), dtype=int)
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            common_neighbors[i, j] = len(list(nx.common_neighbors(graph, i, j)))
+
+    # Compute the edge importance measure
+    edge_importance = inverse_distance_matrix
+
+    # Compute the edge similarity measure
+    edge_similarity = common_neighbors / np.sqrt(node_degrees[:, np.newaxis] * node_degrees)
+
+    # Calculate the heuristic measures
+    heuristics = edge_importance * edge_similarity
+
+    return heuristics
+```
+
+In this modified code, I have made the following changes:
+1. The computation of node degrees has been modified to exclude the self-loop count.
+2. The computation of edge similarity has been added to measure the number of common neighbors between edge endpoints.
+3. The edge centrality measure has been replaced with the edge similarity measure.
+4. The final heuristic measures are calculated as the product of edge importance and edge similarity.

@@ -1,0 +1,51 @@
+Code description: 
+
+In this improved scoring function, I propose a novel approach to combine the node degree measure, the hop count measure, and the edge centrality measure to develop a more effective scoring function for the TSP instance. The node degree measure captures the connectivity of nodes, the hop count measure considers the number of edges between nodes, and the edge centrality measure identifies edges that are more central in the network. By combining these measures, we aim to create a scoring function that captures both local and global properties of the TSP instance.
+
+```python
+import numpy as np
+from scipy.spatial.distance import squareform
+
+def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to inf.
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    
+    n_nodes = distance_matrix.shape[0]
+
+    # Compute the inverse of the distance matrix
+    inverse_distance_matrix = np.where(distance_matrix != 0, 1 / distance_matrix, 0)
+
+    # Compute the node degree measure
+    node_degree = np.count_nonzero(distance_matrix, axis=1)
+    
+    # Compute the hop count measure
+    hop_count = np.zeros((n_nodes, n_nodes), dtype=int)
+    for hop in range(1, n_nodes):
+        hop_count += (distance_matrix <= hop)
+        
+    # Compute the edge centrality measure
+    edge_centrality = np.sum(inverse_distance_matrix, axis=1) / np.sum(inverse_distance_matrix)
+    
+    # Compute the heuristic measures for each edge
+    heuristics = (np.power(node_degree, 2) * hop_count) / (distance_matrix * edge_centrality[:, np.newaxis])
+    
+    # Normalize the heuristic measures so that they sum up to 1
+    heuristics /= np.sum(heuristics)
+    
+    return heuristics
+```
+
+This modified scoring function computes the inverse of the distance matrix, node degree measure, hop count measure, and edge centrality measure. Then, the heuristics are calculated by combining these measures in a novel way. The node degree measure is computed using the `np.count_nonzero` function, which counts the number of nonzero elements in each row of the distance matrix. The hop count measure is computed by iterating over different hop values and accumulating the number of edges that have a distance less than or equal to the hop value. The edge centrality measure is calculated by summing the inverse distance matrix along the rows and dividing by the total sum of the inverse distance matrix.
+
+Finally, the heuristic measures are computed by combining the node degree measure, hop count measure, and edge centrality measure. The node degree measure is squared to emphasize the connectivity of nodes. The hop count measure, edge centrality measure, and distance matrix are used to adjust the weights of each measure. The heuristic measures are then normalized so that they sum up to 1.
