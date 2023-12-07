@@ -3,7 +3,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 import logging
 import time
 import re
-import shutil
 import subprocess
 import numpy as np
 
@@ -18,7 +17,8 @@ class GA_LLM:
         
         self.iteration = 0
         self.function_evals = 0
-            
+        self.elitist = None
+                
         self.population = self.init_population()
 
         if cfg.problem_type != "constructive":
@@ -254,23 +254,32 @@ class GA_LLM:
         population = self.population
         objs = [individual["obj"] for individual in population]
         best_obj, best_sample_idx = min(objs), np.argmin(np.array(objs))
+        
+        # update best overall
         if best_obj < self.best_obj_overall:
             self.best_obj_overall = best_obj
             self.best_code_overall = population[best_sample_idx]["code"]
             self.best_desc_overall = population[best_sample_idx]["description"]
             self.best_code_path_overall = population[best_sample_idx]["code_path"]
+        
+        # update elitist
+        if self.elitist is None or best_obj < self.elitist["obj"]:
+            # If diversification is enabled, only update elitist if the best individual is better than the greedy algorithm
+            if not self.cfg.diversify or population[best_sample_idx]["obj"] < self.greedy_obj:
+                self.elitist = population[best_sample_idx]
+        
         logging.info(f"Iteration {self.iteration}: Min obj: {self.best_obj_overall}, Best Code Path: {self.best_code_path_overall}")
         logging.info(f"Iteration {self.iteration}: Function Evals: {self.function_evals}")
         self.iteration += 1
 
     @staticmethod
-    def fitness_sharing(similarity_matrix: np.ndarray, fitness: list[float], sigma_share: float=0.2, alpha: int=1) -> list[float]:
+    def fitness_sharing(similarity_matrix: np.ndarray, fitness: list[float], sigma_share: float=0.9) -> list[float]:
         """
-        Fitness sharing is a mechanism to encourage diversity in the population. 
+        Fitness sharing based on cosine similarity matrix to encourage diversity in the population.
         
-        :param similarity_matrix: An n x n matrix representing the similarity between each pair of individuals.
-        :param objs: A list of original fitness values for each individual.
-        :param sigma_share: The sharing radius, defining the niche size.
+        :param similarity_matrix: An n x n matrix representing the cosine similarity between each pair of individuals.
+        :param fitness: A list of original fitness values for each individual.
+        :param sigma_share: The sharing threshold, defining the niche size.
         :param alpha: A constant that determines the shape of the sharing function.
         :return: A list of adjusted fitness values.
         """
@@ -278,14 +287,13 @@ class GA_LLM:
         n = len(fitness)
         adjusted_fitness = np.zeros(n)
 
-        # Define the sharing function adjusted for similarity
+        # Define the sharing function adjusted for cosine similarity
         def sharing_function(similarity: float) -> float:
-            effective_distance = 1 - similarity
-            if effective_distance < sigma_share:  # if sigma_share is set to 0.2, then any pair with similarity > 0.8 will share fitness
-                return 1 - (effective_distance / sigma_share) ** alpha
+            if similarity > sigma_share: 
+                return (similarity - sigma_share) / (1 - sigma_share)
             else:
                 return 0
-
+        
         # Calculate the niche count for each individual
         for i in range(n):
             m_i = sum(sharing_function(similarity_matrix[i][j]) for j in range(n))
@@ -296,7 +304,7 @@ class GA_LLM:
     
     def random_select(self, population: list[dict]) -> list[dict]:
         """
-        Random selection, select individuals with equal probability
+        Random selection, select individuals with equal probability. Deprecated.
         """
         selected_population = []
         for _ in range(self.cfg.pop_size):
@@ -308,12 +316,13 @@ class GA_LLM:
 
     def select(self, population: list[dict]) -> list[dict]:
         """
-        Roulette selection, select individuals with probability proportional to their fitness
+        Roulette selection, select individuals with probability proportional to their adjusted fitness
         """
         # Eliminate those without description (description is None or "")
         population = [individual for individual in population if individual["description"] is not None and individual["description"] != ""]
         
         similarity_matrix = self.compute_similarity([individual["description"] for individual in population], self.client)
+        similarity_matrix = self.adjust_similarity_matrix(similarity_matrix, population)
         logging.info("Similarity Matrix: \n" + str(similarity_matrix))
         
         fitness = [individual["fitness"] for individual in population]
@@ -353,7 +362,7 @@ class GA_LLM:
             individual = self.response_to_individual(responses[0], response_id)
             crossed_population.append(individual)
             response_id += 1
-        # logging.info("Crossover user prompt: \n" + crossover_prompt)
+
         assert len(crossed_population) == self.cfg.pop_size
         return crossed_population
 
@@ -379,7 +388,8 @@ class GA_LLM:
             # Diversify
             self.population = self.diversify(self.population) if self.cfg.diversify else self.population
             # Select
-            selected_population = self.random_select(self.population)
+            population_to_select = self.population if self.elitist is None else [self.elitist] + self.population # add elitist to population for selection
+            selected_population = self.select(population_to_select)
             # Crossover
             crossed_population = self.crossover(selected_population)
             # Mutate
@@ -397,7 +407,6 @@ class GA_LLM:
         """
         Embed code descriptions using OpenAI's embedding API and compute the cosine similarity matrix.
         """
-        logging.info("Description: \n" + str(descriptions))
         response = client.embeddings.create(
             input=descriptions,
             model=model,
@@ -406,11 +415,24 @@ class GA_LLM:
         similarity_matrix = cosine_similarity(embeddings)
         return similarity_matrix
     
+    @staticmethod
+    def adjust_similarity_matrix(similarity_matrix: np.ndarray, population: list[dict]) -> np.ndarray:
+        """
+        For those with identical objective values, set their similarity to 1.
+        """
+        for i in range(len(population)):
+            for j in range(i+1, len(population)):
+                if population[i]["obj"] == population[j]["obj"]:
+                    similarity_matrix[i][j] = 1
+                    similarity_matrix[j][i] = 1
+        return similarity_matrix
+
+
     def diversify(self, population: list[dict]) -> list[dict]:
         """
         Diversify the population by eliminating the greedy algorithms (obj == self.greedy_obj) and adding new ones.
         """
-        self.iteration += 1
+        self.iteration += 1 # iteration added for bookkeeping
         
         # Eliminate greedy algorithms or those with execution errors
         population = [individual for individual in population if individual["obj"] != self.greedy_obj and individual["exec_success"]]
@@ -433,4 +455,3 @@ class GA_LLM:
         # Add new population to population
         population.extend(new_population)
         return population
-
