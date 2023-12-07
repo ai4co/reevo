@@ -1,0 +1,14 @@
+problem_type: constructive
+model: gpt-3.5-turbo
+temperature: 1
+suffix: GPT
+max_iter: 20
+pop_size: 10
+mutation_rate: 0.3
+diversify: true
+problem:
+  problem_name: tsp_constructive
+  problem_size: 50
+  description: The task is to solve Traveling Salesman Problem (TSP) with constructive
+    heuristics. TSP requires finding the shortest path that visits all given nodes
+    and returns to the starting node.
