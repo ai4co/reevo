@@ -1,7 +1,6 @@
 defaults:
   - _self_
   - problem: tsp_constructive
-  - override hydra/launcher: local
   - override hydra/output: local
 
 problem_type: constructive

@@ -323,13 +323,13 @@ class GA_LLM:
         
         similarity_matrix = self.compute_similarity([individual["description"] for individual in population], self.client)
         similarity_matrix = self.adjust_similarity_matrix(similarity_matrix, population)
-        logging.info("Similarity Matrix: \n" + str(similarity_matrix))
+        # logging.info("Similarity Matrix: \n" + str(similarity_matrix))
         
         fitness = [individual["fitness"] for individual in population]
-        logging.info("Fitness before sharing: \n" + str(fitness))
+        # logging.info("Fitness before sharing: \n" + str(fitness))
         
         fitness = self.fitness_sharing(similarity_matrix, fitness)
-        logging.info("Fitness after sharing: \n" + str(fitness))
+        # logging.info("Fitness after sharing: \n" + str(fitness))
         
         fitness_sum = sum(fitness)
         fitness_prob = [f / fitness_sum for f in fitness]

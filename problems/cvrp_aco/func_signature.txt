@@ -1,0 +1,22 @@
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    """
+    Map the inputs into heuristic measures, which indicates how promising is each edge before solution construction.
+    Note that the depot is indexed as 0, and fixed in the middle of all nodes. The demand of depot is set to 0, i.e., demands[0] = 0.
+
+    Parameters
+    ----------
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes), where diagonal elements are set to a very large number.
+    demands : np.ndarray
+        The customer demands of nodes, where demands[0] = 0.
+    CAPACITY : int
+        The capacity of a vehicle.
+    
+    
+    Returns
+    -------
+    heuristics: np.ndarray
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+    """
+    ...
+    return heuristics

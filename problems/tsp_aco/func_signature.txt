@@ -1,6 +1,6 @@
 def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
     """
-    The heuristic measures indicate how promising is each edge before actually solving this TSP instance.
+    Map distance_matrix into heuristic measures, which indicates how promising is each edge before actually solving this TSP instance.
     
     Parameters
     ----------

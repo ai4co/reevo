@@ -4,7 +4,7 @@ import random
 import itertools
 import numpy as np
 
-CAPACITY = 50
+
 
 class ACO():
 
@@ -12,20 +12,19 @@ class ACO():
                  distances, # (n, n)
                  demand,   # (n, )
                  heuristic, # (n, n)
+                 capacity,
                  n_ants=30, 
                  decay=0.9,
                  alpha=1,
                  beta=1,
                  device='cpu',
-                 capacity=CAPACITY
                  ):
         
         self.problem_size = len(distances)
         self.distances = torch.tensor(distances) if not isinstance(distances, torch.Tensor) else distances
         self.demand = torch.tensor(demand) if not isinstance(demand, torch.Tensor) else demand
         self.capacity = capacity
-        self.demand = demand
-        
+                
         self.n_ants = n_ants
         self.decay = decay
         self.alpha = alpha
@@ -43,7 +42,7 @@ class ACO():
     @torch.no_grad()
     def run(self, n_iterations):
         for _ in range(n_iterations):
-            paths = self.gen_path(require_prob=False)
+            paths = self.gen_path()
             costs = self.gen_path_costs(paths)
             
             best_cost, best_idx = costs.min(dim=0)
