@@ -13,11 +13,11 @@ hydra:
 # LLM parameters
 model: gpt-3.5-turbo  # LLM model (other options include gpt-4-1106-preview, gpt-3.5-turbo-16k-0613)
 # model: gpt-4-1106-preview
-temperature: 0.7  # temperature for chat completion
+temperature: 1  # temperature for chat completion
 suffix: GPT  # suffix for generated files (indicates LLM model)
 
 # Main GA loop parameters
-max_iter: 10 # number of outer loop iterations for GA
+max_iter: 20 # number of outer loop iterations for GA. When implementing "diversify" option, this number is the double of the actual number of iterations
 pop_size: 10 # population size for GA
 mutation_rate: 0.3 # mutation rate for GA
 diversify: True # whether to diversify population
