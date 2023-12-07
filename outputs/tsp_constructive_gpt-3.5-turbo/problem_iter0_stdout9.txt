@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 8, in <module>
+    from gpt import select_next_node
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py", line 3, in <module>
+    def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+                                                                                                          ^^
+NameError: name 'np' is not defined

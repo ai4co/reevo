@@ -1,0 +1,33 @@
+Code description:
+This code selects the next node to visit based on a combination of the distances between the current node and each unvisited node and the attractiveness of each unvisited node. The attractiveness of each unvisited node is calculated by considering the balance between the node's distance to the destination node and its distance to the current node. The function calculates the attractiveness for each unvisited node and selects the node with the highest attractiveness to be the next node to visit. If there are multiple nodes with the same highest attractiveness, it selects the node with the lowest index.
+
+```python
+import numpy as np
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    # Initialize the variables
+    max_attractiveness = -np.inf
+    nxt_node = None
+
+    # Calculate the attractiveness for each unvisited node
+    for node in unvisited_nodes:
+        # Calculate the distance between the current node and the unvisited node
+        distance_current = distance_matrix[current_node][node]
+        
+        # Calculate the distance between the unvisited node and the destination node
+        distance_destination = distance_matrix[node][destination_node]
+        
+        # Calculate the attractiveness of the unvisited node
+        attractiveness = distance_destination - distance_current
+        
+        # If the attractiveness is higher than the maximum attractiveness, update the maximum attractiveness and the next node
+        if attractiveness > max_attractiveness:
+            max_attractiveness = attractiveness
+            nxt_node = node
+        # If the attractiveness is equal to the maximum attractiveness, select the next node with the lowest index
+        elif attractiveness == max_attractiveness:
+            nxt_node = min(nxt_node, node)
+
+    return nxt_node
+```
+

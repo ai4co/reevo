@@ -1,0 +1,35 @@
+Code description: 
+In this code, I will implement a novel selecting-next-node function called "Random Next Node". This function randomly selects the next node to visit from the set of unvisited nodes. It assigns equal probability to each unvisited node, ensuring a fair and unbiased selection process. 
+
+```python
+import random
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    """
+    Select the next node to visit from the unvisited nodes.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    
+    # Convert set to list for random selection
+    unvisited_list = list(unvisited_nodes)
+    
+    # Randomly select next node from unvisited nodes
+    nxt_node = random.choice(unvisited_list)
+    
+    return nxt_node
+```

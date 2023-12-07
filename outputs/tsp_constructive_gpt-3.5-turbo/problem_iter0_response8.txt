@@ -1,0 +1,21 @@
+Code description: 
+
+In this code, we will implement the "Random Selection" heuristic for solving the Traveling Salesman Problem (TSP). This heuristic randomly selects the next node to visit from the set of unvisited nodes. 
+
+The implementation follows these steps:
+1. Check if there are any unvisited nodes left. If not, return the destination_node as the next node to visit.
+2. Randomly select a node from the unvisited nodes set.
+3. Return the selected node as the next node to visit.
+
+```python
+import numpy as np
+import random
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    if len(unvisited_nodes) == 0:
+        return destination_node
+    
+    selected_node = random.choice(list(unvisited_nodes))
+    return selected_node
+```
+Note: Don't forget to import the necessary packages (numpy and random) at the beginning of the code.

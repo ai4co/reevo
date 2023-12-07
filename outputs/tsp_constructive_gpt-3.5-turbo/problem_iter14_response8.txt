@@ -1,0 +1,24 @@
+Code description: The novel algorithm selects the next node based on both the distance to the node and the number of unvisited neighbors. It calculates a score for each unvisited node using these factors and selects the node with the highest score as the next node to visit. However, it introduces a weight factor to balance the importance of distance and number of unvisited neighbors. The weight factor can be adjusted to prioritize either distance or number of unvisited neighbors.
+
+```python
+import numpy as np
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    # Initialize variables
+    max_score = -np.inf
+    nxt_node = None
+    weight = 0.5
+    
+    # Calculate the score for each unvisited node
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        num_unvisited_neighbors = np.sum(distance_matrix[node,:] > 0)
+        score = (1 - weight) * distance - weight * num_unvisited_neighbors
+        
+        if score > max_score:
+            max_score = score
+            nxt_node = node
+    
+    return nxt_node
+```
+

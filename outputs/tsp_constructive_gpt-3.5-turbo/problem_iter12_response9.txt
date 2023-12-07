@@ -1,0 +1,46 @@
+Code description: 
+
+The proposed code uses the Randomized Edge Selection algorithm as a basis, but introduces a modification to improve the exploration of less promising nodes in a probabilistic manner. Instead of inversely proportional probabilities based on distance, the proposed code calculates the probabilities as a power of the inverse of the distance. This modification allows for a more flexible weighting of the probabilities, giving the algorithm a greater ability to explore different nodes. The parameter alpha determines the power to which the inverse of the distance is raised, allowing for fine-tuning of the exploration-exploitation trade-off.
+
+```python
+import numpy as np
+import random
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray, alpha: float) -> int:
+    """
+    Select the next node to visit from the unvisited nodes using a modified Randomized Edge Selection algorithm.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    alpha : float
+        The power to which the inverse of the distance is raised to calculate the probabilities.
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    # Calculate the distances from the current node to unvisited nodes
+    distances = distance_matrix[current_node, list(unvisited_nodes)]
+    
+    # Calculate the probabilities of selecting each unvisited node
+    probabilities = 1 / distances
+    probabilities = np.power(probabilities, alpha)
+    
+    # Normalize the probabilities
+    probabilities /= np.sum(probabilities)
+    
+    # Select the next node randomly based on the probabilities
+    nxt_node = random.choices(list(unvisited_nodes), probabilities)[0]
+    
+    return nxt_node
+```
+

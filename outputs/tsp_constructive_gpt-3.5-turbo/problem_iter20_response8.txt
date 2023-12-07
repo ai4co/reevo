@@ -1,0 +1,38 @@
+Code description: 
+The code aims to select the next node based on a combination of distance and the average distance to unvisited nodes. This is done by calculating a score for each unvisited node that takes into account both factors. 
+
+The distance score is calculated by dividing the distance to the current node by the maximum distance in the distance matrix. This normalizes the distances and ensures that all nodes have a score between 0 and 1. 
+
+The average distance score is calculated by summing the distances from the unvisited node to all other unvisited nodes and dividing it by the number of unvisited nodes. This provides an indication of how far the unvisited node is from the remaining unvisited nodes.
+
+Finally, the two scores are combined using a trade-off parameter, which determines the relative importance of distance and average distance. The node with the highest score is selected as the next node to visit.
+
+```python
+import numpy as np
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    # Initialize variables
+    max_score = -np.inf
+    nxt_node = None
+    trade_off = 0.5
+    
+    # Calculate the score for each unvisited node
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        
+        # Distance score
+        distance_score = distance / np.max(distance_matrix)
+        
+        # Average distance score
+        avg_distance = np.mean(distance_matrix[node][list(unvisited_nodes)])
+        avg_distance_score = avg_distance / np.max(distance_matrix)
+        
+        # Calculate the weighted score
+        score = trade_off * distance_score + (1 - trade_off) * avg_distance_score
+        
+        if score > max_score:
+            max_score = score
+            nxt_node = node
+    
+    return nxt_node
+```

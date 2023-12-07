@@ -1,0 +1,75 @@
+Code description: 
+The crossover algorithm combines the key ideas from Algorithm 1 and Algorithm 2 to create a new heuristic called "Weighted Distance with Uncertainty, Degree, Neighbor Count, and Farthest Insertion" (WDDNCFI). It selects the next node based on a weighted score that considers distance, uncertainty, degree, neighbor count, and the farthest insertion cost.
+
+The algorithm first calculates the degree, uncertainty scores, and number of unvisited neighbors for each unvisited node, as in Algorithm 1. It then calculates the weighted distances from the current node to each unvisited node, considering these factors. Additionally, it calculates the farthest insertion cost for each unvisited node by finding the node that minimizes the insertion cost when inserted between the current node and the farthest node.
+
+Finally, the algorithm combines the weighted distances and the farthest insertion costs by summing them and chooses the node with the highest score as the next node to visit.
+
+```python
+import numpy as np
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    """
+    Select the next node to visit from the unvisited nodes using the Weighted Distance with Uncertainty, Degree, Neighbor Count, and Farthest Insertion heuristic.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    
+    n_nodes = len(distance_matrix)
+    
+    # Calculate the degree for each unvisited node
+    degree = np.zeros(n_nodes)
+    for node in unvisited_nodes:
+        degree[node] = np.sum(distance_matrix[node,:] > 0)
+    
+    # Calculate the uncertainty scores for each unvisited node
+    uncertainty_scores = np.zeros(n_nodes)
+    for node in unvisited_nodes:
+        variability = np.std(distance_matrix[:, node])
+        uncertainty_scores[node] = variability
+    
+    # Calculate the number of unvisited neighbors for each unvisited node
+    num_unvisited_neighbors = np.zeros(n_nodes)
+    for node in unvisited_nodes:
+        num_unvisited_neighbors[node] = np.sum(distance_matrix[node,:] > 0)
+    
+    # Calculate the weighted distances from the current node to each unvisited node, considering uncertainty, degree, and neighbor count
+    weighted_distances = np.zeros(n_nodes)
+    for node in unvisited_nodes:
+        weighted_distance = distance_matrix[current_node, node] * degree[node] * uncertainty_scores[node] * num_unvisited_neighbors[node]
+        weighted_distances[node] = weighted_distance
+    
+    # Calculate the distance from the current node to all unvisited nodes
+    node_distances = distance_matrix[current_node, list(unvisited_nodes)]
+    
+    # Find the farthest node from the current node
+    farthest_node = list(unvisited_nodes)[np.argmax(node_distances)]
+    
+    # Calculate the farthest insertion cost for each unvisited node
+    insertion_costs = []
+    for node in unvisited_nodes:
+        cost = distance_matrix[current_node, node] + distance_matrix[node, farthest_node] - distance_matrix[current_node, farthest_node]
+        insertion_costs.append(cost)
+    
+    # Combine the weighted distances and farthest insertion costs by summing them
+    scores = weighted_distances + np.array(insertion_costs)
+    
+    # Select the node with the highest score as the next node to visit
+    nxt_node = np.argmax(scores)
+    
+    return nxt_node
+```

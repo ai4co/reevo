@@ -1,0 +1,34 @@
+Code description: 
+
+To improve upon the existing algorithms, I propose a new algorithm that selects the next node based on a combination of attractiveness, closeness centrality, and the number of unvisited neighbors. The rationale behind this is to strike a balance between selecting nodes that are close to the current node, have a high centrality, and have many unvisited neighbors.
+
+```python
+import numpy as np
+import networkx as nx
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    # Initialize variables
+    max_score = -np.inf
+    nxt_node = None
+    
+    # Calculate the attractiveness for each unvisited node
+    attractiveness = distance_matrix[:, destination_node] - distance_matrix[:, current_node]
+    
+    # Calculate the closeness centrality of each unvisited node
+    closeness_centrality = nx.closeness_centrality(nx.Graph(distance_matrix))
+    
+    # Calculate the score for each unvisited node
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        num_unvisited_neighbors = len(unvisited_nodes.intersection(set(distance_matrix[node] > 0)))
+        
+        # Calculate the combined score based on attractiveness, closeness centrality, and number of unvisited neighbors
+        score = attractiveness[node] + closeness_centrality[node] + num_unvisited_neighbors
+        
+        if score > max_score:
+            max_score = score
+            nxt_node = node
+    
+    return nxt_node
+```
+

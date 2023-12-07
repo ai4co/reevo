@@ -1,0 +1,18 @@
+[*] Running ...
+[*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/dataset/val50_dataset.npy with 64 instances.
+/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py:17: RuntimeWarning: divide by zero encountered in divide
+  
+/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py:20: RuntimeWarning: invalid value encountered in divide
+  nxt_node : int
+Traceback (most recent call last):
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 66, in <module>
+    obj = eval_heuristic(node_positions[i])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 37, in eval_heuristic
+    next_node = select_next_node(
+                ^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py", line 23, in select_next_node
+    distances = distance_matrix[current_node]
+                ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^~
+  File "mtrand.pyx", line 951, in numpy.random.mtrand.RandomState.choice
+ValueError: 'a' and 'p' must have same size

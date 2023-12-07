@@ -1,0 +1,42 @@
+Code description: In this algorithm, we will combine the ideas from Algorithm 1 and Algorithm 2 to create a novel heuristic for selecting the next node. The new algorithm will prioritize nodes that have a higher improvement in path length, like Algorithm 1, but also take into account the savings between pairs of unvisited nodes, like Algorithm 2. By considering both factors, we aim to select nodes that not only improve the current path but also connect nodes that are closer to the current node.
+
+```python
+import numpy as np
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    # Initialize variables
+    max_combined_score = -np.inf
+    max_combined_score_nodes = []
+    
+    # Iterate over each unvisited node
+    for node in unvisited_nodes:
+        current_distance = distance_matrix[current_node][node]
+        destination_distance = distance_matrix[node][destination_node]
+        improvement = current_distance + destination_distance - distance_matrix[current_node][destination_node]
+        
+        # Calculate the savings for each pair of unvisited nodes
+        savings = 0
+        for node1 in unvisited_nodes:
+            for node2 in unvisited_nodes:
+                # Skip if the nodes are the same
+                if node1 == node2:
+                    continue
+                
+                savings += distance_matrix[current_node][node1] - distance_matrix[current_node][node2]
+        
+        # Combine the improvement and savings factors
+        combined_score = improvement + savings
+        
+        # Update max combined score if higher
+        if combined_score > max_combined_score:
+            max_combined_score = combined_score
+            max_combined_score_nodes = [node]
+        elif combined_score == max_combined_score:
+            max_combined_score_nodes.append(node)
+    
+    # Randomly select one of the nodes with the highest combined score
+    nxt_node = np.random.choice(max_combined_score_nodes)
+    
+    return nxt_node
+```
+

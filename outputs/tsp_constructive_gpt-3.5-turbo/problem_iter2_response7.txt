@@ -1,0 +1,42 @@
+Code description: The novel code selects the next node to visit based on the concept of uncertainty. Instead of considering only the distances, it considers the uncertainty in the distances. The uncertainty is calculated by measuring the variability in the distances of each unvisited node from the current node. The node with the highest uncertainty is selected as the next node to visit.
+
+```python
+import numpy as np
+import random
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    """
+    Select the next node to visit from the unvisited nodes based on uncertainty.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    distances = distance_matrix[current_node]
+    uncertainty_scores = []
+    nxt_node = -1
+
+    for node in unvisited_nodes:
+        distance = distances[node]
+        variability = np.std(distance_matrix[:, node])
+        uncertainty_scores.append(variability)
+
+    max_uncertainty_score = np.max(uncertainty_scores)
+    possible_next_nodes = [node for node, score in zip(unvisited_nodes, uncertainty_scores) if score == max_uncertainty_score]
+    nxt_node = random.choice(possible_next_nodes)
+
+    return nxt_node
+```
+

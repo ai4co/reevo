@@ -1,0 +1,32 @@
+Code description: The following code implements a novel selecting-next-node function called "Weighted Random Selection". 
+
+The function selects the next node based on a combination of the distance to the current node and a weight assigned to each unvisited node. 
+
+The algorithm starts by calculating the distances from the current node to all unvisited nodes. It then assigns a weight to each unvisited node based on its distance. The weight is calculated as the product of the inverse of the distance and a random number between 0 and 1. This random number introduces exploration to the selection process. 
+
+The function then normalizes the weights by dividing each weight by the sum of all weights. This ensures that the weight values represent probabilities.
+
+Finally, the function selects the next node based on the normalized weights. The node is selected randomly using the calculated probabilities. The probability of each node determines the likelihood of selection. If there are multiple nodes with the same probability, one of them is randomly chosen. 
+
+The function returns the index of the selected node.
+
+```python
+import numpy as np
+import random
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    # Calculate distances from the current node to all unvisited nodes
+    unvisited_distances = distance_matrix[current_node, list(unvisited_nodes)]
+
+    # Calculate the weights for all unvisited nodes based on the inverse of the distances and random exploration
+    weights = (1 / unvisited_distances) * np.random.rand(len(unvisited_distances))
+
+    # Normalize the weights to probabilities
+    probabilities = weights / np.sum(weights)
+
+    # Select the next node based on the probabilities
+    next_node = np.random.choice(list(unvisited_nodes), p=probabilities)
+
+    return next_node
+```
+

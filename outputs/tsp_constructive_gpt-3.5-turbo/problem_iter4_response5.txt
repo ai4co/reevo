@@ -1,0 +1,23 @@
+Code description: In this code, I will implement a selecting-next-node function for solving the Traveling Salesman Problem (TSP) using a probabilistic approach. The function will select the next node to visit based on the following steps:
+1. Calculate the weights for each unvisited node as the sum of inverse distances from the current node to all other unvisited nodes.
+2. Normalize the weights to probabilities.
+3. Select the next node based on the probabilities, giving more weight to the nodes with shorter distances.
+
+```python
+import numpy as np
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    # Calculate the weights for each unvisited node
+    weights = []
+    for node in unvisited_nodes:
+        weight = np.sum(1 / distance_matrix[current_node][unvisited_nodes])  # Sum of inverse distances
+        weights.append(weight)
+    
+    # Normalize the weights to probabilities
+    probabilities = np.array(weights) / np.sum(weights)
+    
+    # Select the next node based on the probabilities
+    nxt_node = np.random.choice(list(unvisited_nodes), size=1, p=probabilities)[0]
+    
+    return nxt_node
+```

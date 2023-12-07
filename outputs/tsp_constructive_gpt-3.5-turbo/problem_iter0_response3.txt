@@ -1,0 +1,43 @@
+Code description: 
+In this code, I will use a modified version of the Nearest Neighbor heuristic to select the next node to visit. Instead of always selecting the nearest neighbor, I will randomly select one of the nearest neighbors based on their distances. This introduces some randomness in the solution construction process.
+
+```python
+import numpy as np
+import random
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    """
+    Select the next node to visit from the unvisited nodes.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    
+    # Compute the distances from the current node to the unvisited nodes
+    distances = distance_matrix[current_node, list(unvisited_nodes)]
+    
+    # Find the index of the node with minimum distance
+    min_dist_index = distances.argmin()
+    
+    # Get the nearest neighbor nodes with minimum distance
+    nearest_nodes = np.where(distances == distances[min_dist_index])[0]
+    
+    # Select a random nearest neighbor node
+    nxt_node = random.choice(nearest_nodes)
+    
+    return nxt_node
+```
+In this code, I compute the distances from the current node to all unvisited nodes using the distance matrix. Then, I find the index of the node with the minimum distance. I find all the nodes that have the same minimum distance and randomly select one of them. Finally, I return the selected node as the next node to visit.

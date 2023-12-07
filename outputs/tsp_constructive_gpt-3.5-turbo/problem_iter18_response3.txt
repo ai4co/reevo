@@ -1,0 +1,34 @@
+Code description: 
+
+The crossover algorithm combines the concepts from both Algorithm 1 and Algorithm 2 to create a novel node selection strategy. The algorithm calculates a score for each unvisited node based on a combination of distance to the current node, closeness centrality, and the number of unvisited neighboring nodes. The score is a weighted combination of these factors, and the node with the highest score is selected as the next node to visit.
+
+```python
+import numpy as np
+import networkx as nx
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    # Initialize variables
+    max_score = -np.inf
+    nxt_node = None
+    weight1 = 0.4
+    weight2 = 0.3
+    weight3 = 0.3
+    
+    # Calculate the closeness centrality of each unvisited node
+    closeness_centrality = nx.closeness_centrality(nx.Graph(distance_matrix))
+    
+    # Calculate the score for each unvisited node
+    for node in unvisited_nodes:
+        distance_to_current = distance_matrix[current_node][node]
+        distance_to_destination = distance_matrix[node][destination_node]
+        num_unvisited_neighbors = len(unvisited_nodes.intersection(set(distance_matrix[node] > 0)))
+        
+        score = weight1 * (1 / distance_to_current) + weight2 * closeness_centrality[node] - weight3 * num_unvisited_neighbors
+        
+        if score > max_score:
+            max_score = score
+            nxt_node = node
+    
+    return nxt_node
+```
+

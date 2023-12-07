@@ -1,0 +1,29 @@
+Code description: The current algorithm constructs a minimum spanning tree from the current node to all unvisited nodes and selects the unvisited node with the shortest distance to the minimum spanning tree. In order to improve the algorithm, we can introduce a randomized element to the selection process. This can help to explore different paths and potentially find better solutions. 
+
+```python
+import numpy as np
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import minimum_spanning_tree
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    # Calculate the distance from the current node to all unvisited nodes
+    node_distances = distance_matrix[current_node, list(unvisited_nodes)]
+    
+    # Construct a minimum spanning tree
+    subgraph_nodes = [current_node] + list(unvisited_nodes)
+    subgraph_distances = distance_matrix[np.ix_(subgraph_nodes, subgraph_nodes)]
+    subgraph = minimum_spanning_tree(csr_matrix(subgraph_distances))
+    
+    # Calculate the distance from the minimum spanning tree to each unvisited node
+    mst_distances = subgraph.toarray()
+    mst_node_distances = mst_distances[0, 1:]
+    
+    # Randomly select one of the unvisited nodes with the shortest distance to the minimum spanning tree
+    min_distance = np.min(mst_node_distances)
+    indices = np.where(mst_node_distances == min_distance)[0]
+    rand_index = np.random.choice(indices)
+    nxt_node = list(unvisited_nodes)[rand_index]
+    
+    return nxt_node
+```
+

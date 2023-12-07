@@ -1,0 +1,11 @@
+[*] Running ...
+[*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/dataset/val50_dataset.npy with 64 instances.
+Traceback (most recent call last):
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 66, in <module>
+    obj = eval_heuristic(node_positions[i])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 37, in eval_heuristic
+    next_node = select_next_node(
+                ^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py", line 53, in select_next_node
+ValueError: operands could not be broadcast together with shapes (50,) (49,) 

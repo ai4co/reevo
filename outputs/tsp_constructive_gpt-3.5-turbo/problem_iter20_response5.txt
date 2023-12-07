@@ -1,0 +1,39 @@
+Code description: 
+My code implements a novel selecting-next-node function for the Traveling Salesman Problem (TSP). The function selects the next node to visit based on a combination of distance score and a novel neighbor score. 
+
+The distance score is calculated as the inverse of the distance between the current node and each unvisited node. A smaller distance corresponds to a higher score.
+
+The neighbor score is calculated as the number of unvisited neighbors that each unvisited node has. A node with more unvisited neighbors has a higher score.
+
+The trade-off parameter is used to adjust the relative importance of the distance score and neighbor score. By adjusting the trade-off parameter, the function can prioritize either minimizing distance or maximizing the number of unvisited neighbors.
+
+The code selects the node with the highest combined score as the next node to visit.
+
+```python
+import numpy as np
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    trade_off = 0.5
+    
+    # Calculate the distance scores for each unvisited node
+    distance_scores = []
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node, node]
+        distance_score = 1 / (distance + 1e-6)  # Adding small epsilon to avoid division by zero
+        distance_scores.append(distance_score)
+    
+    # Calculate the neighbor scores for each unvisited node
+    neighbor_scores = []
+    for node in unvisited_nodes:
+        num_unvisited_neighbors = len(unvisited_nodes) - 1
+        neighbor_score = num_unvisited_neighbors
+        neighbor_scores.append(neighbor_score)
+    
+    # Combine the distance scores and neighbor scores
+    scores = trade_off * np.array(distance_scores) + (1 - trade_off) * np.array(neighbor_scores)
+    
+    # Select the node with the highest combined score
+    nxt_node = np.argmax(scores)
+    
+    return nxt_node
+```

@@ -1,0 +1,63 @@
+Code description: 
+The modified code implements a novel selecting-next-node function for solving the Traveling Salesman Problem (TSP). The function selects the next node to visit based on a combination of three criteria: distance from the current node, distance to the destination node, and the number of unvisited neighboring nodes.
+
+```python
+import numpy as np
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    """
+    Select the next node to visit from the unvisited nodes.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    distances = distance_matrix[current_node]
+    max_distance = -1
+    max_dist_node = -1
+    min_dist_to_dest = np.inf
+    min_dist_node = -1
+    max_unvisited_neighbours = -1
+    max_unvisited_neighbours_node = -1
+
+    for node in unvisited_nodes:
+        # Determine node with maximum distance from current node
+        if distances[node] > max_distance:
+            max_distance = distances[node]
+            max_dist_node = node
+        elif distances[node] == max_distance:
+            # If two nodes have the same maximum distance, choose the one with shorter distance to the destination node
+            if distance_matrix[node][destination_node] < distance_matrix[max_dist_node][destination_node]:
+                max_dist_node = node
+        
+        # Determine node with minimum distance to destination node
+        if distance_matrix[node][destination_node] < min_dist_to_dest:
+            min_dist_to_dest = distance_matrix[node][destination_node]
+            min_dist_node = node
+        
+        # Determine node with maximum number of unvisited neighboring nodes
+        num_unvisited_neighbours = len(unvisited_nodes.intersection(distance_matrix[node].nonzero()[0]))
+        if num_unvisited_neighbours > max_unvisited_neighbours:
+            max_unvisited_neighbours = num_unvisited_neighbours
+            max_unvisited_neighbours_node = node
+
+    # Select the next node based on a weighted sum of the three criteria
+    weights = [0.3, 0.4, 0.3]
+    scores = [distances[node] / max_distance + distance_matrix[node][destination_node] / min_dist_to_dest + num_unvisited_neighbours / max_unvisited_neighbours for node in unvisited_nodes]
+    nxt_node = unvisited_nodes[np.argmax([score * weight for score, weight in zip(scores, weights)])]
+
+    return nxt_node
+```
+

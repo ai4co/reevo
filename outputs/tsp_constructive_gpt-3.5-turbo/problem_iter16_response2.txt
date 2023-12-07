@@ -1,0 +1,141 @@
+Code description: 
+The current code uses a combination of a genetic algorithm and local search to solve the Traveling Salesman Problem. The genetic algorithm is used to generate an initial population of candidate solutions, and then the local search is applied to each candidate solution to improve its quality. The next node to visit is selected based on the candidate solution with the highest improvement after the local search.
+
+In order to provide a better algorithm, I will use a combination of the nearest neighbor heuristic and 2-opt local search. The next node to visit will be selected using the nearest neighbor heuristic, which selects the unvisited node that is closest to the current node. After selecting the next node, the 2-opt local search will be applied to the current solution to improve its quality. The 2-opt algorithm swaps pairs of edges in the solution to reduce the total distance. This combination of nearest neighbor and 2-opt will result in a more efficient selecting-next-node function for the TSP.
+
+```python
+import numpy as np
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    """
+    Select the next node to visit from the unvisited nodes.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    
+    # Select the next node using the nearest neighbor heuristic
+    nxt_node = nearest_neighbor(current_node, unvisited_nodes, distance_matrix)
+    
+    # Apply 2-opt local search to the current solution
+    solution = list(unvisited_nodes - {nxt_node})
+    solution.insert(0, current_node)
+    solution.append(destination_node)
+    improved_solution = two_opt_local_search(solution, distance_matrix)
+    
+    # Select the next node from the improved solution
+    nxt_node = improved_solution[1]
+    
+    return nxt_node
+
+
+def nearest_neighbor(current_node, unvisited_nodes, distance_matrix):
+    """
+    Select the nearest unvisited node to the current node.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    
+    Returns
+    -------
+    closest_node : int
+        The nearest unvisited node.
+    """
+    closest_node = None
+    min_distance = np.inf
+    
+    for node in unvisited_nodes:
+        distance = distance_matrix[current_node][node]
+        if distance < min_distance:
+            min_distance = distance
+            closest_node = node
+    
+    return closest_node
+
+
+def two_opt_local_search(solution, distance_matrix):
+    """
+    Apply the 2-opt algorithm to improve the quality of the solution.
+    
+    Parameters
+    ----------
+    solution : list
+        The current solution.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    
+    Returns
+    -------
+    improved_solution : list
+        The improved solution.
+    """
+    best_solution = solution
+    best_distance = calculate_distance(solution, distance_matrix)
+    improved = True
+    
+    while improved:
+        improved = False
+        
+        for i in range(1, len(solution) - 2):
+            for j in range(i + 1, len(solution)):
+                if j - i == 1:
+                    continue
+                
+                new_solution = solution.copy()
+                new_solution[i:j] = solution[j - 1:i - 1:-1]
+                new_distance = calculate_distance(new_solution, distance_matrix)
+                
+                if new_distance < best_distance:
+                    best_solution = new_solution
+                    best_distance = new_distance
+                    improved = True
+        
+        solution = best_solution
+    
+    return best_solution
+
+
+def calculate_distance(solution, distance_matrix):
+    """
+    Calculate the total distance of a candidate solution.
+    
+    Parameters
+    ----------
+    solution : list
+        The candidate solution.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    
+    Returns
+    -------
+    distance : float
+        The total distance of the solution.
+    """
+    distance = 0
+    
+    for i in range(len(solution)-1):
+        distance += distance_matrix[solution[i]][solution[i+1]]
+    
+    return distance
+```
+
+The new algorithm uses the nearest neighbor heuristic to select the next node based on the unvisited nodes that are closest to the current node. After selecting the next node, the 2-opt local search algorithm is applied to the current solution to iteratively improve it by swapping pairs of edges. The improved solution is then returned and the next node is selected. This combination of nearest neighbor and 2-opt provides a more efficient selecting-next-node function for the TSP.

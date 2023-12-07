@@ -1,0 +1,12 @@
+Code description: 
+The code below proposes a modified version of Algorithm 2 that incorporates the idea of balancing exploration and exploitation. The modified algorithm introduces a randomness factor that allows for the exploration of different paths while still prioritizing nodes that are closer to the current and destination nodes. 
+
+The modified algorithm works as follows:
+1. Initialize an empty list called scores to store the scores of each unvisited node.
+2. Iterate through each unvisited node.
+3. For each unvisited node, calculate the score by summing the distance from the current node to the unvisited node, the distance from the unvisited node to the destination node, and a random number from a uniform distribution.
+4. Append the score to the scores list.
+5. Find the index of the minimum score in the scores list.
+6. Return the unvisited node at the same index as the minimum score in the scores list. 
+
+The introduction of randomness in the scoring mechanism allows for the exploration of different paths, which can potentially lead to finding better solutions.
