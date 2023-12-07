@@ -7,6 +7,5 @@ Traceback (most recent call last):
   File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 37, in eval_heuristic
     next_node = select_next_node(
                 ^^^^^^^^^^^^^^^^^
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py", line 61, in select_next_node
-    degree_weight = 2.0
-ValueError: operands could not be broadcast together with shapes (50,) (49,) 
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py", line 35, in select_next_node
+IndexError: index 49 is out of bounds for axis 0 with size 49

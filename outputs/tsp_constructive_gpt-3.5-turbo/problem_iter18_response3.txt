@@ -1,34 +1,22 @@
-Code description: 
-
-The crossover algorithm combines the concepts from both Algorithm 1 and Algorithm 2 to create a novel node selection strategy. The algorithm calculates a score for each unvisited node based on a combination of distance to the current node, closeness centrality, and the number of unvisited neighboring nodes. The score is a weighted combination of these factors, and the node with the highest score is selected as the next node to visit.
+Code description: In this novel algorithm, I propose a modification to the original algorithm that takes into account both the distance from the current node to each unvisited node and the distance from the destination node to each unvisited node. The algorithm calculates a score for each unvisited node and selects the node with the highest score as the next node to visit. The score is calculated based on a combination of these two distances, where the current distance has a higher weight than the destination distance.
 
 ```python
 import numpy as np
-import networkx as nx
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    # Initialize variables
-    max_score = -np.inf
-    nxt_node = None
-    weight1 = 0.4
-    weight2 = 0.3
-    weight3 = 0.3
+    # Calculate distance from current node to each unvisited node
+    current_distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    # Calculate the closeness centrality of each unvisited node
-    closeness_centrality = nx.closeness_centrality(nx.Graph(distance_matrix))
+    # Calculate distance from destination node to each unvisited node
+    destination_distances = distance_matrix[destination_node, list(unvisited_nodes)]
     
-    # Calculate the score for each unvisited node
-    for node in unvisited_nodes:
-        distance_to_current = distance_matrix[current_node][node]
-        distance_to_destination = distance_matrix[node][destination_node]
-        num_unvisited_neighbors = len(unvisited_nodes.intersection(set(distance_matrix[node] > 0)))
-        
-        score = weight1 * (1 / distance_to_current) + weight2 * closeness_centrality[node] - weight3 * num_unvisited_neighbors
-        
-        if score > max_score:
-            max_score = score
-            nxt_node = node
+    # Calculate score for each unvisited node
+    scores = current_distances - 0.5 * destination_distances
+    
+    # Find the node with the highest score
+    nxt_node = list(unvisited_nodes)[np.argmax(scores)]
     
     return nxt_node
 ```
 
+The proposed algorithm calculates a score for each unvisited node by subtracting a weighted factor (0.5) times the distance from the destination node from the distance from the current node. The algorithm then selects the node with the highest score as the next node to visit. This modification aims to balance the importance of both distances in the decision-making process, allowing for better selection of the next node.

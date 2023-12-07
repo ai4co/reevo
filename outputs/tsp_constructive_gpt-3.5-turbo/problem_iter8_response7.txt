@@ -1,11 +1,21 @@
-Code description: The following code implements a novel selecting-next-node function for the Traveling Salesman Problem (TSP) using a combination of local and global information. The function selects the next node based on both the local distance between the current node and the unvisited nodes, and the global distance between all unvisited nodes. The function considers the close neighbors of the current node and selects the unvisited node that has the smallest average distance to those neighbors.
+Code description: In this code, I will propose a new selecting-next-node function that combines the ideas from both Algorithm 1 and Algorithm 2. The goal is to select the next node that minimizes the distance to both the current node and the destination node, while also considering the attractiveness of each unvisited node based on a dynamically adjusted alpha value.
+
+I will start by calculating the distances from the current node to all unvisited nodes, the distances from the destination node to all unvisited nodes, and the distance from the current node to the destination node, similar to Algorithm 1.
+
+Next, I will calculate the weighted distances, which is the sum of the distances from the current node to all unvisited nodes and the distances from the destination node to those unvisited nodes, just like in Algorithm 1.
+
+Then, I will determine the adaptive alpha value based on the number of remaining unvisited nodes. If the number of remaining nodes is small, I will increase the alpha value to favor exploration and avoid getting stuck in local optima. If the number of remaining nodes is large, I will decrease the alpha value to favor exploitation and focus on exploiting promising regions of the search space.
+
+After that, I will calculate the attractiveness of each unvisited node based on the dynamically adjusted alpha value and the pheromone levels. This will give a score that balances both the distance and the attractiveness.
+
+Finally, I will select the unvisited node with the maximum combined score as the next node to visit and return it as the output of the function.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
     """
-    Select the next node to visit from the unvisited nodes using a combination of local and global information.
+    Select the next node to visit from the unvisited nodes.
     
     Parameters
     ----------
@@ -24,77 +34,37 @@ def select_next_node(current_node: int, destination_node: int, unvisited_nodes: 
         The next node to visit.
     """
     
-    # Initialize variables
-    min_avg_distance = np.inf
-    best_node = None
+    # Calculate the distances from the current node to all unvisited nodes
+    distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    # Calculate the average distance between the current_node and its neighbors
-    neighbors = [node for node in unvisited_nodes if distance_matrix[current_node, node] < np.inf]
-    avg_distance = np.mean([distance_matrix[current_node, node] for node in neighbors])
+    # Calculate the distances from the destination node to all unvisited nodes
+    dest_distances = distance_matrix[destination_node, list(unvisited_nodes)]
     
-    # Iterate over unvisited nodes
-    for node in unvisited_nodes:
-        if node != current_node:
-            # Calculate the average distance between the neighbors and the current unvisited node
-            avg_distance_new = np.mean([distance_matrix[node, neigh] for neigh in neighbors])
-            
-            # Update the best_node if the average distance is smaller
-            if avg_distance_new < min_avg_distance:
-                min_avg_distance = avg_distance_new
-                best_node = node
+    # Calculate the distance from the current node to the destination node
+    dest_distance = distance_matrix[current_node, destination_node]
     
-    nxt_node = best_node
-    return nxt_node
-```
+    # Calculate the distances from the current node to all unvisited nodes added to the distance from the destination node to those unvisited nodes
+    weighted_distances = distances + dest_distances
+    
+    # Determine the adaptive alpha value based on the number of remaining unvisited nodes
+    remaining_nodes = len(unvisited_nodes)
+    if remaining_nodes <= 0.5 * distance_matrix.shape[0]:  # If remaining nodes are less than or equal to half the total nodes
+        alpha = 5.0  # Increase alpha to favor exploration
+    else:
+        alpha = 0.5  # Decrease alpha to favor exploitation
+    
+    # Calculate attractiveness of each unvisited node based on the dynamically adjusted alpha value and the pheromone levels
+    pheromone_matrix = np.full_like(distance_matrix, 0.01)  # Initialize pheromone matrix with small values
+    attractiveness = np.exp(-alpha * pheromone_matrix[current_node, list(unvisited_nodes)])
 
------
-Code description: 
-
-The modified code below uses the local information to find the next node, but it also includes a random element. It sorts all the unvisited nodes in ascending order of their distances to the current node and then selects the next node randomly from the top k closest nodes. This introduces some randomness into the selection process, which can help avoid getting stuck in local optima.
-
-```python
-import numpy as np
-import random
-
-def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    """
-    Select the next node to visit from the unvisited nodes using a combination of local and global information.
+    # Calculate the combined attractiveness and weighted distance score for each unvisited node
+    combined_score = attractiveness / weighted_distances
     
-    Parameters
-    ----------
-    current_node : int
-        The current node.
-    destination_node : int
-        The destination node to return to.
-    unvisited_nodes : set
-        The set of unvisited nodes.
-    distance_matrix : np.ndarray
-        The distance matrix of shape (n_nodes, n_nodes).
+    # Find the index of the unvisited node with the maximum combined score
+    max_index = np.argmax(combined_score)
     
-    Returns
-    -------
-    nxt_node : int
-        The next node to visit.
-    """
-    
-    # Initialize variables
-    k = 5  # Number of closest nodes to consider
-    closest_nodes = []
-    
-    # Calculate the distances between the current_node and all unvisited nodes
-    distances = {node: distance_matrix[current_node, node] for node in unvisited_nodes if node != current_node}
-    
-    # Sort the unvisited nodes based on their distances to the current_node
-    sorted_nodes = sorted(distances, key=distances.get)
-    
-    # Select randomly from the top k closest nodes
-    if len(sorted_nodes) > k:
-        closest_nodes = sorted_nodes[:k]
-    elif len(sorted_nodes) > 0:
-        closest_nodes = sorted_nodes
-    
-    # Randomly select a node from the closest_nodes
-    nxt_node = random.choice(closest_nodes) if closest_nodes else None
+    # Get the corresponding unvisited node
+    nxt_node = list(unvisited_nodes)[max_index]
     
     return nxt_node
 ```

@@ -1,47 +1,36 @@
------
-Code description: The improved code selects the next node to visit based on a combination of uncertainty and distance, while also considering the importance of both factors. It calculates the weight for each unvisited node by combining the uncertainty score and the inverse of the distance. The next node is then selected by choosing the node with the highest weight. 
+Code description: The code implements a novel selecting-next-node function called "Weighted Random Choice" for the Traveling Salesman Problem (PSP).
 
-This code introduces a novel element by assigning different weights to the uncertainty score and the distance, allowing for a more balanced selection process. Additionally, it adds a level of randomness by selecting a random node from the top-weighted nodes, rather than always selecting the node with the highest weight.
+Weighted Random Choice works as follows:
+1. Start at the current node.
+2. For each unvisited neighbor of the current node, calculate a weight based on the distance between the current node and the neighbor.
+3. Randomly select a neighbor using the weights as probabilities.
+4. Return the selected neighbor as the next node to visit.
+
+The code uses the distance matrix to determine the neighbors of each node and to calculate the distances between nodes. The weighted random choice ensures that nodes closer to the current node have higher probabilities of being selected, but still allows for some exploration in the solution space.
 
 ```python
 import numpy as np
+import random
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    """
-    Select the next node to visit from the unvisited nodes based on a combination of uncertainty and distance, while introducing randomness.
+    # Get the neighbors of the current node
+    neighbors = [i for i in range(distance_matrix.shape[0]) if i != current_node and i in unvisited_nodes]
     
-    Parameters
-    ----------
-    current_node : int
-        The current node.
-    destination_node : int
-        The destination node to return to.
-    unvisited_nodes : set
-        The set of unvisited nodes.
-    distance_matrix : np.ndarray
-        The distance matrix of shape (n_nodes, n_nodes).
+    if not neighbors:
+        # If there are no unvisited neighbors, select the destination node
+        return destination_node
     
-    Returns
-    -------
-    nxt_node : int
-        The next node to visit.
-    """
-    distances = distance_matrix[current_node]
-    uncertainty_scores = []
-    weights = []
-    nxt_node = -1
-
-    for node in unvisited_nodes:
-        distance = distances[node]
-        variability = np.std(distance_matrix[:, node])
-        
-        uncertainty_scores.append(variability)
-        weights.append(variability / distance)  # Calculate the weight for each unvisited node
-
-    max_weight = np.max(weights)
-    top_weight_nodes = [node for node, weight in zip(unvisited_nodes, weights) if weight == max_weight]
-    nxt_node = np.random.choice(top_weight_nodes)  # Select a random node with the highest weight
-
+    # Calculate the weights for each neighbor based on distance
+    weights = [1 / distance_matrix[current_node][neighbor] for neighbor in neighbors]
+    
+    # Normalize the weights to probabilities
+    total_weight = sum(weights)
+    probabilities = [weight / total_weight for weight in weights]
+    
+    # Randomly select a neighbor using the probabilities as weights
+    nxt_node = random.choices(neighbors, probabilities)[0]
+    
     return nxt_node
 ```
------
+
+In this code, the weights of the neighbors are calculated based on the inverse of their distances from the current node. The distances are obtained from the distance matrix. The weights are then normalized to probabilities, and a neighbor is randomly selected using these probabilities. This way, nodes that are closer to the current node have higher probabilities of being selected, but there is still a chance for other nodes to be chosen, allowing for exploration in the solution space.

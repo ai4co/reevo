@@ -1,28 +1,27 @@
-Code description: In this algorithm, we will modify the selection process to consider multiple factors including the improvement in path length, the distance to the destination node, and the number of unvisited neighbors. By combining these factors using weighted scores, we can select a node that balances all these considerations.
+Code description: The proposed algorithm aims to improve upon the previous algorithms by considering multiple factors and incorporating a more balanced approach to selecting the next node. The modified algorithm considers the current distance, destination distance, and the number of neighboring unvisited nodes for each unvisited node. It calculates a combined score for each unvisited node and selects the node with the highest combined score as the next node to visit.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    # Initialize variables
-    max_score = -np.inf
-    nxt_node = None
-    weight1 = 0.3  # Weight for improvement in path length
-    weight2 = 0.3  # Weight for distance to destination node
-    weight3 = 0.4  # Weight for number of unvisited neighbors
+    # Calculate the distance from the current node to each unvisited node
+    current_distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    # Calculate the score for each unvisited node
+    # Calculate the distance from the destination node to each unvisited node
+    destination_distances = distance_matrix[destination_node, list(unvisited_nodes)]
+    
+    # Calculate the number of neighboring unvisited nodes for each unvisited node
+    neighboring_nodes = set()
     for node in unvisited_nodes:
-        current_distance = distance_matrix[current_node][node]
-        destination_distance = distance_matrix[node][destination_node]
-        improvement = current_distance + destination_distance - distance_matrix[current_node][destination_node]
-        num_unvisited_neighbors = np.sum(distance_matrix[node,:] > 0)
-        
-        score = weight1 * improvement + weight2 * (1 / (destination_distance+1)) + weight3 * num_unvisited_neighbors
-        
-        if score > max_score:
-            max_score = score
-            nxt_node = node
+        neighboring_nodes.update(np.where(distance_matrix[node] > 0)[0])
+    neighboring_unvisited_nodes = neighboring_nodes.intersection(unvisited_nodes)
+    neighbor_counts = np.array([len(np.where(distance_matrix[node] > 0)[0].tolist()) for node in unvisited_nodes])
+    
+    # Calculate the combined score as the sum of current distances, destination distances, and neighbor counts
+    combined_scores = current_distances + destination_distances + neighbor_counts
+    
+    # Find the node with the highest combined score
+    nxt_node = list(unvisited_nodes)[np.argmax(combined_scores)]
     
     return nxt_node
 ```

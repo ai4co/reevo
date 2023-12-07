@@ -1,11 +1,72 @@
 [*] Running ...
 [*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/dataset/val50_dataset.npy with 64 instances.
-Traceback (most recent call last):
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 66, in <module>
-    obj = eval_heuristic(node_positions[i])
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 37, in eval_heuristic
-    next_node = select_next_node(
-                ^^^^^^^^^^^^^^^^^
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py", line 36, in select_next_node
-IndexError: only integers, slices (`:`), ellipsis (`...`), numpy.newaxis (`None`) and integer or boolean arrays are valid indices
+/Users/yhr/anaconda3/lib/python3.11/site-packages/numpy/core/fromnumeric.py:3464: RuntimeWarning: Mean of empty slice.
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/Users/yhr/anaconda3/lib/python3.11/site-packages/numpy/core/_methods.py:192: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+[*] Instance 0: 8.188743635103341
+[*] Instance 1: 8.36151322769916
+[*] Instance 2: 7.569391312417254
+[*] Instance 3: 9.157695143994285
+[*] Instance 4: 7.947885169720538
+[*] Instance 5: 8.366743056105399
+[*] Instance 6: 8.373752928651554
+[*] Instance 7: 8.018830111063775
+[*] Instance 8: 8.126857478960424
+[*] Instance 9: 7.309269823505021
+[*] Instance 10: 7.644759547938273
+[*] Instance 11: 7.71128528568723
+[*] Instance 12: 7.066943026345958
+[*] Instance 13: 9.074706977919536
+[*] Instance 14: 9.72458482510442
+[*] Instance 15: 8.064506254884678
+[*] Instance 16: 7.660417587647187
+[*] Instance 17: 6.852046617078036
+[*] Instance 18: 8.1649210824249
+[*] Instance 19: 7.955615388934958
+[*] Instance 20: 8.097981156625522
+[*] Instance 21: 7.856898188063737
+[*] Instance 22: 7.545280662714736
+[*] Instance 23: 8.127745619460343
+[*] Instance 24: 7.303446870158237
+[*] Instance 25: 7.5616341053655525
+[*] Instance 26: 8.2995941490262
+[*] Instance 27: 7.166119525713984
+[*] Instance 28: 7.6737610007407655
+[*] Instance 29: 8.668568467472014
+[*] Instance 30: 8.374392669842424
+[*] Instance 31: 6.567113185278631
+[*] Instance 32: 7.767409447984393
+[*] Instance 33: 9.071966515113983
+[*] Instance 34: 8.289491782763232
+[*] Instance 35: 8.23544381176123
+[*] Instance 36: 7.100476108332842
+[*] Instance 37: 8.810572600703939
+[*] Instance 38: 8.33071040438055
+[*] Instance 39: 7.472393889721128
+[*] Instance 40: 7.014468783640196
+[*] Instance 41: 8.506423754395808
+[*] Instance 42: 7.596550175956785
+[*] Instance 43: 8.945181251226325
+[*] Instance 44: 8.754239417742733
+[*] Instance 45: 9.366661569505238
+[*] Instance 46: 8.982928305643567
+[*] Instance 47: 9.081804423240175
+[*] Instance 48: 7.485370340432892
+[*] Instance 49: 9.212902518779227
+[*] Instance 50: 8.259948830381584
+[*] Instance 51: 8.709427380805105
+[*] Instance 52: 8.570870249815503
+[*] Instance 53: 8.275561204882374
+[*] Instance 54: 8.549674196596493
+[*] Instance 55: 8.435643761602693
+[*] Instance 56: 8.772087848555556
+[*] Instance 57: 8.446026238842306
+[*] Instance 58: 6.945245295873966
+[*] Instance 59: 7.4174060404737405
+[*] Instance 60: 9.002587869061207
+[*] Instance 61: 7.341632615886785
+[*] Instance 62: 8.307803174141858
+[*] Instance 63: 7.067250375872625
+[*] Average:
+8.104830691652564

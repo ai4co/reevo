@@ -1,68 +1,13 @@
 [*] Running ...
 [*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/dataset/val50_dataset.npy with 64 instances.
-[*] Instance 0: 24.278978728201988
-[*] Instance 1: 25.264151268939308
-[*] Instance 2: 26.721027812330405
-[*] Instance 3: 28.19230925325648
-[*] Instance 4: 26.928663622146054
-[*] Instance 5: 27.157401615584458
-[*] Instance 6: 24.390673468120017
-[*] Instance 7: 25.129077411941864
-[*] Instance 8: 26.653517954970503
-[*] Instance 9: 26.24345075006659
-[*] Instance 10: 31.54126658863448
-[*] Instance 11: 26.285662255291015
-[*] Instance 12: 24.171961855356866
-[*] Instance 13: 29.344695021920423
-[*] Instance 14: 28.007388316717115
-[*] Instance 15: 28.179037681469094
-[*] Instance 16: 27.470206044289437
-[*] Instance 17: 25.201968592659636
-[*] Instance 18: 28.478440784766438
-[*] Instance 19: 26.302906050006634
-[*] Instance 20: 25.219871297530585
-[*] Instance 21: 27.651327977625886
-[*] Instance 22: 24.774993378084556
-[*] Instance 23: 27.24427021471662
-[*] Instance 24: 26.587851527423073
-[*] Instance 25: 29.596571968156862
-[*] Instance 26: 24.13498404839704
-[*] Instance 27: 27.449931000108027
-[*] Instance 28: 28.218235905669413
-[*] Instance 29: 30.57881840897992
-[*] Instance 30: 25.06472701952878
-[*] Instance 31: 25.430042422056616
-[*] Instance 32: 27.574277457688588
-[*] Instance 33: 23.779176956968794
-[*] Instance 34: 27.87544787192694
-[*] Instance 35: 29.666969906236297
-[*] Instance 36: 26.399318508407095
-[*] Instance 37: 22.00463645149421
-[*] Instance 38: 23.558413386751422
-[*] Instance 39: 26.92322101707359
-[*] Instance 40: 23.912545288880953
-[*] Instance 41: 25.285315658344913
-[*] Instance 42: 26.781332996722103
-[*] Instance 43: 25.20019040987496
-[*] Instance 44: 26.266321888116902
-[*] Instance 45: 25.57136555505856
-[*] Instance 46: 26.248832954332318
-[*] Instance 47: 24.434943678055426
-[*] Instance 48: 26.82956326900055
-[*] Instance 49: 26.536568271280306
-[*] Instance 50: 26.303432855217483
-[*] Instance 51: 27.762714036184445
-[*] Instance 52: 23.205964597249192
-[*] Instance 53: 26.383615736206178
-[*] Instance 54: 26.60406650447218
-[*] Instance 55: 27.946972498749485
-[*] Instance 56: 27.32684027451363
-[*] Instance 57: 23.41197003352358
-[*] Instance 58: 24.673386234347493
-[*] Instance 59: 27.524311831883107
-[*] Instance 60: 24.388927429375443
-[*] Instance 61: 28.693293132151982
-[*] Instance 62: 26.474404880521984
-[*] Instance 63: 25.882260662549537
-[*] Average:
-26.3957033199704
+Traceback (most recent call last):
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 66, in <module>
+    obj = eval_heuristic(node_positions[i])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 37, in eval_heuristic
+    next_node = select_next_node(
+                ^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py", line 11, in select_next_node
+    connectivity_scores = np.zeros(len(unvisited_nodes))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ZeroDivisionError: division by zero

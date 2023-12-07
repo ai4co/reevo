@@ -1,36 +1,29 @@
-Code description: 
-The goal of the proposed algorithm is to select the next node to visit based on both the attractiveness of each unvisited node and the number of unvisited neighbors. However, instead of calculating the attractiveness and the number of unvisited neighbors for each unvisited node, a pre-processing step is introduced to calculate these values in advance. This allows for faster computation during the selection process. The attractiveness is calculated as the difference between the distance to the destination node and the distance to the current node, while the number of unvisited neighbors is simply the number of unvisited nodes adjacent to each unvisited node.
+Code description: The proposed algorithm aims to incorporate a more comprehensive approach to selecting the next node by considering multiple factors. The modified algorithm considers the current distance, destination distance, and the number of neighboring unvisited nodes for each unvisited node. The algorithm calculates a combined score for each unvisited node and selects the node with the highest combined score as the next node to visit.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    # Calculate the attractiveness and number of unvisited neighbors in advance
-    attractiveness_dict = {}
-    num_unvisited_neighbors_dict = {}
+    # Calculate distance from current node to each unvisited node
+    current_distances = distance_matrix[current_node, list(unvisited_nodes)]
     
+    # Calculate distance from destination node to each unvisited node
+    destination_distances = distance_matrix[destination_node, list(unvisited_nodes)]
+    
+    # Calculate the number of neighboring unvisited nodes for each unvisited node
+    neighboring_nodes = set()
     for node in unvisited_nodes:
-        distance_current = distance_matrix[current_node][node]
-        distance_destination = distance_matrix[node][destination_node]
-        attractiveness = distance_destination - distance_current
-        attractiveness_dict[node] = attractiveness
-        
-        num_unvisited_neighbors = len(unvisited_nodes.intersection(set(np.nonzero(distance_matrix[node])[0])))
-        num_unvisited_neighbors_dict[node] = num_unvisited_neighbors
+        neighboring_nodes.update(np.where(distance_matrix[node] > 0)[0])
+    neighboring_unvisited_nodes = neighboring_nodes.intersection(unvisited_nodes)
+    neighbor_counts = np.array([len(np.where(distance_matrix[node] > 0)[0].tolist()) for node in unvisited_nodes])
     
-    # Select the next node based on attractiveness and number of unvisited neighbors
-    max_score = -np.inf
-    nxt_node = None
+    # Calculate the combined score as the sum of the reciprocal of current and destination distances, multiplied by the neighbor counts
+    combined_scores = (1 / current_distances) + (1 / destination_distances) + neighbor_counts
     
-    for node in unvisited_nodes:
-        score = attractiveness_dict[node] + num_unvisited_neighbors_dict[node]
-        
-        if score > max_score:
-            max_score = score
-            nxt_node = node
-        elif score == max_score:
-            nxt_node = min(nxt_node, node)
+    # Find the node with the highest combined score
+    nxt_node = list(unvisited_nodes)[np.argmax(combined_scores)]
     
     return nxt_node
 ```
-
+- In this modified algorithm, the combined score is calculated as the sum of the reciprocal of the current and destination distances, multiplied by the neighbor counts. This modification aims to give more weight to nodes that are closer to both the current and destination nodes and have fewer neighboring unvisited nodes.
+- The node with the highest combined score is selected as the next node to visit. This approach aims to prioritize nodes that have a favorable combination of distance factors and fewer neighboring unvisited nodes.

@@ -1,11 +1,68 @@
 [*] Running ...
 [*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/dataset/val50_dataset.npy with 64 instances.
-/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py:37: RuntimeWarning: divide by zero encountered in scalar divide
-  # Calculate the number of unvisited neighbors for each unvisited node
-Traceback (most recent call last):
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 66, in <module>
-    obj = eval_heuristic(node_positions[i])
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 44, in eval_heuristic
-    unvisited.remove(next_node)
-KeyError: None
+[*] Instance 0: 33.814573696342734
+[*] Instance 1: 37.62189503337085
+[*] Instance 2: 34.15320349201331
+[*] Instance 3: 37.227357525072506
+[*] Instance 4: 36.784284298798454
+[*] Instance 5: 36.354446190767504
+[*] Instance 6: 33.74945150690175
+[*] Instance 7: 36.21567278241522
+[*] Instance 8: 33.20531534931443
+[*] Instance 9: 36.710012003783035
+[*] Instance 10: 37.4383239806417
+[*] Instance 11: 35.09342434146433
+[*] Instance 12: 32.420364351208484
+[*] Instance 13: 38.33648054623828
+[*] Instance 14: 33.53015798261881
+[*] Instance 15: 35.707092841830836
+[*] Instance 16: 32.28032865189038
+[*] Instance 17: 33.56246939080721
+[*] Instance 18: 41.16355090375004
+[*] Instance 19: 35.922147431712446
+[*] Instance 20: 32.633140308076
+[*] Instance 21: 36.93212423167335
+[*] Instance 22: 36.48995377354393
+[*] Instance 23: 36.866623701488386
+[*] Instance 24: 33.86384198424928
+[*] Instance 25: 35.73312871530353
+[*] Instance 26: 33.4551728203995
+[*] Instance 27: 35.79331551224922
+[*] Instance 28: 31.43950806219363
+[*] Instance 29: 36.96911639443823
+[*] Instance 30: 32.55445727228222
+[*] Instance 31: 34.17974778969242
+[*] Instance 32: 33.416238613639294
+[*] Instance 33: 33.85985254013395
+[*] Instance 34: 35.92772559027735
+[*] Instance 35: 36.40507790758528
+[*] Instance 36: 34.57343643625177
+[*] Instance 37: 32.95117803279222
+[*] Instance 38: 32.20273032020915
+[*] Instance 39: 35.81669952151501
+[*] Instance 40: 34.91112147155379
+[*] Instance 41: 35.53679951659521
+[*] Instance 42: 34.51682072794125
+[*] Instance 43: 30.660051951963993
+[*] Instance 44: 36.75845284519831
+[*] Instance 45: 35.984823344691605
+[*] Instance 46: 35.987752786961046
+[*] Instance 47: 34.93450884618177
+[*] Instance 48: 34.85953756143173
+[*] Instance 49: 35.62052614210522
+[*] Instance 50: 29.985321517724426
+[*] Instance 51: 37.70502604241554
+[*] Instance 52: 35.80655726607067
+[*] Instance 53: 34.63780737856614
+[*] Instance 54: 35.56412954429449
+[*] Instance 55: 36.27071875729736
+[*] Instance 56: 37.56403174318444
+[*] Instance 57: 34.35848374570899
+[*] Instance 58: 33.369485077008406
+[*] Instance 59: 32.841997166843235
+[*] Instance 60: 34.029350996810614
+[*] Instance 61: 38.535137367850936
+[*] Instance 62: 36.0792329799794
+[*] Instance 63: 35.25827176902847
+[*] Average:
+35.080149505880364

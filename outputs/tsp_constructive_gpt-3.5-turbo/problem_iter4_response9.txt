@@ -1,12 +1,17 @@
-Code description: The code implements a novel heuristic called Weighted Distance and Degree with Neighborhood Exploration. This heuristic selects the next node to visit based on the distance from the current node to each unvisited node, weighted by the degree of each unvisited node. In addition, it explores the neighborhood of the current node and considers the distance and degree of the neighboring nodes. The node with the highest weighted distance, considering both the current node and its neighbors, is selected as the next node to visit.
+Code description: In this modified algorithm, I will introduce a parameter called "diversification_factor" to control the level of diversification in the algorithm. The diversification_factor determines the probability of selecting a random unvisited node instead of choosing the node with the highest attractiveness. 
+
+When the diversification_factor is set to 0, the algorithm will always select the node with the highest attractiveness, favoring exploitation. When the diversification_factor is set to 1, the algorithm will randomly select a node from the available unvisited nodes, favoring diversification.
+
+This approach allows the algorithm to explore different paths while still exploiting the attractiveness information of the unvisited nodes.
 
 ```python
 import numpy as np
+import random
 
-def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray, diversification_factor: float) -> int:
     """
-    Select the next node to visit from the unvisited nodes using the Weighted Distance and Degree with Neighborhood Exploration heuristic.
-    
+    Select the next node to visit from the unvisited nodes using a balanced exploration-exploitation approach with diversification.
+
     Parameters
     ----------
     current_node : int
@@ -17,39 +22,29 @@ def select_next_node(current_node: int, destination_node: int, unvisited_nodes: 
         The set of unvisited nodes.
     distance_matrix : np.ndarray
         The distance matrix of shape (n_nodes, n_nodes).
-    
+    diversification_factor : float
+        The diversification factor, controlling the level of diversification. Should be between 0 and 1.
+
     Returns
     -------
     nxt_node : int
         The next node to visit.
     """
-    
-    n_nodes = len(distance_matrix)
-    
-    # Calculate the degree for each unvisited node
-    degree = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        degree[node] = np.sum(distance_matrix[node,:] > 0)
-    
-    # Calculate the weighted distances from the current node to each unvisited node
-    weighted_distances = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        weighted_distances[node] = distance_matrix[current_node, node] * degree[node]
-    
-    # Explore the neighborhood of the current node
-    neighboring_nodes = set()
-    for node in unvisited_nodes:
-        if distance_matrix[current_node, node] > 0:
-            neighboring_nodes.add(node)
-    
-    # Calculate the weighted distances from the neighboring nodes to each unvisited node
-    for node in neighboring_nodes:
-        for neighbor in unvisited_nodes:
-            if distance_matrix[node, neighbor] > 0:
-                weighted_distances[neighbor] += distance_matrix[node, neighbor] * degree[neighbor]
-    
-    # Select the node with the highest weighted distance as the next node to visit
-    nxt_node = np.argmax(weighted_distances)
-    
+
+    # Initialize parameters
+    alpha = 1.0
+    beta = 1.0
+    pheromone_matrix = np.full_like(distance_matrix, 0.01)  # Initialize pheromone matrix with small values
+
+    # Calculate attractiveness of each unvisited node
+    attractiveness = pheromone_matrix[current_node, list(unvisited_nodes)]**alpha * (1 / distance_matrix[current_node, list(unvisited_nodes)])**beta
+
+    # Determine whether to select the node with highest attractiveness or do a random selection
+    if random.random() < diversification_factor:
+        nxt_node = random.choice(list(unvisited_nodes))  # Randomly select a node
+    else:
+        nxt_node = max(unvisited_nodes, key=lambda node: attractiveness[list(unvisited_nodes).index(node)])  # Select node with highest attractiveness
+
     return nxt_node
 ```
+

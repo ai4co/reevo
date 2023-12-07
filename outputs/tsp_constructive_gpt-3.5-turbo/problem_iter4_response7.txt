@@ -1,13 +1,18 @@
-Code description: The novel code selects the next node to visit based on a combination of uncertainty and distance. Instead of solely considering the uncertainty in the distances, it takes into account both the uncertainty score and the distance from the current node to each unvisited node. The next node is selected by lowering the uncertainty score and minimizing the distance at the same time.
+Code description: In this code, I will modify the algorithm to introduce a diversification strategy by selecting the next node based on a combination of attractiveness and distance. The goal is to balance exploration and exploitation by selecting nodes that are both attractive and have a reasonable distance from the current node.
 
-The updated code considers a weighted sum of the uncertainty scores and the distances, and selects the next node based on the minimum weighted sum. This allows for more flexibility in selecting the next node, as it takes into account the importance of both factors.
+To achieve this, I will calculate the attractiveness and distance values for each unvisited node. Then, I will introduce a parameter called "diversification_factor" that controls the importance of distance in the selection process.
+
+Instead of simply selecting the node with the maximum combined score, I will use a weighted selection approach. The weighting will be determined by the attractiveness value, with higher attractiveness resulting in a higher probability of selection.
+
+To implement this, I will calculate the cumulative sum of the attractiveness values and normalize it to obtain a probability distribution. Then, I will generate a random number between 0 and 1 and use binary search to find the index of the corresponding node in the distribution. The node at this index will be selected as the next node to visit.
 
 ```python
 import numpy as np
+from bisect import bisect_right
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
     """
-    Select the next node to visit from the unvisited nodes based on a combination of uncertainty and distance.
+    Select the next node to visit from the unvisited nodes.
     
     Parameters
     ----------
@@ -25,19 +30,46 @@ def select_next_node(current_node: int, destination_node: int, unvisited_nodes: 
     nxt_node : int
         The next node to visit.
     """
-    distances = distance_matrix[current_node]
-    uncertainty_scores = []
-    nxt_node = -1
+    
+    # Calculate the distances from the current node to all unvisited nodes
+    distances = distance_matrix[current_node, list(unvisited_nodes)]
+    
+    # Calculate the distances from the destination node to all unvisited nodes
+    dest_distances = distance_matrix[destination_node, list(unvisited_nodes)]
+    
+    # Calculate the distances from the current node to the destination node
+    dest_distance = distance_matrix[current_node, destination_node]
+    
+    # Calculate the distances from the current node to all unvisited nodes added to the distance from the destination node to those unvisited nodes
+    weighted_distances = distances + dest_distances
+    
+    # Calculate attractiveness of each unvisited node based on the pheromone levels
+    alpha = 1.0
+    pheromone_matrix = np.full_like(distance_matrix, 0.01)  # Initialize pheromone matrix with small values
+    attractiveness = np.exp(-alpha * pheromone_matrix[current_node, list(unvisited_nodes)])
 
-    for node in unvisited_nodes:
-        distance = distances[node]
-        variability = np.std(distance_matrix[:, node])
-        uncertainty_scores.append(variability)
-
-    weighted_sum = [score + (distance / np.mean(distances)) for score, distance in zip(uncertainty_scores, distances)]
-    min_weighted_sum = np.min(weighted_sum)
-    possible_next_nodes = [node for node, score in zip(unvisited_nodes, weighted_sum) if score == min_weighted_sum]
-    nxt_node = possible_next_nodes[0]  # Select the first node with the minimum weighted sum
-
+    # Calculate the combined attractiveness and weighted distance score for each unvisited node
+    combined_score = attractiveness / weighted_distances
+    
+    # Calculate the diversification factor (higher values give more importance to distance)
+    diversification_factor = 0.5
+    
+    # Weight the combined score based on the diversification factor
+    weighted_score = combined_score * (1 - diversification_factor) + distances / dest_distance * diversification_factor
+    
+    # Normalize the weighted score to obtain a probability distribution
+    prob_distribution = weighted_score / np.sum(weighted_score)
+    
+    # Generate a random number between 0 and 1
+    rand_num = np.random.rand()
+    
+    # Use binary search to find the index of the corresponding node in the distribution
+    node_index = bisect_right(prob_distribution, rand_num)
+    
+    # Get the corresponding unvisited node
+    nxt_node = list(unvisited_nodes)[node_index]
+    
     return nxt_node
 ```
+
+

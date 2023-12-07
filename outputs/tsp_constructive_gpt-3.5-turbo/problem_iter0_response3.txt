@@ -1,5 +1,6 @@
 Code description: 
-In this code, I will use a modified version of the Nearest Neighbor heuristic to select the next node to visit. Instead of always selecting the nearest neighbor, I will randomly select one of the nearest neighbors based on their distances. This introduces some randomness in the solution construction process.
+
+This code uses a novel selecting-next-node function for solving the Traveling Salesman Problem (TSP). The algorithm selects the next node to visit based on a modified version of the nearest neighbor heuristic. Instead of always selecting the nearest unvisited node, the algorithm randomly selects one of the nearest unvisited nodes. This introduces some randomness into the construction process, potentially giving better solutions. The algorithm calculates the distance between the current node and all unvisited nodes, selects the nearest nodes, and then randomly selects one of them as the next node to visit.
 
 ```python
 import numpy as np
@@ -25,19 +26,14 @@ def select_next_node(current_node: int, destination_node: int, unvisited_nodes: 
     nxt_node : int
         The next node to visit.
     """
-    
-    # Compute the distances from the current node to the unvisited nodes
+    # Calculate distances between current node and all unvisited nodes
     distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    # Find the index of the node with minimum distance
-    min_dist_index = distances.argmin()
+    # Find the nearest nodes
+    nearest_nodes = np.where(distances == np.min(distances))[0]
     
-    # Get the nearest neighbor nodes with minimum distance
-    nearest_nodes = np.where(distances == distances[min_dist_index])[0]
-    
-    # Select a random nearest neighbor node
+    # Select one of the nearest nodes randomly
     nxt_node = random.choice(nearest_nodes)
     
     return nxt_node
 ```
-In this code, I compute the distances from the current node to all unvisited nodes using the distance matrix. Then, I find the index of the node with the minimum distance. I find all the nodes that have the same minimum distance and randomly select one of them. Finally, I return the selected node as the next node to visit.

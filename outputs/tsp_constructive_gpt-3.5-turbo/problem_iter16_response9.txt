@@ -1,41 +1,32 @@
-Code description: 
-The current algorithm selects the next node based on the attractiveness of each unvisited node, which is calculated as the difference between the distance to the destination node and the distance to the current node. However, this approach may not always result in the most optimal solution. 
-
-To improve the algorithm, we can introduce a new strategy that takes into account both the attractiveness and the number of unvisited neighbors of each unvisited node. The rationale behind this is that if a node has fewer unvisited neighbors, it is likely to have less impact on the overall route and therefore may be a good candidate for early selection.
+Code description: In this code, I propose a new selecting-next-node function called "Probabilistic Degree-Biased Exploration". This heuristic builds upon the degree-biased exploration strategy by introducing probabilistic selection based on node degree centrality. Instead of selecting the node with the highest degree centrality every time, we assign probabilities to each unvisited node based on their degree centrality values. This allows for exploration of less connected nodes as well, while still prioritizing nodes with higher degree centrality.
 
 ```python
 import numpy as np
+import networkx as nx
+import random
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    # Initialize the variables
-    max_attractiveness = -np.inf
-    nxt_node = None
+    # Calculate degree centrality for each unvisited node
+    graph = nx.from_numpy_array(distance_matrix)
+    degree_centralities = nx.degree_centrality(graph)
     
-    # Calculate the attractiveness and number of unvisited neighbors for each unvisited node
+    # Compute the sum of degree centrality values for unvisited nodes
+    sum_degree = sum([degree_centralities[node] for node in unvisited_nodes])
+    
+    # Generate a random number to determine the selected node
+    r = random.random()
+    
+    # Calculate cumulative probabilities based on degree centrality
+    cum_prob = 0
     for node in unvisited_nodes:
-        # Calculate the distance between the current node and the unvisited node
-        distance_current = distance_matrix[current_node][node]
+        prob = degree_centralities[node] / sum_degree
+        cum_prob += prob
         
-        # Calculate the distance between the unvisited node and the destination node
-        distance_destination = distance_matrix[node][destination_node]
-        
-        # Calculate the attractiveness of the unvisited node
-        attractiveness = distance_destination - distance_current
-        
-        # Calculate the number of unvisited neighbors of the unvisited node
-        num_unvisited_neighbors = len(unvisited_nodes.intersection(set(np.nonzero(distance_matrix[node])[0])))
-        
-        # Evaluate the combined score based on attractiveness and number of unvisited neighbors
-        score = attractiveness + num_unvisited_neighbors
-        
-        # If the score is higher than the maximum score, update the maximum score and the next node
-        if score > max_attractiveness:
-            max_attractiveness = score
+        if r <= cum_prob:
             nxt_node = node
-        # If the score is equal to the maximum score, select the next node with the lowest index
-        elif score == max_attractiveness:
-            nxt_node = min(nxt_node, node)
+            break
     
     return nxt_node
 ```
 
+Note: In this modified code, I've added functionality to compute probabilities for each unvisited node based on their degree centrality values. I've also introduced a cumulative probability calculation and a random number comparison to probabilistically select the next node.

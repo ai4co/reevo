@@ -1,43 +1,33 @@
-Code description: My code implements a selecting-next-node function for the Traveling Salesman Problem using a novel constructive heuristic called "Closest Insertion".
+Code description: 
 
-The Closest Insertion heuristic starts with an initial solution that contains only two nodes: the starting node and a randomly selected unvisited node. Then, at each step, it selects the unvisited node that is closest to any of the nodes in the current solution. The selected node is inserted into the solution at the position that creates the smallest increase in the total distance.
+The code below proposes a novel selecting-next-node function called "Randomized Shortest Edge". This function selects the next node to visit by considering the distance between the current node and the unvisited nodes. However, instead of always selecting the node with the shortest edge, this function adds a random element to the selection process.
 
-Here is the code:
+Randomization can be beneficial to exploration, especially in cases where multiple nodes have similar distances from the current node. By occasionally choosing a node with a slightly longer edge, the algorithm can potentially discover new and potentially better paths.
+
+The algorithm works as follows:
+1. Get the distances from the current node to all unvisited nodes.
+2. Calculate the minimum distance among these distances.
+3. Select all the nodes that have the minimum distance and store them in a list.
+4. Randomly select a node from the list of nodes with the minimum distance.
+5. Return the selected node as the next node to visit.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    # Initialize the solution with the current_node and a randomly selected unvisited node
-    solution = [current_node, next(iter(unvisited_nodes))]
+    # Get the distances from the current node to all unvisited nodes
+    distances = distance_matrix[current_node][list(unvisited_nodes)]
     
-    while len(solution) < len(distance_matrix):
-        closest_node = None
-        min_increase = float('inf')
-
-        # Find the unvisited node that is closest to any of the nodes in the current solution
-        for node in unvisited_nodes:
-            increase = 0
-            for i in range(len(solution) - 1):
-                increase += distance_matrix[solution[i]][node] + distance_matrix[node][solution[i+1]] - distance_matrix[solution[i]][solution[i+1]]
-
-            # Update the closest_node and min_increase if this node offers a smaller increase in distance
-            if increase < min_increase:
-                closest_node = node
-                min_increase = increase
-
-        # Find the position in the solution where the closest_node should be inserted
-        min_insertion = float('inf')
-        position = None
-        for i in range(1, len(solution)):
-            insertion = distance_matrix[solution[i-1]][closest_node] + distance_matrix[closest_node][solution[i]] - distance_matrix[solution[i-1]][solution[i]]
-            if insertion < min_insertion:
-                min_insertion = insertion
-                position = i
-
-        # Insert the closest_node into the solution at the determined position
-        solution.insert(position, closest_node)
-
-    # Return the next node to visit, which is the second node in the solution
-    return solution[1]
+    # Find the minimum distance
+    min_distance = np.min(distances)
+    
+    # Find the nodes with the minimum distance
+    min_distance_nodes = [node for node in unvisited_nodes if distance_matrix[current_node][node] == min_distance]
+    
+    # Select a random node from the nodes with minimum distance
+    next_node = np.random.choice(min_distance_nodes)
+    
+    return next_node
 ```
+
+This code randomizes the selection process by selecting one node randomly from the set of nodes that have the minimum distance from the current node. This allows for exploration and the possibility of discovering new paths.

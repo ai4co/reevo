@@ -1,24 +1,29 @@
-Code description: In this modified algorithm, we will introduce a new factor called "urgency" to guide the selection of the next node. The urgency will be calculated based on the distance to the node and the number of unvisited neighbors of the node. The higher the urgency, the more likely the node will be selected as the next node to visit.
+Code description: In this code, I propose a modification to the select_next_node function that incorporates a new factor in the scoring function. This factor takes into account the degree centrality of each unvisited node. Degree centrality measures how connected a node is to the rest of the nodes in the graph. By considering this factor, we aim to select nodes that are not only close in distance but also well-connected to the rest of the nodes.
 
 ```python
 import numpy as np
+import networkx as nx
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    # Initialize variables
-    max_urgency = -np.inf
-    nxt_node = None
+    # Calculate distance from current node to each unvisited node
+    current_distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    # Calculate the urgency for each unvisited node
-    for node in unvisited_nodes:
-        if node != current_node:
-            distance = distance_matrix[current_node][node]
-            neighbors = [neigh for neigh in unvisited_nodes if distance_matrix[node, neigh] < np.inf]
-            urgency = distance / len(neighbors)
-            
-            if urgency > max_urgency:
-                max_urgency = urgency
-                nxt_node = node
+    # Calculate distance from destination node to each unvisited node
+    destination_distances = distance_matrix[destination_node, list(unvisited_nodes)]
+    
+    # Calculate degree centrality for each unvisited node
+    graph = nx.from_numpy_array(distance_matrix)
+    degree_centralities = nx.degree_centrality(graph)
+    
+    # Calculate combined score based on a weighted sum of the three factors
+    score = current_distances - 0.5 * destination_distances + 0.2 * np.array([degree_centralities[node] for node in unvisited_nodes])
+    
+    # Find the node with the smallest score
+    nxt_node = list(unvisited_nodes)[np.argmin(score)]
     
     return nxt_node
 ```
 
+The code calculates the current distance and destination distance from the current node to each unvisited node. It then calculates the degree centrality for each unvisited node using the distance matrix. Finally, it combines the distance factors with the degree centrality factor using a weighted sum and selects the node with the smallest score as the next node to visit.
+
+The modification is to replace the closeness centrality factor with the degree centrality factor. This aims to select nodes that not only have short distances but are also well-connected to the rest of the nodes.

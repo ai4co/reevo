@@ -1,34 +1,37 @@
-Code description: 
-In this code, I propose a novel algorithm for selecting the next node in the Traveling Salesman Problem (TSP). The algorithm is based on a combination of nearest neighbor and 2-opt techniques. 
-
-The algorithm starts by selecting the nearest unvisited node to the current node. This is done by calculating the distance between the current node and all unvisited nodes and selecting the node with the minimum distance. 
-
-After selecting the nearest node, the algorithm applies a 2-opt technique to improve the current solution. The 2-opt technique involves removing two edges from the current solution and reconnecting them in a different way, resulting in a shorter path. This is repeated until no more improvements can be made.
-
-Finally, the algorithm returns the next node to visit.
+Code description: The code uses a novel constructive heuristic called "Furthest Neighbor". This heuristic selects the next node to visit based on the distance from the current node to each unvisited node. The node that is furthest from the current node is selected as the next node to visit.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    # Find the nearest unvisited node
-    nearest_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+    """
+    Select the next node to visit from the unvisited nodes using the Furthest Neighbor heuristic.
     
-    # Apply 2-opt technique
-    improved = True
-    while improved:
-        improved = False
-        for i in range(len(unvisited_nodes)):
-            for j in range(i+1, len(unvisited_nodes)):
-                node1 = unvisited_nodes[i]
-                node2 = unvisited_nodes[j]
-                new_distance = (distance_matrix[current_node][node1] + distance_matrix[destination_node][node2]) - (distance_matrix[current_node][node2] + distance_matrix[destination_node][node1])
-                if new_distance < 0:
-                    nearest_node = node1
-                    improved = True
-                    break
-            if improved:
-                break
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
     
-    return nearest_node
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    # Calculate the distances from the current node to each unvisited node
+    distances = distance_matrix[current_node, list(unvisited_nodes)]
+    
+    # Find the index of the node that is furthest from the current node
+    furthest_node_index = np.argmax(distances)
+    
+    # Get the corresponding node number
+    furthest_node = list(unvisited_nodes)[furthest_node_index]
+    
+    return furthest_node
 ```
+

@@ -1,38 +1,41 @@
-Code description: 
-
-I propose a novel algorithm called "Combined Attractiveness and Closeness Centrality Algorithm" to select the next node. This algorithm combines the ideas from both Algorithm 1 and Algorithm 2. It calculates the attractiveness for each unvisited node based on the distance to the destination node and the distance to the current node. It also considers the closeness centrality of each unvisited node. The selected node will have a high attractiveness and closeness centrality, indicating that it is both close to the current node and has a high centrality in the network.
+Code description: This code selects the next node to visit based on a novel scoring mechanism that takes into account the distance from the current node to each unvisited node, the distance from the destination node to each unvisited node, and a modification of the Greedy Squeezing distance. The algorithm also incorporates the average neighbor distance as a factor in the scoring mechanism. The node with the highest combined score is selected as the next node to visit.
 
 ```python
 import numpy as np
-import networkx as nx
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    # Calculate the number of nodes
-    n_nodes = distance_matrix.shape[0]
+    # Calculate direct distance from current node to each unvisited node
+    direct_distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    # Initialize variables
-    max_score = -np.inf
-    nxt_node = None
+    # Calculate distance from destination node to each unvisited node
+    destination_distances = distance_matrix[destination_node, list(unvisited_nodes)]
     
-    # Calculate the attractiveness for each unvisited node
-    attractiveness = distance_matrix[:, destination_node] - distance_matrix[:, current_node]
-    
-    # Calculate the closeness centrality of each unvisited node
-    closeness_centrality = nx.closeness_centrality(nx.Graph(distance_matrix))
-    
-    # Calculate the score for each unvisited node
+    # Calculate Modified Greedy Squeezing distance for each unvisited node
+    mgs_distance = {}
     for node in unvisited_nodes:
-        distance = distance_matrix[current_node][node]
-        num_unvisited_neighbors = len(unvisited_nodes.intersection(set(distance_matrix[node] > 0)))
+        direct_distance = distance_matrix[current_node, destination_node]
+        node_distance = distance_matrix[current_node, node]
         
-        # Calculate the combined score based on attractiveness, closeness centrality, and number of unvisited neighbors
-        score = attractiveness[node] + closeness_centrality[node] + num_unvisited_neighbors
+        # Calculate the weight based on the number of neighboring unvisited nodes
+        weight = 1
+        for neighbor in unvisited_nodes:
+            if neighbor != node and neighbor in distance_matrix[node]:
+                weight += 1
+
+        mgs_distance[node] = direct_distance / (node_distance * weight)
         
-        if score > max_score:
-            max_score = score
-            nxt_node = node
+    # Calculate average neighbor distance for each unvisited node
+    neighbor_distance = {}
+    for node in unvisited_nodes:
+        neighbor_distances = distance_matrix[node, list(unvisited_nodes - set([node]))]
+        neighbor_distance[node] = np.mean(neighbor_distances)
+        
+    # Calculate combined scores for each unvisited node
+    combined_scores = 0.35 * direct_distances + 0.3 * destination_distances + 0.2 * np.array(list(mgs_distance.values())) + 0.15 * np.array(list(neighbor_distance.values()))
+    
+    # Find the node with the highest combined score
+    nxt_node = list(unvisited_nodes)[np.argmax(combined_scores)]
     
     return nxt_node
 ```
 
-Note: This algorithm integrates the attractiveness calculation from Algorithm 2 and the savings calculation from Algorithm 1. It also incorporates the closeness centrality and the number of unvisited neighbors. By combining these factors, the algorithm is likely to select a node that is both close to the current node and has a high centrality in the network.

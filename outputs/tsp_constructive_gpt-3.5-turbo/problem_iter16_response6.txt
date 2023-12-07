@@ -1,27 +1,46 @@
-Code description: In this algorithm, we aim to balance the importance of distance and number of unvisited neighbors while selecting the next node. We calculate a score for each unvisited node by normalizing the distance and the number of unvisited neighbors, and then taking their weighted average. The weight factor can be adjusted to prioritize either distance or number of unvisited neighbors. We select the node with the highest score as the next node to visit.
+Code description: The proposed crossover algorithm combines the advantages of Algorithm 1 and Algorithm 2. It incorporates the dynamic weights adjustment and modified Greedy Squeezing distance from Algorithm 1, and also considers the direct distance, destination distance, and neighbor distance measures from Algorithm 2. Additionally, it introduces a new measure called Edge Weight Distance, which represents the average distance between the current node and its neighboring unvisited nodes. The algorithm calculates a score for each unvisited node, considering all these factors, and selects the node with the highest score as the next node to visit.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    # Initialize variables
-    max_score = -np.inf
-    nxt_node = None
-    weight = 0.5
+    # Calculate direct distance from current node to each unvisited node
+    direct_distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    # Calculate the score for each unvisited node
+    # Calculate distance from destination node to each unvisited node
+    destination_distances = distance_matrix[destination_node, list(unvisited_nodes)]
+    
+    # Calculate Modified Greedy Squeezing distance for each unvisited node
+    mgs_distance = {}
     for node in unvisited_nodes:
-        distance = distance_matrix[current_node][node]
-        num_unvisited_neighbors = np.sum(distance_matrix[node,:] > 0)
-        distance_norm = distance / np.max(distance_matrix)
-        neighbors_norm = num_unvisited_neighbors / np.max(distance_matrix)
+        direct_distance = distance_matrix[current_node, destination_node]
+        node_distance = distance_matrix[current_node, node]
         
-        score = (1 - weight) * distance_norm + weight * neighbors_norm
+        # Calculate the weight based on the number of neighboring unvisited nodes
+        weight = 1
+        for neighbor in unvisited_nodes:
+            if neighbor != node and neighbor in distance_matrix[node]:
+                weight += 1
+
+        mgs_distance[node] = direct_distance / (node_distance * weight)
         
-        if score > max_score:
-            max_score = score
-            nxt_node = node
+    # Calculate Neighbor Distance for each unvisited node
+    neighbor_distance = {}
+    for node in unvisited_nodes:
+        neighbor_distances = distance_matrix[node, list(unvisited_nodes - set([node]))]
+        neighbor_distance[node] = np.mean(neighbor_distances)
+        
+    # Calculate Edge Weight Distance for each unvisited node
+    edge_weight_distances = {}
+    for node in unvisited_nodes:
+        edge_weight_distances[node] = np.mean(distance_matrix[current_node, list(unvisited_nodes & set(distance_matrix[node]))])
+        
+    # Calculate combined scores for each unvisited node
+    combined_scores = 0.3 * direct_distances + 0.3 * destination_distances + 0.2 * np.array(list(mgs_distance.values())) + 0.1 * np.array(list(neighbor_distance.values())) + 0.1 * np.array(list(edge_weight_distances.values()))
+    
+    # Find the node with the highest combined score
+    nxt_node = list(unvisited_nodes)[np.argmax(combined_scores)]
     
     return nxt_node
 ```
-The algorithm first calculates the maximum distance in the distance matrix using np.max(distance_matrix). Then, it normalizes the distance and the number of unvisited neighbors by dividing them by the maximum distance. The score is calculated as a weighted average of the normalized distance and the normalized number of unvisited neighbors. The node with the highest score is selected as the next node to visit.
+

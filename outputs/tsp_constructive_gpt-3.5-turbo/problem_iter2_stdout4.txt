@@ -7,7 +7,8 @@ Traceback (most recent call last):
   File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 37, in eval_heuristic
     next_node = select_next_node(
                 ^^^^^^^^^^^^^^^^^
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py", line 44, in select_next_node
-    scores = normalized_distances * (1 - normalized_destination_distances) * unvisited_neighbors
-             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~
-ValueError: operands could not be broadcast together with shapes (49,) (50,) 
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py", line 61, in select_next_node
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py", line 25, in calculate_distance
+    # Select a random subset of nodes from the unvisited nodes
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+IndexError: arrays used as indices must be of integer (or boolean) type

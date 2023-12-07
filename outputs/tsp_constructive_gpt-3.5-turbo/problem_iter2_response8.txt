@@ -1,35 +1,23 @@
-Code description: In this code, we will implement a novel selecting-next-node function for solving the Traveling Salesman Problem (TSP). This heuristic aims to provide a more balanced exploration and exploitation of the problem space by considering both the distance to the next node and the number of unvisited neighbors for each node. In addition to that, we will introduce a new factor that takes into account the proximity of the unvisited neighbors.
-
-The implementation follows these steps:
-1. Initialize a list, scores, to store the scores for each unvisited node.
-2. Calculate the distance from the current node to each unvisited node.
-3. For each unvisited node, calculate its score using the formula:
-   score = distance + alpha * (1 / unvisited_neighbors) + beta * proximity
-   - The distance represents the direct distance from the current node to the unvisited node.
-   - The alpha coefficient controls the balance between distance and number of unvisited neighbors.
-   - The unvisited_neighbors term represents the number of unvisited neighbors of the unvisited node. This term helps to prioritize nodes that have more unvisited neighbors, promoting exploration.
-   - The beta coefficient controls the importance of the proximity factor. A higher beta value will prioritize nodes with closer unvisited neighbors, while a lower beta value will prioritize nodes with more distant unvisited neighbors.
-   - The proximity term represents the average distance from the unvisited node to its unvisited neighbors. This term helps to promote nodes that are closer to other unvisited nodes.
-4. Find the node with the highest score and return it as the next node to visit.
+Code description: This code implements a novel selecting-next-node function called "HybridACO". It combines the attractiveness calculation from Algorithm 1 with the edge selection method from Algorithm 2. This hybrid approach aims to leverage the advantages of both algorithms to improve the performance of the solution construction process.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    alpha = 0.5  # coefficient to balance distance and number of unvisited neighbors
-    beta = 0.5  # coefficient to balance proximity of unvisited neighbors
-    scores = []
-    
-    for node in unvisited_nodes:
-        distance = distance_matrix[current_node][node]
-        unvisited_neighbors = len(unvisited_nodes) - 1  # subtract 1 as the node itself is not considered
-        
-        proximity = np.mean([distance_matrix[node][neighbor] for neighbor in unvisited_nodes if neighbor != node])
-        
-        score = distance + alpha * (1 / unvisited_neighbors) + beta * proximity
-        scores.append((node, score))
-    
-    scores = sorted(scores, key=lambda x: x[1], reverse=True)  # sort nodes by score in descending order
-    
-    return scores[0][0]  # return the node with the highest score
+    # Initialize parameters
+    alpha = 1.0
+    beta = 1.0
+    pheromone_matrix = np.full_like(distance_matrix, 0.01)  # Initialize pheromone matrix with small values
+
+    # Calculate attractiveness of each unvisited node based on pheromone level and distance
+    attractiveness = np.exp(-alpha * distance_matrix[current_node, list(unvisited_nodes)] + beta * pheromone_matrix[current_node, list(unvisited_nodes)])
+
+    # Calculate probability distribution for selecting the next node
+    probability = attractiveness / np.sum(attractiveness)
+
+    # Select next node based on probability distribution
+    nxt_node = np.random.choice(list(unvisited_nodes), p=probability)
+
+    return nxt_node
 ```
+

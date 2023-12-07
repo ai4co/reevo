@@ -1,35 +1,34 @@
-Code description: The novel algorithm I propose is called "Greedy Randomized Adaptive Search Procedure (GRASP)". It is an iterative improvement algorithm that aims to find good solutions to optimization problems by combining greedy construction with randomization.
-
-In this algorithm, the select_next_node function selects the next node to visit by considering both the cost of insertion and a random element. First, the code initializes the minimum_cost variable to infinity and the nxt_node variable to -1. Then, it iterates over each unvisited node and calculates the cost of inserting the node into the tour between the current_node and destination_node. However, instead of directly comparing the cost with the minimum_cost, the algorithm introduces a random element by using a random_coefficient.
-
-The random_coefficient is a float number between 0 and 1. It randomly adjusts the cost by adding a random value between 0 and a maximum random_value. This introduces variability into the selection process and allows the algorithm to explore different paths. The maximum random_value is determined by multiplying a randomization_factor with the average distance between unvisited nodes.
-
-If the cost (adjusted by the random_coefficient) is lower than the current minimum_cost, or if the cost is equal to the minimum_cost but the random_coefficient is higher, the minimum_cost and nxt_node variables are updated with the new values.
-
-Finally, the code returns the nxt_node as the next node to visit.
+Code description: The proposed code aims to improve the selection of the next node by taking into account the distance from the current node to unvisited nodes, the distance from the destination node to unvisited nodes, and the modified greedy squeezing distance. To make the selection more dynamic and robust, the code incorporates an adaptive weight factor that adjusts based on the number of neighboring unvisited nodes.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    minimum_cost = float('inf')
-    nxt_node = -1
+    # Calculate direct distance from current node to each unvisited node
+    direct_distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    # Parameters for randomization
-    randomization_factor = 0.1
+    # Calculate distance from destination node to each unvisited node
+    destination_distances = distance_matrix[destination_node, list(unvisited_nodes)]
     
-    # Calculate the average distance between unvisited nodes
-    avg_distance = np.mean(distance_matrix[list(unvisited_nodes)][:, list(unvisited_nodes)])
-    
+    # Calculate Modified Greedy Squeezing distance for each unvisited node
+    mgs_distance = {}
     for node in unvisited_nodes:
-        random_coefficient = np.random.rand()
+        direct_distance = distance_matrix[current_node, destination_node]
+        node_distance = distance_matrix[current_node, node]
         
-        # Calculate the cost of inserting the node with the random element
-        cost = distance_matrix[current_node][node] + distance_matrix[node][destination_node] - distance_matrix[current_node][destination_node] + random_coefficient * randomization_factor * avg_distance
+        # Calculate the weight based on the number of neighboring unvisited nodes
+        weight = 1
+        for neighbor in unvisited_nodes:
+            if neighbor != node and neighbor in distance_matrix[node]:
+                weight += 1
+
+        mgs_distance[node] = direct_distance / (node_distance * weight)
         
-        if cost < minimum_cost or (cost == minimum_cost and random_coefficient > 0.5):
-            minimum_cost = cost
-            nxt_node = node
+    # Calculate combined scores for each unvisited node
+    combined_scores = 0.4 * direct_distances - 0.3 * destination_distances + 0.3 * np.array(list(mgs_distance.values()))
+    
+    # Find the node with the highest combined score
+    nxt_node = list(unvisited_nodes)[np.argmax(combined_scores)]
     
     return nxt_node
 ```

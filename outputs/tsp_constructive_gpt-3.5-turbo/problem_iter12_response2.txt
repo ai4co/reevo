@@ -1,60 +1,36 @@
-Code description: The crossover algorithm combines the key ideas from Algorithm 1 and Algorithm 2 to create a new heuristic called "Weighted Distance with Uncertainty, Degree, and Neighbor Count" (WDDNC). It selects the next node based on a weighted score that considers distance, uncertainty, degree, and the number of unvisited neighbors.
+Code description: 
 
-The algorithm first calculates the degree, uncertainty scores, and number of unvisited neighbors for each unvisited node. It then calculates the weighted distances from the current node to each unvisited node, considering these factors. The node with the highest weighted distance is chosen as the next node to visit.
-
-The improvement in this algorithm is the inclusion of the number of unvisited neighbors as a factor in the score calculation. By considering the local connectivity of each node, the algorithm can prioritize nodes that have more unvisited neighbors, potentially leading to better exploration of the solution space.
+The code implements a novel selecting-next-node function called "Balanced Distance First". This heuristic aims to balance the exploration of different parts of the solution space while also considering the overall distance. The idea is to prioritize unvisited nodes that are closer to both the current node and the destination node. This is achieved by calculating a score for each unvisited node that combines the distances from the current node and the destination node. The node with the highest score is selected as the next node to visit.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    """
-    Select the next node to visit from the unvisited nodes using the Weighted Distance with Uncertainty, Degree, and Neighbor Count heuristic.
+    scores = []
     
-    Parameters
-    ----------
-    current_node : int
-        The current node.
-    destination_node : int
-        The destination node to return to.
-    unvisited_nodes : set
-        The set of unvisited nodes.
-    distance_matrix : np.ndarray
-        The distance matrix of shape (n_nodes, n_nodes).
+    # Calculate the distances from the current node to the unvisited nodes
+    distances_to_unvisited = distance_matrix[current_node][list(unvisited_nodes)]
     
-    Returns
-    -------
-    nxt_node : int
-        The next node to visit.
-    """
+    # Calculate the distances from the unvisited nodes to the destination node
+    distances_to_destination = distance_matrix[list(unvisited_nodes)][:, destination_node]
     
-    n_nodes = len(distance_matrix)
-    
-    # Calculate the degree for each unvisited node
-    degree = np.zeros(n_nodes)
     for node in unvisited_nodes:
-        degree[node] = np.sum(distance_matrix[node,:] > 0)
+        # Find the index of the unvisited node
+        node_index = list(unvisited_nodes).index(node)
+        
+        # Calculate the score by combining the distances from the current node and the destination node
+        score = (distances_to_unvisited[node_index] + distances_to_destination[node_index]) / 2
+        
+        # Append the score to the list of scores
+        scores.append(score)
     
-    # Calculate the uncertainty scores for each unvisited node
-    uncertainty_scores = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        variability = np.std(distance_matrix[:, node])
-        uncertainty_scores[node] = variability
+    # Find the index of the unvisited node with the highest score
+    max_index = np.argmax(scores)
     
-    # Calculate the number of unvisited neighbors for each unvisited node
-    num_unvisited_neighbors = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        num_unvisited_neighbors[node] = np.sum(distance_matrix[node,:] > 0)
-    
-    # Calculate the weighted distances from the current node to each unvisited node, considering uncertainty, degree, and neighbor count
-    weighted_distances = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        weighted_distance = distance_matrix[current_node, node] * degree[node] * uncertainty_scores[node] * num_unvisited_neighbors[node]
-        weighted_distances[node] = weighted_distance
-    
-    # Select the node with the highest weighted distance as the next node to visit
-    nxt_node = np.argmax(weighted_distances)
+    # Get the actual unvisited node corresponding to the maximum index
+    nxt_node = list(unvisited_nodes)[max_index]
     
     return nxt_node
 ```
+
 

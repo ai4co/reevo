@@ -1,41 +1,25 @@
 Code description: 
-The selecting-next-node function uses a probabilistic approach to choose the next node to visit. It calculates the probability of visiting each unvisited node based on the distances between the current node and the unvisited nodes. The node with the highest probability is selected as the next node to visit.
+
+The code implements a novel heuristic for selecting the next node in the Traveling Salesman Problem (TSP). The heuristic is called Randomized Greedy Shortest Path (RGSP). It starts from the current node and calculates the shortest path to each unvisited node. It then randomly selects one of the unvisited nodes that has the shortest path length. This introduces randomization into the greedy selection process, which can help avoid getting trapped in local optima. The code uses the distance matrix to calculate the shortest paths between nodes.
 
 ```python
 import numpy as np
+import random
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    """
-    Select the next node to visit from the unvisited nodes using a probabilistic approach.
+    # Calculate the shortest path length from current node to each unvisited node
+    shortest_paths = {}
+    for node in unvisited_nodes:
+        shortest_paths[node] = distance_matrix[current_node][node]
     
-    Parameters
-    ----------
-    current_node : int
-        The current node.
-    destination_node : int
-        The destination node to return to.
-    unvisited_nodes : set
-        The set of unvisited nodes.
-    distance_matrix : np.ndarray
-        The distance matrix of shape (n_nodes, n_nodes).
+    # Find the shortest path length among all unvisited nodes
+    min_path_length = min(shortest_paths.values())
     
-    Returns
-    -------
-    nxt_node : int
-        The next node to visit.
-    """
-    # Calculate the distances between the current node and the unvisited nodes
-    distances = distance_matrix[current_node, list(unvisited_nodes)]
+    # Filter the unvisited nodes that have the shortest path length
+    shortest_nodes = [node for node, path_length in shortest_paths.items() if path_length == min_path_length]
     
-    # Calculate the inverse of the distances
-    inv_distances = 1 / distances
-    
-    # Calculate the probabilities of visiting each unvisited node
-    probabilities = inv_distances / np.sum(inv_distances)
-    
-    # Select the next node based on the probabilities
-    nxt_node = list(unvisited_nodes)[np.argmax(probabilities)]
+    # Select one of the shortest node randomly
+    nxt_node = random.choice(shortest_nodes)
     
     return nxt_node
 ```
-

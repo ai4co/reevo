@@ -1,30 +1,43 @@
-Code description: The crossover algorithm selects the next node based on both the distance to the node and the number of unvisited neighbors. However, it introduces a random element by considering multiple nodes with the highest score and randomly selecting one of them. To improve upon this, I will modify the scoring function to prioritize nodes that are closer to the destination node rather than the current node. This will encourage the algorithm to move towards the destination more efficiently.
+Code description: The proposed code aims to combine the ideas from Algorithm 1 and Algorithm 2 to create a better selecting-next-node function. This code considers the direct distance from the current node to each unvisited node, the distance from the destination node to each unvisited node, the modified greedy squeezing distance, and the degree centrality of each unvisited node. It uses a weighted sum of these factors to determine the next node to visit.
 
 ```python
 import numpy as np
+import networkx as nx
+import random
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    # Initialize variables
-    max_score = -np.inf
-    max_score_nodes = []
-    weight1 = 0.5
-    weight2 = 0.5
+    # Calculate direct distance from current node to each unvisited node
+    direct_distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    # Calculate the score for each unvisited node
+    # Calculate distance from destination node to each unvisited node
+    destination_distances = distance_matrix[destination_node, list(unvisited_nodes)]
+    
+    # Calculate Modified Greedy Squeezing distance for each unvisited node
+    mgs_distance = {}
     for node in unvisited_nodes:
-        distance_to_destination = distance_matrix[node][destination_node]
-        num_unvisited_neighbors = np.sum(distance_matrix[node,:] > 0)
+        direct_distance = distance_matrix[current_node, destination_node]
+        node_distance = distance_matrix[current_node, node]
         
-        score = weight1 * (1 / distance_to_destination) - weight2 * num_unvisited_neighbors
-        
-        if score > max_score:
-            max_score = score
-            max_score_nodes = [node]
-        elif score == max_score:
-            max_score_nodes.append(node)
+        # Calculate the weight based on the number of neighboring unvisited nodes
+        weight = 1
+        for neighbor in unvisited_nodes:
+            if neighbor != node and neighbor in distance_matrix[node]:
+                weight += 1
+
+        mgs_distance[node] = direct_distance / (node_distance * weight)
     
-    # Randomly select one of the nodes with the highest score
-    nxt_node = np.random.choice(max_score_nodes)
+    # Calculate degree centrality for each unvisited node
+    graph = nx.from_numpy_array(distance_matrix)
+    degree_centralities = nx.degree_centrality(graph)
+    
+    # Normalize degree centrality values
+    degree_centralities = {node: degree_centralities[node] / sum(degree_centralities.values()) for node in unvisited_nodes}
+    
+    # Combine scores for each unvisited node
+    combined_scores = 0.4 * direct_distances - 0.3 * destination_distances + 0.2 * np.array(list(mgs_distance.values())) + 0.1 * np.array([degree_centralities[node] for node in unvisited_nodes])
+    
+    # Find the node with the highest combined score
+    nxt_node = list(unvisited_nodes)[np.argmax(combined_scores)]
     
     return nxt_node
 ```

@@ -1,46 +1,27 @@
-Code description: 
-
-The proposed code uses the Randomized Edge Selection algorithm as a basis, but introduces a modification to improve the exploration of less promising nodes in a probabilistic manner. Instead of inversely proportional probabilities based on distance, the proposed code calculates the probabilities as a power of the inverse of the distance. This modification allows for a more flexible weighting of the probabilities, giving the algorithm a greater ability to explore different nodes. The parameter alpha determines the power to which the inverse of the distance is raised, allowing for fine-tuning of the exploration-exploitation trade-off.
+Code description: In this code, I propose a novel approach for selecting the next node to visit. The algorithm takes into account the distance from the current node, the destination node, and the unvisited nodes, and assigns a score to each unvisited node based on these distances. The node with the highest score is selected as the next node to visit.
 
 ```python
 import numpy as np
-import random
 
-def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray, alpha: float) -> int:
-    """
-    Select the next node to visit from the unvisited nodes using a modified Randomized Edge Selection algorithm.
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    # Calculate distance from current node to each unvisited node
+    current_distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    Parameters
-    ----------
-    current_node : int
-        The current node.
-    destination_node : int
-        The destination node to return to.
-    unvisited_nodes : set
-        The set of unvisited nodes.
-    distance_matrix : np.ndarray
-        The distance matrix of shape (n_nodes, n_nodes).
-    alpha : float
-        The power to which the inverse of the distance is raised to calculate the probabilities.
+    # Calculate distance from destination node to each unvisited node
+    destination_distances = distance_matrix[destination_node, list(unvisited_nodes)]
     
-    Returns
-    -------
-    nxt_node : int
-        The next node to visit.
-    """
-    # Calculate the distances from the current node to unvisited nodes
-    distances = distance_matrix[current_node, list(unvisited_nodes)]
+    # Calculate distance between each pair of unvisited nodes
+    unvisited_distances = distance_matrix[list(unvisited_nodes)][:, list(unvisited_nodes)]
     
-    # Calculate the probabilities of selecting each unvisited node
-    probabilities = 1 / distances
-    probabilities = np.power(probabilities, alpha)
+    # Calculate the average distance from each unvisited node to all other unvisited nodes
+    avg_unvisited_distances = unvisited_distances.sum(axis=1) / (len(unvisited_nodes) - 1)
     
-    # Normalize the probabilities
-    probabilities /= np.sum(probabilities)
+    # Calculate the score for each unvisited node
+    scores = 0.5 * current_distances - 0.3 * destination_distances - 0.2 * avg_unvisited_distances
     
-    # Select the next node randomly based on the probabilities
-    nxt_node = random.choices(list(unvisited_nodes), probabilities)[0]
+    # Find the node with the highest score
+    nxt_node = list(unvisited_nodes)[np.argmax(scores)]
     
     return nxt_node
 ```
-
+The proposed algorithm assigns a score to each unvisited node by combining the current distance, the destination distance, and the average distance to all other unvisited nodes. The algorithm aims to balance proximity to the current node (to minimize travel distance) and the destination node (to optimize the overall route) while also considering the average distance to other unvisited nodes (to avoid selecting nodes that are too close to each other). The node with the highest score is chosen as the next node to visit.

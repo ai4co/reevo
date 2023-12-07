@@ -1,75 +1,53 @@
 Code description: 
-The crossover algorithm combines the key ideas from Algorithm 1 and Algorithm 2 to create a new heuristic called "Weighted Distance with Uncertainty, Degree, Neighbor Count, and Farthest Insertion" (WDDNCFI). It selects the next node based on a weighted score that considers distance, uncertainty, degree, neighbor count, and the farthest insertion cost.
 
-The algorithm first calculates the degree, uncertainty scores, and number of unvisited neighbors for each unvisited node, as in Algorithm 1. It then calculates the weighted distances from the current node to each unvisited node, considering these factors. Additionally, it calculates the farthest insertion cost for each unvisited node by finding the node that minimizes the insertion cost when inserted between the current node and the farthest node.
+In this code, I propose a novel selecting-next-node function that combines the advantages of Algorithm 1 and Algorithm 2. The goal is to select the next node based on a combination of factors including the Modified Greedy Squeezing (MGS) distance, the direct distance to the destination node, and the degree centrality of each unvisited node.
 
-Finally, the algorithm combines the weighted distances and the farthest insertion costs by summing them and chooses the node with the highest score as the next node to visit.
+First, we calculate the MGS distance for each unvisited node using Algorithm 1. This distance reflects the balance between being close to the current node and having a low MGS distance.
+
+Next, we calculate the current distances and destination distances for each unvisited node like in Algorithm 2. The current distances measure the direct distance from the current node to each unvisited node, while the destination distances measure the direct distance from each unvisited node to the destination node.
+
+Then, we calculate the degree centrality for each unvisited node. Degree centrality represents the number of neighbors each unvisited node has, indicating the level of connectivity.
+
+Finally, we combine the MGS distance, the current distances, the destination distances, and the degree centrality into a score for each unvisited node. We then select the node with the highest score as the next node to visit and return it.
 
 ```python
 import numpy as np
+import networkx as nx
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    """
-    Select the next node to visit from the unvisited nodes using the Weighted Distance with Uncertainty, Degree, Neighbor Count, and Farthest Insertion heuristic.
-    
-    Parameters
-    ----------
-    current_node : int
-        The current node.
-    destination_node : int
-        The destination node to return to.
-    unvisited_nodes : set
-        The set of unvisited nodes.
-    distance_matrix : np.ndarray
-        The distance matrix of shape (n_nodes, n_nodes).
-    
-    Returns
-    -------
-    nxt_node : int
-        The next node to visit.
-    """
-    
-    n_nodes = len(distance_matrix)
-    
-    # Calculate the degree for each unvisited node
-    degree = np.zeros(n_nodes)
+    direct_distance = distance_matrix[current_node][destination_node]
+
+    mgs_distance = {}
+
     for node in unvisited_nodes:
-        degree[node] = np.sum(distance_matrix[node,:] > 0)
-    
-    # Calculate the uncertainty scores for each unvisited node
-    uncertainty_scores = np.zeros(n_nodes)
+        node_distance = distance_matrix[current_node][node]
+
+        weight = 1
+        for neighbor in unvisited_nodes:
+            if neighbor != node and neighbor in distance_matrix[node]:
+                weight += 1
+
+        mgs_distance[node] = direct_distance / (node_distance * weight)
+
+    scores = {}
     for node in unvisited_nodes:
-        variability = np.std(distance_matrix[:, node])
-        uncertainty_scores[node] = variability
-    
-    # Calculate the number of unvisited neighbors for each unvisited node
-    num_unvisited_neighbors = np.zeros(n_nodes)
+        scores[node] = mgs_distance[node] / distance_matrix[current_node][node]
+
+    # Calculate distance from current node to each unvisited node
+    current_distances = distance_matrix[current_node, list(unvisited_nodes)]
+
+    # Calculate distance from destination node to each unvisited node
+    destination_distances = distance_matrix[destination_node, list(unvisited_nodes)]
+
+    # Calculate degree centrality for each unvisited node
+    graph = nx.from_numpy_array(distance_matrix)
+    degree_centralities = nx.degree_centrality(graph)
+
+    # Calculate combined score based on a weighted sum of the factors
     for node in unvisited_nodes:
-        num_unvisited_neighbors[node] = np.sum(distance_matrix[node,:] > 0)
-    
-    # Calculate the weighted distances from the current node to each unvisited node, considering uncertainty, degree, and neighbor count
-    weighted_distances = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        weighted_distance = distance_matrix[current_node, node] * degree[node] * uncertainty_scores[node] * num_unvisited_neighbors[node]
-        weighted_distances[node] = weighted_distance
-    
-    # Calculate the distance from the current node to all unvisited nodes
-    node_distances = distance_matrix[current_node, list(unvisited_nodes)]
-    
-    # Find the farthest node from the current node
-    farthest_node = list(unvisited_nodes)[np.argmax(node_distances)]
-    
-    # Calculate the farthest insertion cost for each unvisited node
-    insertion_costs = []
-    for node in unvisited_nodes:
-        cost = distance_matrix[current_node, node] + distance_matrix[node, farthest_node] - distance_matrix[current_node, farthest_node]
-        insertion_costs.append(cost)
-    
-    # Combine the weighted distances and farthest insertion costs by summing them
-    scores = weighted_distances + np.array(insertion_costs)
-    
-    # Select the node with the highest score as the next node to visit
-    nxt_node = np.argmax(scores)
-    
+        scores[node] += current_distances[node] - 0.5 * destination_distances[node] + 0.2 * degree_centralities[node]
+
+    nxt_node = max(scores, key=scores.get)
+
     return nxt_node
 ```

@@ -1,9 +1,68 @@
 [*] Running ...
 [*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/dataset/val50_dataset.npy with 64 instances.
-Traceback (most recent call last):
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 66, in <module>
-    obj = eval_heuristic(node_positions[i])
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 44, in eval_heuristic
-    unvisited.remove(next_node)
-KeyError: 0
+[*] Instance 0: 7.064747037752676
+[*] Instance 1: 7.418554616119015
+[*] Instance 2: 8.397172336418636
+[*] Instance 3: 7.416227675137915
+[*] Instance 4: 7.596212123089192
+[*] Instance 5: 7.63539845325267
+[*] Instance 6: 7.754401455975061
+[*] Instance 7: 7.631824508787938
+[*] Instance 8: 7.342883651394586
+[*] Instance 9: 8.592319437629799
+[*] Instance 10: 7.721738212008195
+[*] Instance 11: 6.666370273210948
+[*] Instance 12: 7.785276772000946
+[*] Instance 13: 7.132955254257238
+[*] Instance 14: 8.142047154555828
+[*] Instance 15: 7.966857806480013
+[*] Instance 16: 7.236465933656152
+[*] Instance 17: 6.8333137258439205
+[*] Instance 18: 6.9335128424599155
+[*] Instance 19: 7.001035150681049
+[*] Instance 20: 6.686747064945971
+[*] Instance 21: 7.68473837446259
+[*] Instance 22: 8.348211355946216
+[*] Instance 23: 7.251254098562829
+[*] Instance 24: 7.66567801778575
+[*] Instance 25: 7.796873929766199
+[*] Instance 26: 6.814546870979907
+[*] Instance 27: 7.7560851724571815
+[*] Instance 28: 7.354529810181598
+[*] Instance 29: 8.088404657111225
+[*] Instance 30: 7.858134356755318
+[*] Instance 31: 7.7902682727053705
+[*] Instance 32: 7.963942722285261
+[*] Instance 33: 8.105129399818802
+[*] Instance 34: 7.920809668582164
+[*] Instance 35: 7.497466018502438
+[*] Instance 36: 7.452216508275042
+[*] Instance 37: 8.285185227967839
+[*] Instance 38: 6.721955643149507
+[*] Instance 39: 7.569190567811226
+[*] Instance 40: 7.86879217491885
+[*] Instance 41: 7.358193876748508
+[*] Instance 42: 7.4234175033874275
+[*] Instance 43: 8.031347176611554
+[*] Instance 44: 7.511340171484045
+[*] Instance 45: 7.6433479017749315
+[*] Instance 46: 7.869201272678713
+[*] Instance 47: 7.275738519653381
+[*] Instance 48: 6.681291487339757
+[*] Instance 49: 7.474837338730287
+[*] Instance 50: 8.08517601373106
+[*] Instance 51: 8.789479035491084
+[*] Instance 52: 8.342208504426896
+[*] Instance 53: 7.645529567658089
+[*] Instance 54: 7.834852160608921
+[*] Instance 55: 7.304044886655064
+[*] Instance 56: 7.317998681160117
+[*] Instance 57: 6.814790256458705
+[*] Instance 58: 7.278387211502343
+[*] Instance 59: 7.843021616657152
+[*] Instance 60: 8.397041038479161
+[*] Instance 61: 6.592583808461814
+[*] Instance 62: 8.000551003765937
+[*] Instance 63: 7.521463373542996
+[*] Average:
+7.5903955740732965

@@ -1,68 +1,14 @@
 [*] Running ...
 [*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/dataset/val50_dataset.npy with 64 instances.
-[*] Instance 0: 33.50682269338469
-[*] Instance 1: 38.12570729968632
-[*] Instance 2: 35.8132035037493
-[*] Instance 3: 39.66618998099371
-[*] Instance 4: 37.602821977195234
-[*] Instance 5: 39.59946017752549
-[*] Instance 6: 37.0431508360903
-[*] Instance 7: 37.2399210578043
-[*] Instance 8: 35.069396860196996
-[*] Instance 9: 37.838235956977236
-[*] Instance 10: 38.319642519945994
-[*] Instance 11: 35.95165957593952
-[*] Instance 12: 34.74396285579858
-[*] Instance 13: 40.12114932223821
-[*] Instance 14: 35.93638734606355
-[*] Instance 15: 36.29364260650991
-[*] Instance 16: 34.70012273090716
-[*] Instance 17: 36.497159163090124
-[*] Instance 18: 42.74131143658944
-[*] Instance 19: 37.51667966037914
-[*] Instance 20: 33.18304969927623
-[*] Instance 21: 37.144264910964246
-[*] Instance 22: 38.18196787902028
-[*] Instance 23: 37.87960860599541
-[*] Instance 24: 36.791779469055605
-[*] Instance 25: 38.76677211056141
-[*] Instance 26: 34.62233922681817
-[*] Instance 27: 35.708584831741284
-[*] Instance 28: 34.999820801143734
-[*] Instance 29: 39.56804260329962
-[*] Instance 30: 35.02127067765808
-[*] Instance 31: 33.82325168820371
-[*] Instance 32: 33.958635217644826
-[*] Instance 33: 35.38053669428437
-[*] Instance 34: 37.71095874796556
-[*] Instance 35: 39.30363223235555
-[*] Instance 36: 37.894296965472996
-[*] Instance 37: 35.09679109051555
-[*] Instance 38: 33.12992905604037
-[*] Instance 39: 37.650814806188265
-[*] Instance 40: 37.50799922264803
-[*] Instance 41: 34.95210600140742
-[*] Instance 42: 36.53013370929318
-[*] Instance 43: 32.89846385906102
-[*] Instance 44: 38.38686244617646
-[*] Instance 45: 37.605107440146725
-[*] Instance 46: 36.41420778838677
-[*] Instance 47: 37.21315907089227
-[*] Instance 48: 36.809605916138146
-[*] Instance 49: 35.05443139524435
-[*] Instance 50: 34.726165204721525
-[*] Instance 51: 39.859273909737404
-[*] Instance 52: 36.367505690535886
-[*] Instance 53: 35.500642421014135
-[*] Instance 54: 35.822913939776214
-[*] Instance 55: 38.85715150171864
-[*] Instance 56: 37.75555035852123
-[*] Instance 57: 36.35151440907738
-[*] Instance 58: 34.31564303029312
-[*] Instance 59: 35.36652941594798
-[*] Instance 60: 34.133337347030256
-[*] Instance 61: 39.62084164256056
-[*] Instance 62: 37.041052712741326
-[*] Instance 63: 36.106756261066245
-[*] Average:
-36.645936399521986
+Traceback (most recent call last):
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 66, in <module>
+    obj = eval_heuristic(node_positions[i])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 37, in eval_heuristic
+    next_node = select_next_node(
+                ^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py", line 23, in select_next_node
+    
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py", line 23, in <lambda>
+    
+IndexError: index 49 is out of bounds for axis 0 with size 49

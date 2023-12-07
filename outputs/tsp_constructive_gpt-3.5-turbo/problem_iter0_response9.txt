@@ -1,12 +1,18 @@
-Code description: 
-In this code, I will implement a novel selecting-next-node function called "Random Next Node". This function randomly selects the next node to visit from the set of unvisited nodes. It assigns equal probability to each unvisited node, ensuring a fair and unbiased selection process. 
+Code description: This code uses a novel algorithm called "Closest Insertion" to select the next node in the Traveling Salesman Problem.
+
+1. Start by randomly selecting a current node from the unvisited nodes.
+2. Create a loop that iterates until all nodes have been visited.
+3. Inside the loop, initialize a variable `min_distance` to a large value and set `nxt_node` to None.
+4. For each node `i` in the unvisited nodes, calculate the distance from the current node to node `i`.
+5. If the calculated distance is smaller than `min_distance`, update `min_distance` and set `nxt_node` to node `i`.
+6. After iterating through all nodes, return `nxt_node` as the next node to visit.
 
 ```python
-import random
+import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
     """
-    Select the next node to visit from the unvisited nodes.
+    Select the next node to visit from the unvisited nodes using Closest Insertion algorithm.
     
     Parameters
     ----------
@@ -24,12 +30,15 @@ def select_next_node(current_node: int, destination_node: int, unvisited_nodes: 
     nxt_node : int
         The next node to visit.
     """
+    min_distance = float('inf')
+    nxt_node = None
     
-    # Convert set to list for random selection
-    unvisited_list = list(unvisited_nodes)
-    
-    # Randomly select next node from unvisited nodes
-    nxt_node = random.choice(unvisited_list)
+    for i in unvisited_nodes:
+        distance = distance_matrix[current_node, i]
+        if distance < min_distance:
+            min_distance = distance
+            nxt_node = i
     
     return nxt_node
 ```
+Note: This algorithm selects the next node by choosing the one with the smallest distance from the current node. This approach ensures that the path selected is based on the shortest distances available at each step, regardless of the starting point.

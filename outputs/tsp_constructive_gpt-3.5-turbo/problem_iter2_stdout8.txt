@@ -1,17 +1,68 @@
 [*] Running ...
 [*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/dataset/val50_dataset.npy with 64 instances.
-/Users/yhr/anaconda3/lib/python3.11/site-packages/numpy/core/fromnumeric.py:3464: RuntimeWarning: Mean of empty slice.
-  return _methods._mean(a, axis=axis, dtype=dtype,
-/Users/yhr/anaconda3/lib/python3.11/site-packages/numpy/core/_methods.py:192: RuntimeWarning: invalid value encountered in scalar divide
-  ret = ret.dtype.type(ret / rcount)
-Traceback (most recent call last):
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 66, in <module>
-    obj = eval_heuristic(node_positions[i])
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 37, in eval_heuristic
-    next_node = select_next_node(
-                ^^^^^^^^^^^^^^^^^
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py", line 14, in select_next_node
-    The set of unvisited nodes.
-                                
-ZeroDivisionError: division by zero
+[*] Instance 0: 23.58405335183809
+[*] Instance 1: 24.321686097222816
+[*] Instance 2: 21.39952654501218
+[*] Instance 3: 24.279969854998907
+[*] Instance 4: 23.426798767715592
+[*] Instance 5: 28.459177802042728
+[*] Instance 6: 24.152370527476183
+[*] Instance 7: 25.73431123911199
+[*] Instance 8: 25.88916589160398
+[*] Instance 9: 22.882938147115862
+[*] Instance 10: 23.936738254642215
+[*] Instance 11: 22.972452575724272
+[*] Instance 12: 24.272454891920365
+[*] Instance 13: 24.06447220358237
+[*] Instance 14: 22.488088518820472
+[*] Instance 15: 25.092245979570986
+[*] Instance 16: 23.212437373335025
+[*] Instance 17: 22.84695943846194
+[*] Instance 18: 22.770937477462986
+[*] Instance 19: 25.503215192123733
+[*] Instance 20: 21.7965473113195
+[*] Instance 21: 24.448749950842405
+[*] Instance 22: 26.681469603437293
+[*] Instance 23: 26.40111759476173
+[*] Instance 24: 25.09883525302149
+[*] Instance 25: 22.37610539822928
+[*] Instance 26: 23.792821835703194
+[*] Instance 27: 21.01188112633581
+[*] Instance 28: 21.08949401890483
+[*] Instance 29: 25.333562635865594
+[*] Instance 30: 21.225687484260792
+[*] Instance 31: 25.46021621289589
+[*] Instance 32: 21.104163062940763
+[*] Instance 33: 25.224383123826357
+[*] Instance 34: 23.132173230915843
+[*] Instance 35: 25.10443613558169
+[*] Instance 36: 22.37738522980301
+[*] Instance 37: 24.44871823948032
+[*] Instance 38: 24.925231639193374
+[*] Instance 39: 25.260547444030887
+[*] Instance 40: 24.066864177744577
+[*] Instance 41: 18.458750003236975
+[*] Instance 42: 22.783298966086658
+[*] Instance 43: 22.159150331858797
+[*] Instance 44: 26.007744907086476
+[*] Instance 45: 25.468559575070486
+[*] Instance 46: 25.882805496522742
+[*] Instance 47: 23.811042780246677
+[*] Instance 48: 22.6287741820802
+[*] Instance 49: 23.25386859959256
+[*] Instance 50: 25.16357326770554
+[*] Instance 51: 24.608186332243907
+[*] Instance 52: 23.751238017057823
+[*] Instance 53: 19.873863021335406
+[*] Instance 54: 22.866509223039
+[*] Instance 55: 23.395757207795683
+[*] Instance 56: 24.150969999531092
+[*] Instance 57: 24.934399812240546
+[*] Instance 58: 23.255123869433003
+[*] Instance 59: 24.964495089095195
+[*] Instance 60: 23.628236658202994
+[*] Instance 61: 28.804242064494982
+[*] Instance 62: 21.67534464461846
+[*] Instance 63: 26.165670164792658
+[*] Average:
+23.895968672691332

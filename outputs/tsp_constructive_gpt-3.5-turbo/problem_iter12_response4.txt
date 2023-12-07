@@ -1,14 +1,15 @@
-Code description: 
+Code description: In this algorithm, I propose a modified version of the original selecting-next-node function that takes into account not only the direct distance from the current node to the destination node but also the average distance between the current node and the unvisited nodes.
 
-The current code calculates a score for each unvisited node based on factors such as distance, number of unvisited neighbors, and degree. However, it does not take into account the importance of visiting nodes that are closer to the destination node. In order to improve the algorithm, we will add a new factor to the score calculation that considers the distance between the unvisited node and the destination node.
+The algorithm first calculates the direct distance from the current node to the destination node and stores it as the minimum distance. Then, for each unvisited node, it calculates the average distance from the current node to that node and updates the minimum distance if a smaller distance is found.
+
+Finally, the algorithm selects the node with the smallest average distance as the next node to visit.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
     """
-    Select the next node to visit from the unvisited nodes based on uncertainty, distance, number of unvisited neighbors,
-    degree, and distance to the destination node.
+    Select the next node to visit from the unvisited nodes.
     
     Parameters
     ----------
@@ -26,36 +27,14 @@ def select_next_node(current_node: int, destination_node: int, unvisited_nodes: 
     nxt_node : int
         The next node to visit.
     """
-    # Initialize variables
-    max_score = -np.inf
-    nxt_node = None
-    n_nodes = len(distance_matrix)
+    direct_distance = distance_matrix[current_node, destination_node]
+    min_distance = direct_distance
     
-    # Calculate the number of unvisited neighbors for each unvisited node
-    num_unvisited_neighbors = np.zeros(n_nodes)
     for node in unvisited_nodes:
-        num_unvisited_neighbors[node] = np.sum(distance_matrix[node,:] > 0)
+        avg_distance = np.mean(distance_matrix[current_node, list(unvisited_nodes - set([node]))])
+        min_distance = min(min_distance, avg_distance)
     
-    # Calculate the degree for each unvisited node
-    degree = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        degree[node] = np.sum(distance_matrix[node,:] > 0)
-    
-    # Calculate the uncertainty scores for each unvisited node
-    uncertainty_scores = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        variability = np.std(distance_matrix[:, node])
-        uncertainty_scores[node] = variability
-    
-    # Calculate the score for each unvisited node
-    for node in unvisited_nodes:
-        distance_to_dest = distance_matrix[node][destination_node] # new factor: distance to destination node
-        distance = distance_matrix[current_node][node]
-        score = distance - 0.5 * num_unvisited_neighbors[node] + 0.5 * degree[node] * uncertainty_scores[node] - 0.1 * distance_to_dest # consider distance to destination
-        
-        if score > max_score:
-            max_score = score
-            nxt_node = node
+    nxt_node = min(unvisited_nodes, key=lambda node: np.mean(distance_matrix[current_node, list(unvisited_nodes - set([node]))]))
     
     return nxt_node
 ```

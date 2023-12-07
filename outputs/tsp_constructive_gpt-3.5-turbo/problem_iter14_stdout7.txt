@@ -1,11 +1,68 @@
 [*] Running ...
 [*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/dataset/val50_dataset.npy with 64 instances.
-Traceback (most recent call last):
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 66, in <module>
-    obj = eval_heuristic(node_positions[i])
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 37, in eval_heuristic
-    next_node = select_next_node(
-                ^^^^^^^^^^^^^^^^^
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py", line 53, in select_next_node
-ValueError: operands could not be broadcast together with shapes (50,) (49,) 
+[*] Instance 0: 8.011999931814676
+[*] Instance 1: 8.36151322769916
+[*] Instance 2: 7.569391312417254
+[*] Instance 3: 9.041657241102252
+[*] Instance 4: 7.960627791795942
+[*] Instance 5: 8.887773140496241
+[*] Instance 6: 8.437863242633773
+[*] Instance 7: 8.018830111063775
+[*] Instance 8: 8.778980943865797
+[*] Instance 9: 8.155462578925254
+[*] Instance 10: 8.849996911430075
+[*] Instance 11: 7.388976430953691
+[*] Instance 12: 7.260700919692004
+[*] Instance 13: 9.718492343480786
+[*] Instance 14: 8.766444178997498
+[*] Instance 15: 9.413082197076607
+[*] Instance 16: 7.590352220249661
+[*] Instance 17: 7.9027473324355455
+[*] Instance 18: 8.736402567608133
+[*] Instance 19: 8.83498043399014
+[*] Instance 20: 9.295252628622347
+[*] Instance 21: 9.486598767093568
+[*] Instance 22: 8.893984923002941
+[*] Instance 23: 9.098003629544545
+[*] Instance 24: 7.979110232781456
+[*] Instance 25: 7.651410194377233
+[*] Instance 26: 8.477550254567106
+[*] Instance 27: 7.216987452612069
+[*] Instance 28: 8.77609646664046
+[*] Instance 29: 9.05999079690772
+[*] Instance 30: 8.180924308968137
+[*] Instance 31: 8.874592000673
+[*] Instance 32: 8.174366165446937
+[*] Instance 33: 9.22537492379106
+[*] Instance 34: 8.697981591748404
+[*] Instance 35: 8.23544381176123
+[*] Instance 36: 8.200425211032433
+[*] Instance 37: 8.822060125581872
+[*] Instance 38: 7.942921746394869
+[*] Instance 39: 8.523028472904416
+[*] Instance 40: 7.281570534950636
+[*] Instance 41: 9.349956924556825
+[*] Instance 42: 8.73286868432864
+[*] Instance 43: 8.733207288865401
+[*] Instance 44: 8.630499467756435
+[*] Instance 45: 9.372670566167415
+[*] Instance 46: 9.304650848663588
+[*] Instance 47: 9.168202604509629
+[*] Instance 48: 8.040562361325701
+[*] Instance 49: 10.636405509857783
+[*] Instance 50: 8.519352339090283
+[*] Instance 51: 8.709427380805105
+[*] Instance 52: 10.390177862514644
+[*] Instance 53: 8.65907340007203
+[*] Instance 54: 8.63529744124314
+[*] Instance 55: 9.232782257836359
+[*] Instance 56: 9.07571147923237
+[*] Instance 57: 8.724733509700133
+[*] Instance 58: 6.945245295873966
+[*] Instance 59: 7.420705798263863
+[*] Instance 60: 9.650488806757817
+[*] Instance 61: 8.945675558702849
+[*] Instance 62: 8.192384285903803
+[*] Instance 63: 8.635989481302666
+[*] Average:
+8.585719038288456

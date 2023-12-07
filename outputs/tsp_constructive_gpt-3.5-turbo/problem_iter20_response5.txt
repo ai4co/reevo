@@ -1,39 +1,27 @@
-Code description: 
-My code implements a novel selecting-next-node function for the Traveling Salesman Problem (TSP). The function selects the next node to visit based on a combination of distance score and a novel neighbor score. 
-
-The distance score is calculated as the inverse of the distance between the current node and each unvisited node. A smaller distance corresponds to a higher score.
-
-The neighbor score is calculated as the number of unvisited neighbors that each unvisited node has. A node with more unvisited neighbors has a higher score.
-
-The trade-off parameter is used to adjust the relative importance of the distance score and neighbor score. By adjusting the trade-off parameter, the function can prioritize either minimizing distance or maximizing the number of unvisited neighbors.
-
-The code selects the node with the highest combined score as the next node to visit.
+Code description: The proposed algorithm aims to incorporate a more balanced approach to selecting the next node by considering both the current distance and the destination distance for each unvisited node. Additionally, it introduces a novel factor that evaluates the connectivity of each unvisited node to the other unvisited nodes. By taking into account these factors, the algorithm aims to find a better next node that can lead to a more optimal solution.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    trade_off = 0.5
+    # Calculate the distance from the current node to each unvisited node
+    current_distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    # Calculate the distance scores for each unvisited node
-    distance_scores = []
-    for node in unvisited_nodes:
-        distance = distance_matrix[current_node, node]
-        distance_score = 1 / (distance + 1e-6)  # Adding small epsilon to avoid division by zero
-        distance_scores.append(distance_score)
+    # Calculate the distance from the destination node to each unvisited node
+    destination_distances = distance_matrix[destination_node, list(unvisited_nodes)]
     
-    # Calculate the neighbor scores for each unvisited node
-    neighbor_scores = []
-    for node in unvisited_nodes:
-        num_unvisited_neighbors = len(unvisited_nodes) - 1
-        neighbor_score = num_unvisited_neighbors
-        neighbor_scores.append(neighbor_score)
+    # Calculate the connectivity score for each unvisited node
+    connectivity_scores = np.zeros(len(unvisited_nodes))
+    for i, node in enumerate(unvisited_nodes):
+        connectivity_scores[i] = np.mean(distance_matrix[node, list(unvisited_nodes)])
     
-    # Combine the distance scores and neighbor scores
-    scores = trade_off * np.array(distance_scores) + (1 - trade_off) * np.array(neighbor_scores)
+    # Calculate the combined score as a weighted sum of the current distance, destination distance, and connectivity score
+    combined_scores = 0.4 * current_distances + 0.4 * destination_distances - 0.2 * connectivity_scores
     
-    # Select the node with the highest combined score
-    nxt_node = np.argmax(scores)
+    # Find the node with the smallest combined score
+    nxt_node = list(unvisited_nodes)[np.argmin(combined_scores)]
     
     return nxt_node
 ```
+
+In this code, I first calculate the current distance and destination distance for each unvisited node using the given distance matrix. Then, I calculate the connectivity score for each unvisited node by averaging the distances between a node and all other unvisited nodes. The combined score is calculated as a weighted sum of the current distance, destination distance, and connectivity score. By assigning higher weights to the current and destination distances, the algorithm prioritizes nodes that are closer to the current node and the destination node. However, the connectivity score is used with a negative weight, which encourages the algorithm to select nodes that are more connected to the other unvisited nodes. Finally, I select the node with the smallest combined score as the next node to visit.

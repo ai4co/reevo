@@ -1,44 +1,28 @@
-Code description: The code uses a novel selecting-next-node function for the solution construction process for the Traveling Salesman Problem (TSP). The function selects the next node to visit based on a combination of uncertainty and distance. It calculates the uncertainty score for each unvisited node, which is a measure of the variability in distances from that node to all other nodes. The function then assigns a weight to each unvisited node based on the uncertainty score and the distance between the current node and the unvisited node. The node with the highest weight is selected as the next node to visit.
+Code description: This code implements a selecting-next-node function using a novel constructive heuristic called "Semi-random Path Extension". The heuristic aims to balance exploration and exploitation by considering both random and greedy choices.
+
+The idea behind this heuristic is to randomly select a few nodes from the set of unvisited nodes and calculate the distance between the current node and each of these randomly selected nodes. It then chooses the node with the minimum distance as the next node to visit. This approach allows for some exploration by randomly selecting nodes, while also exploiting the information from the distance matrix to make a more informed decision.
 
 ```python
 import numpy as np
+import random
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    """
-    Select the next node to visit from the unvisited nodes based on uncertainty and distance.
+    # Randomly select a few nodes for exploration
+    num_random_nodes = min(5, len(unvisited_nodes))
+    random_nodes = random.sample(unvisited_nodes, num_random_nodes)
     
-    Parameters
-    ----------
-    current_node : int
-        The current node.
-    destination_node : int
-        The destination node to return to.
-    unvisited_nodes : set
-        The set of unvisited nodes.
-    distance_matrix : np.ndarray
-        The distance matrix of shape (n_nodes, n_nodes).
+    # Calculate the distance between the current node and each randomly selected node
+    distances = []
+    for node in random_nodes:
+        distance = distance_matrix[current_node, node]
+        distances.append((node, distance))
     
-    Returns
-    -------
-    nxt_node : int
-        The next node to visit.
-    """
-    distances = distance_matrix[current_node]
-    uncertainty_scores = []
-    weights = []
+    # Sort the distances in ascending order
+    distances.sort(key=lambda x: x[1])
     
-    for node in unvisited_nodes:
-        distance = distances[node]
-        variability = np.std(distance_matrix[:, node])
-        inverse_cv = 1 / (variability / np.mean(distance_matrix[:, node]))  # Calculate the inverse coefficient of variation
-        
-        uncertainty_scores.append(inverse_cv)
-        
-        weights.append(inverse_cv + (1 / distance))  # Calculate the weight for each unvisited node
-        
-    max_weight = np.max(weights)
-    top_weight_nodes = [node for node, weight in zip(unvisited_nodes, weights) if weight == max_weight]
-    nxt_node = np.random.choice(top_weight_nodes)  # Select a random node with the highest weight
-
+    # Choose the node with the minimum distance as the next node to visit
+    nxt_node = distances[0][0]
+    
     return nxt_node
 ```
+This algorithm balances exploration and exploitation by randomly selecting a few nodes for exploration while also using the information from the distance matrix to make a more informed decision.

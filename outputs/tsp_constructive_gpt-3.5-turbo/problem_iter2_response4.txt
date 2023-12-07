@@ -1,11 +1,15 @@
-Code description: The current code uses a combination of factors including proximity to the current node, distance to the destination node, and number of unvisited neighbors to select the next node. However, it does not consider the possibility of reaching a dead end where there are no unvisited neighbors. To address this, we can modify the code to prioritize nodes with a higher number of unvisited neighbors only if they are not dead ends. We can also add a penalty factor for nodes that are closer to the destination, to encourage exploration of nodes that are farther away.
+Code description: 
+
+This code implements a modified version of the ClosestCluster function to solve the Traveling Salesman Problem (TSP). The original code groups the unvisited nodes into clusters based on their proximity to each other and selects the cluster with the closest centroid. It then selects the unvisited node within the selected cluster that is closest to the current node as the next node to visit. 
+
+I will modify the code to introduce a new selection strategy called "FurthestCluster". Instead of selecting the cluster with the closest centroid, this strategy selects the cluster with the furthest centroid from the current node. This can help in exploration by encouraging the algorithm to visit clusters that are farther away. Within the selected cluster, we will still select the node closest to the current node as before.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
     """
-    Select the next node to visit from the unvisited nodes.
+    Select the next node to visit from the unvisited nodes based on the furthest cluster.
     
     Parameters
     ----------
@@ -24,33 +28,80 @@ def select_next_node(current_node: int, destination_node: int, unvisited_nodes: 
         The next node to visit.
     """
     
-    n_nodes = len(distance_matrix)
+    def calculate_distance(node1, node2):
+        distance = distance_matrix[node1, node2]
+        return distance
     
-    # Calculate the distances from the current node to all unvisited nodes
+    def calculate_centroid(node_set):
+        centroid = np.mean(np.asarray(list(node_set)), axis=0)
+        return centroid
+    
+    # Calculate the distances from the current node to each unvisited node
     distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    # Calculate the normalized distances from the current node to all unvisited nodes
-    normalized_distances = distances / np.max(distances)
+    # Calculate the distances between all unvisited nodes
+    node_distances = distance_matrix[list(unvisited_nodes)][:, list(unvisited_nodes)]
     
-    # Calculate the distances from each unvisited node to the destination node
-    destination_distances = distance_matrix[list(unvisited_nodes), destination_node]
+    # Determine the number of clusters
+    n_clusters = int(np.round(np.sqrt(len(unvisited_nodes))))
     
-    # Calculate the normalized distances from each unvisited node to the destination node
-    normalized_destination_distances = destination_distances / np.max(destination_distances)
+    # Initialize an array to store the cluster centroids and their distances to the current node
+    cluster_centroids = np.zeros((n_clusters, distance_matrix.shape[1]))
+    cluster_distances = np.zeros(n_clusters)
     
-    # Calculate the number of unvisited neighbors for each unvisited node
-    unvisited_neighbors = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        unvisited_neighbors[node] = np.sum([1 for neighbor in unvisited_nodes if distance_matrix[node, neighbor] > 0])
+    # Cluster the unvisited nodes
+    clusters = []
+    for i in range(n_clusters):
+        clusters.append(set())
     
-    # Calculate the score for each unvisited node based on proximity to the current node, distance to the destination node, and number of unvisited neighbors
-    scores = normalized_distances * (1 - normalized_destination_distances) * unvisited_neighbors
+    for i, node in enumerate(unvisited_nodes):
+        max_cluster_index = np.argmax(cluster_distances)
+        max_cluster_distance = cluster_distances[max_cluster_index]
+        
+        if max_cluster_distance == 0:
+            max_cluster_distance = 1e-8
+            
+        max_cluster_centroid = cluster_centroids[max_cluster_index]
+            
+        node_distance = distances[i]
+        
+        node_cluster_distance = calculate_distance(node, max_cluster_centroid)
+        
+        if node_cluster_distance > max_cluster_distance:
+            clusters[max_cluster_index].add(node)
+            
+        else:
+            min_distance = np.inf
+            for j in range(n_clusters):
+                cluster_centroid = cluster_centroids[j]
+                distance = calculate_distance(node, cluster_centroid)
+                if distance < min_distance:
+                    min_distance = distance
+                    max_cluster_index = j
+                    
+            clusters[max_cluster_index].add(node)
+        
+        cluster_centroids[max_cluster_index] = calculate_centroid(clusters[max_cluster_index])
+        cluster_distances[max_cluster_index] = calculate_distance(current_node, cluster_centroids[max_cluster_index])
+
+    # Initialize the variables for selecting the closest node
+    min_distance = np.inf
     
-    # Find the index of the node with the highest score
-    max_score_index = np.argmax(scores)
+    # Select the cluster with the furthest centroid from the current node
+    for i, cluster in enumerate(clusters):
+        cluster_centroid = cluster_centroids[i]
+        distance = calculate_distance(current_node, cluster_centroid)
+        if distance > min_distance:
+            min_distance = distance
+            selected_cluster = cluster
     
-    # Find the corresponding node value from the set of unvisited nodes
-    nxt_node = list(unvisited_nodes)[max_score_index]
+    # Select the node within the selected cluster that is closest to the current node
+    min_distance = np.inf
+    for node in selected_cluster:
+        distance = calculate_distance(current_node, node)
+        if distance < min_distance:
+            min_distance = distance
+            nxt_node = node
     
     return nxt_node
 ```

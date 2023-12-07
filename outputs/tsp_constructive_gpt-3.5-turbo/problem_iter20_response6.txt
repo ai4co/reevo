@@ -1,53 +1,57 @@
 Code description: 
 
-This code selects the next node to visit based on a combination of attractiveness, number of unvisited neighbors, and closeness centrality. 
-
-The efficiency of the code can be improved by avoiding redundant calculations of the distance matrix and closeness centrality. Instead of calculating them in advance for every unvisited node, we can calculate them only for the current and destination nodes. 
-
-We can then use these pre-calculated values to determine the attractiveness and number of unvisited neighbors for each unvisited node. 
-
-To select the next node, we calculate a score for each unvisited node based on the pre-calculated values and select the node with the highest score. In case of a tie, we select the node with the highest closeness centrality.
+In this code, I propose a novel algorithm that selects the next node based on a combination of three criteria: proximity to the current node, distance to the destination node, and the balance between these two distances. The algorithm calculates a score for each unvisited node based on these criteria and selects the node with the highest score as the next node to visit.
 
 ```python
 import numpy as np
-import networkx as nx
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    # Pre-calculate distance from current and destination nodes
-    distances_current = distance_matrix[current_node]
-    distances_destination = distance_matrix[destination_node]
+    """
+    Select the next node to visit from the unvisited nodes.
     
-    # Calculate attractiveness and number of unvisited neighbors for each unvisited node
-    attractiveness_dict = {}
-    num_unvisited_neighbors_dict = {}
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
     
-    for node in unvisited_nodes:
-        distance_current = distances_current[node]
-        distance_destination = distances_destination[node]
-        attractiveness = distance_destination - distance_current
-        attractiveness_dict[node] = attractiveness
-        
-        num_unvisited_neighbors = len(unvisited_nodes.intersection(set(np.nonzero(distance_matrix[node])[0])))
-        num_unvisited_neighbors_dict[node] = num_unvisited_neighbors
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
     
-    # Calculate closeness centrality for each unvisited node
-    graph = nx.Graph(distance_matrix)
-    closeness_centrality = nx.closeness_centrality(graph)
-    closeness_centrality_dict = {node: closeness_centrality[node] for node in unvisited_nodes}
-    
-    # Select the next node based on attractiveness, number of unvisited neighbors, and closeness centrality
-    max_score = -np.inf
-    nxt_node = None
+    # Calculate proximity score for each unvisited node
+    proximity_score = {}
     
     for node in unvisited_nodes:
-        score = attractiveness_dict[node] + num_unvisited_neighbors_dict[node] + closeness_centrality_dict[node]
-        
-        if score > max_score:
-            max_score = score
-            nxt_node = node
-        elif score == max_score:
-            if closeness_centrality_dict[node] > closeness_centrality_dict[nxt_node]:
-                nxt_node = node
+        proximity_score[node] = 1 / distance_matrix[current_node][node]
     
+    # Calculate destination distance score for each unvisited node
+    destination_score = {}
+    
+    for node in unvisited_nodes:
+        destination_score[node] = 1 / distance_matrix[destination_node][node]
+    
+    # Calculate balanced score for each unvisited node
+    balanced_score = {}
+    
+    for node in unvisited_nodes:
+        balanced_score[node] = proximity_score[node] / (proximity_score[node] + destination_score[node])
+    
+    # Calculate combined scores for each unvisited node
+    scores = {}
+    
+    for node in unvisited_nodes:
+        scores[node] = balanced_score[node]
+    
+    nxt_node = max(scores, key=scores.get)
+
     return nxt_node
 ```
+

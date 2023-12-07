@@ -1,46 +1,36 @@
 Code description: 
-In this modified algorithm, we will introduce a new factor called "attractiveness" to guide the selection of the next node. The attractiveness will be calculated based on the distance to the node, the number of unvisited neighbors of the node, and the uncertainty score. The higher the attractiveness, the more likely the node will be selected as the next node to visit. However, instead of using a random choice among nodes with the maximum attractiveness, we will select the node with the highest attractiveness. This ensures that the selection is deterministic and avoids unnecessary randomness.
+
+This code modifies the original algorithm by introducing a novel way to select the next node based on a combination of criteria. In addition to considering the distance from the current node and the destination node to each unvisited node, this modified algorithm also takes into account the average distance of unvisited nodes to their neighboring unvisited nodes. 
+
+The modified algorithm assigns weights to each of these criteria and calculates a combined score for each unvisited node. The weights are as follows:
+- 50% weight for the distance from the current node to each unvisited node.
+- 30% weight for the average distance of unvisited nodes to their neighboring unvisited nodes.
+- 20% weight for the distance from the destination node to each unvisited node.
+
+The node with the highest combined score is selected as the next node to visit.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    """
-    Select the next node to visit from the unvisited nodes based on trade-off between distance, uncertainty, and attractiveness.
+    # Calculate distance from current node to each unvisited node
+    current_distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    Parameters
-    ----------
-    current_node : int
-        The current node.
-    destination_node : int
-        The destination node to return to.
-    unvisited_nodes : set
-        The set of unvisited nodes.
-    distance_matrix : np.ndarray
-        The distance matrix of shape (n_nodes, n_nodes).
+    # Calculate distance from destination node to each unvisited node
+    destination_distances = distance_matrix[destination_node, list(unvisited_nodes)]
     
-    Returns
-    -------
-    nxt_node : int
-        The next node to visit.
-    """
-    distances = distance_matrix[current_node]
-    attractiveness_scores = []
-    
+    # Calculate Neighbor Distance for each unvisited node
+    neighbor_distance = {}
     for node in unvisited_nodes:
-        distance = distances[node]
-        variability = np.std(distance_matrix[:, node])
-        neighbors = [neighbor for neighbor in unvisited_nodes if distance_matrix[node, neighbor] < np.inf]
+        neighbor_distances = distance_matrix[node, list(unvisited_nodes - set([node]))]
+        neighbor_distance[node] = np.mean(neighbor_distances)
         
-        distance_score = 1 / distance
-        uncertainty_score = variability / np.mean(distance_matrix[:, node])
-        attractiveness_score = distance_score + uncertainty_score + len(neighbors)
-        
-        attractiveness_scores.append(attractiveness_score)
+    # Calculate combined scores for each unvisited node
+    combined_scores = 0.5 * current_distances + 0.3 * np.array(list(neighbor_distance.values())) - 0.2 * destination_distances
     
-    max_attractiveness = np.max(attractiveness_scores)
-    nxt_node = unvisited_nodes[np.argmax(attractiveness_scores)]
-
+    # Find the node with the highest combined score
+    nxt_node = list(unvisited_nodes)[np.argmax(combined_scores)]
+    
     return nxt_node
 ```
 

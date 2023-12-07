@@ -1,29 +1,33 @@
-Code description: The crossover algorithm selects the next node based on both the distance to the node and the number of unvisited neighbors. It calculates a score for each unvisited node using these factors and selects the node with the highest score as the next node to visit. Additionally, it introduces a random element by considering multiple nodes with the highest score and randomly selecting one of them.
+Code description: In this code, I propose a novel selecting-next-node function called "Distance-based Exploration". This heuristic balances the exploration and exploitation of the distance information available from the current node to each unvisited node to make informed decisions about the next node to visit.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    # Initialize variables
-    max_score = -np.inf
-    max_score_nodes = []
-    weight = 0.5
+    # Calculate distance from current node to each unvisited node
+    current_distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    # Calculate the score for each unvisited node
-    for node in unvisited_nodes:
-        distance = distance_matrix[current_node][node]
-        num_unvisited_neighbors = np.sum(distance_matrix[node,:] > 0)
-        score = (1 - weight) * distance - weight * num_unvisited_neighbors
-        
-        if score > max_score:
-            max_score = score
-            max_score_nodes = [node]
-        elif score == max_score:
-            max_score_nodes.append(node)
+    # Calculate the average distance
+    average_distance = np.mean(current_distances)
     
-    # Randomly select one of the nodes with the highest score
-    nxt_node = np.random.choice(max_score_nodes)
+    # Calculate the normalized distances relative to the average distance
+    normalized_distances = current_distances / average_distance
+    
+    # Calculate the exploitation score for each node
+    exploitation_scores = distance_matrix[current_node, list(unvisited_nodes)] / normalized_distances
+    
+    # Calculate the exploration score for each node
+    exploration_scores = 1 / (distance_matrix[current_node, list(unvisited_nodes)] * normalized_distances)
+    
+    # Calculate the combined scores for each node
+    combined_scores = exploitation_scores + exploration_scores
+    
+    # Sort the nodes based on combined scores in descending order
+    sorted_nodes = sorted(list(unvisited_nodes), key=lambda node: combined_scores[node], reverse=True)
+    
+    # Select the node with the highest combined score
+    nxt_node = sorted_nodes[0]
     
     return nxt_node
 ```
-
+```

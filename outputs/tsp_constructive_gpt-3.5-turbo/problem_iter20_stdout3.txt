@@ -1,27 +1,72 @@
 [*] Running ...
 [*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/dataset/val50_dataset.npy with 64 instances.
-Traceback (most recent call last):
-  File "/Users/yhr/anaconda3/lib/python3.11/site-packages/networkx/convert.py", line 144, in to_networkx_graph
-    return nx.from_numpy_array(data, create_using=create_using)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/yhr/anaconda3/lib/python3.11/site-packages/networkx/convert_matrix.py", line 1615, in from_numpy_array
-    raise nx.NetworkXError(f"Adjacency matrix not square: nx,ny={A.shape}")
-networkx.exception.NetworkXError: Adjacency matrix not square: nx,ny=(49, 50)
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 66, in <module>
-    obj = eval_heuristic(node_positions[i])
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 37, in eval_heuristic
-    next_node = select_next_node(
-                ^^^^^^^^^^^^^^^^^
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py", line 19, in select_next_node
-    num_unvisited_neighbors = len(unvisited_nodes.intersection(set(np.nonzero(distance_matrix[node])[0])))
-                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/yhr/anaconda3/lib/python3.11/site-packages/networkx/classes/graph.py", line 338, in __init__
-    convert.to_networkx_graph(incoming_graph_data, create_using=self)
-  File "/Users/yhr/anaconda3/lib/python3.11/site-packages/networkx/convert.py", line 146, in to_networkx_graph
-    raise nx.NetworkXError(
-networkx.exception.NetworkXError: Failed to interpret array as an adjacency matrix.
+/Users/yhr/anaconda3/lib/python3.11/site-packages/numpy/core/fromnumeric.py:3464: RuntimeWarning: Mean of empty slice.
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/Users/yhr/anaconda3/lib/python3.11/site-packages/numpy/core/_methods.py:192: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+[*] Instance 0: 9.660567127285997
+[*] Instance 1: 12.901493341690385
+[*] Instance 2: 9.408088767407506
+[*] Instance 3: 11.060624799245646
+[*] Instance 4: 11.911641651742432
+[*] Instance 5: 10.420146648004215
+[*] Instance 6: 11.441856499970083
+[*] Instance 7: 11.273321271800187
+[*] Instance 8: 11.921450359785448
+[*] Instance 9: 10.845242697497403
+[*] Instance 10: 11.711745403728672
+[*] Instance 11: 9.774582260574421
+[*] Instance 12: 9.65640011431936
+[*] Instance 13: 11.717377944998745
+[*] Instance 14: 12.568243382360004
+[*] Instance 15: 11.53088279427444
+[*] Instance 16: 9.250968026024061
+[*] Instance 17: 7.9059933741499275
+[*] Instance 18: 12.566860612746813
+[*] Instance 19: 12.622775122967987
+[*] Instance 20: 8.970299883729803
+[*] Instance 21: 13.553551810535513
+[*] Instance 22: 13.585715740942007
+[*] Instance 23: 10.901535991571825
+[*] Instance 24: 10.274346993069596
+[*] Instance 25: 11.042731125912445
+[*] Instance 26: 13.501552474885548
+[*] Instance 27: 13.185580440601143
+[*] Instance 28: 9.624348265213799
+[*] Instance 29: 9.936907752429292
+[*] Instance 30: 9.586337865901683
+[*] Instance 31: 15.854745802685121
+[*] Instance 32: 10.621752714271645
+[*] Instance 33: 11.005902290622119
+[*] Instance 34: 9.084308347434378
+[*] Instance 35: 11.513933506979088
+[*] Instance 36: 12.020314732570853
+[*] Instance 37: 10.042930021919494
+[*] Instance 38: 9.316576206504735
+[*] Instance 39: 11.45250669432898
+[*] Instance 40: 8.72524050666393
+[*] Instance 41: 14.679528567042617
+[*] Instance 42: 12.263986683672597
+[*] Instance 43: 11.734694203304342
+[*] Instance 44: 11.609200171171532
+[*] Instance 45: 11.054599100188224
+[*] Instance 46: 16.288034714455563
+[*] Instance 47: 9.43082990232985
+[*] Instance 48: 9.817719925801967
+[*] Instance 49: 13.230655236234211
+[*] Instance 50: 11.904757063817375
+[*] Instance 51: 11.889413709398266
+[*] Instance 52: 15.199560333002065
+[*] Instance 53: 11.829850897878043
+[*] Instance 54: 12.36865721533985
+[*] Instance 55: 10.689405592212438
+[*] Instance 56: 15.640128276084935
+[*] Instance 57: 10.757112938822209
+[*] Instance 58: 9.497517570240873
+[*] Instance 59: 9.683129495621442
+[*] Instance 60: 14.650985052342376
+[*] Instance 61: 11.41246901141236
+[*] Instance 62: 9.262402259140984
+[*] Instance 63: 9.988583396411194
+[*] Average:
+11.388040666957377

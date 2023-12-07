@@ -1,12 +1,12 @@
-Code description: 
-This code implements a novel algorithm for selecting the next node to visit in the Traveling Salesman Problem. The algorithm selects the next node based on a metric that takes into account both the distance from the current node to the unvisited nodes and the distance from the unvisited nodes to the destination node. The node with the smallest metric value is selected as the next node to visit.
+Code description: In this code, I will implement the Random Selection heuristic for the Traveling Salesman Problem (TSP). This heuristic randomly selects the next node to visit from the set of unvisited nodes.
 
 ```python
 import numpy as np
+import random
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
     """
-    Select the next node to visit from the unvisited nodes.
+    Select the next node to visit from the unvisited nodes using Random Selection heuristic.
     
     Parameters
     ----------
@@ -24,17 +24,10 @@ def select_next_node(current_node: int, destination_node: int, unvisited_nodes: 
     nxt_node : int
         The next node to visit.
     """
-    # Calculate the distance from the current node to the unvisited nodes
-    distance_from_current = distance_matrix[current_node, list(unvisited_nodes)]
     
-    # Calculate the distance from the unvisited nodes to the destination node
-    distance_to_destination = distance_matrix[list(unvisited_nodes), destination_node]
-    
-    # Calculate the metric value for each node
-    metric_values = distance_from_current + distance_to_destination
-    
-    # Find the node with the smallest metric value
-    nxt_node = list(unvisited_nodes)[np.argmin(metric_values)]
+    # Select a random node from the set of unvisited nodes
+    nxt_node = random.choice(list(unvisited_nodes))
     
     return nxt_node
 ```
+This code selects the next node to visit at random from the set of unvisited nodes. The random.choice() function is used to randomly select a node from the given set. This heuristic does not consider any information about the distance between nodes and simply selects a random node each time.

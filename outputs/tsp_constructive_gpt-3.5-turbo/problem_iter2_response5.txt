@@ -1,11 +1,13 @@
-Code description: The following code selects the next node to visit based on a combination of the distance from the current node to each unvisited node and the average distance from each unvisited node to all other unvisited nodes. It calculates a score for each unvisited node based on this combination and selects the node with the highest score as the next node to visit.
+Code description: 
+In this improved algorithm, I will use a combination of the Random Selection heuristic and the Greedy Strategy. The algorithm will randomly select a small subset of nodes from the unvisited nodes, calculate the distance from the current node to each of these nodes, and then select the node with the shortest distance.
 
 ```python
 import numpy as np
+import random
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
     """
-    Select the next node to visit from the unvisited nodes based on a combination of distances.
+    Select the next node to visit from the unvisited nodes using an improved heuristic.
     
     Parameters
     ----------
@@ -23,20 +25,20 @@ def select_next_node(current_node: int, destination_node: int, unvisited_nodes: 
     nxt_node : int
         The next node to visit.
     """
-
-    # Compute the average distance from each unvisited node to all other unvisited nodes
-    avg_distances = np.mean(distance_matrix[list(unvisited_nodes)][:, list(unvisited_nodes)], axis=1)
-
-    # Compute the distance from the current node to each unvisited node
-    distances = distance_matrix[current_node, list(unvisited_nodes)]
-
-    # Calculate a score for each unvisited node based on the combination of distances
-    scores = distances / avg_distances * distances
-
-    # Select the node with the highest score as the next node to visit
-    nxt_node = list(unvisited_nodes)[np.argmax(scores)]
-
+    
+    # Select a random subset of nodes from the unvisited nodes
+    subset_nodes = random.sample(unvisited_nodes, k=min(5, len(unvisited_nodes)))
+    
+    # Calculate the distance from the current node to each node in the subset
+    distances = [(node, distance_matrix[current_node][node]) for node in subset_nodes]
+    
+    # Sort the nodes based on the distance
+    distances.sort(key=lambda x: x[1])
+    
+    # Select the node with the shortest distance
+    nxt_node = distances[0][0]
+    
     return nxt_node
 ```
 
-The novel algorithm selects the next node to visit by considering both the distance from the current node to each unvisited node and the average distance from each unvisited node to all other unvisited nodes. It calculates a score for each unvisited node by dividing the distance from the current node by the average distance and multiplying it by the distance itself. This score balances the importance of visiting nodes that are closer to the current node with nodes that are closer to the average distance. The algorithm selects the node with the highest score as the next node to visit.
+Note: In this improved algorithm, I randomly select a subset of nodes from the unvisited nodes to consider for selection. This adds a degree of randomness to the algorithm while still ensuring a high probability of selecting a node with a short distance. Additionally, by only considering a small subset of nodes, the algorithm will have a lower computational complexity compared to considering all the unvisited nodes.

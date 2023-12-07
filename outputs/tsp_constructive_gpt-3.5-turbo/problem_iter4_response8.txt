@@ -1,50 +1,27 @@
-Code description: The code implements a novel heuristic called "Weighted Distance and Degree with Exploration". This heuristic selects the next node to visit based on the distance from the current node to each unvisited node, weighted by the degree of each unvisited node. Additionally, it introduces an exploration factor to promote exploration of less visited nodes. The exploration factor is calculated by dividing the number of unvisited nodes by the sum of the degrees of all unvisited nodes. The selection of the next node takes into account both the weighted distance and the exploration factor.
+Code description: In this algorithm, I propose a new way to select the next node by considering both the attractiveness of each unvisited node and the distance between the current node and the unvisited node. Instead of using a fixed alpha and beta value for calculating attractiveness, I will dynamically adjust the values based on the number of remaining unvisited nodes. This will allow the algorithm to balance between exploration and exploitation based on the search space.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    """
-    Select the next node to visit from the unvisited nodes using the Weighted Distance and Degree with Exploration heuristic.
+    # Initialize parameters
+    pheromone_matrix = np.full_like(distance_matrix, 0.01)  # Initialize pheromone matrix with small values
+
+    # Calculate distances from current node to unvisited nodes
+    distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    Parameters
-    ----------
-    current_node : int
-        The current node.
-    destination_node : int
-        The destination node to return to.
-    unvisited_nodes : set
-        The set of unvisited nodes.
-    distance_matrix : np.ndarray
-        The distance matrix of shape (n_nodes, n_nodes).
-    
-    Returns
-    -------
-    nxt_node : int
-        The next node to visit.
-    """
-    
-    n_nodes = len(distance_matrix)
-    
-    # Calculate the degree for each unvisited node
-    degree = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        degree[node] = np.sum(distance_matrix[node,:] > 0)
-    
-    # Calculate the exploration factor
-    exploration_factor = len(unvisited_nodes) / np.sum(degree)
-    
-    # Calculate the weighted distances from the current node to each unvisited node
-    weighted_distances = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        weighted_distances[node] = distance_matrix[current_node, node] * degree[node]
-    
-    # Multiply the weighted distances by the exploration factor
-    weighted_distances *= exploration_factor
-    
-    # Select the node with the highest weighted distance as the next node to visit
-    nxt_node = np.argmax(weighted_distances)
-    
+    # Normalize distances
+    norm_distances = distances / np.max(distances)
+
+    # Calculate attractiveness of each unvisited node
+    attractiveness = (1 - norm_distances) + pheromone_matrix[current_node, list(unvisited_nodes)]
+
+    # Calculate probability distribution for selecting the next node
+    probabilities = attractiveness / np.sum(attractiveness)
+
+    # Select next node based on probability distribution
+    nxt_node = np.random.choice(list(unvisited_nodes), p=probabilities)
+
     return nxt_node
 ```
 

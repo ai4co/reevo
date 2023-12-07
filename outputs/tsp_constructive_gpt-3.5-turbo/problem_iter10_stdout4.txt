@@ -1,68 +1,15 @@
 [*] Running ...
 [*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/dataset/val50_dataset.npy with 64 instances.
-[*] Instance 0: 5.970471445145899
-[*] Instance 1: 7.213596264771353
-[*] Instance 2: 7.181624783373638
-[*] Instance 3: 7.070850994290128
-[*] Instance 4: 6.488644004630133
-[*] Instance 5: 7.400440068375346
-[*] Instance 6: 7.676600876886111
-[*] Instance 7: 7.059788346286939
-[*] Instance 8: 6.031013715120654
-[*] Instance 9: 6.852548850791327
-[*] Instance 10: 6.952874697288102
-[*] Instance 11: 6.206332679615222
-[*] Instance 12: 7.019915435418287
-[*] Instance 13: 6.509629720564281
-[*] Instance 14: 7.781041651905772
-[*] Instance 15: 6.42453906664621
-[*] Instance 16: 6.619338064455331
-[*] Instance 17: 6.662259139652184
-[*] Instance 18: 7.19712500804559
-[*] Instance 19: 6.243306649631354
-[*] Instance 20: 6.332757376337411
-[*] Instance 21: 7.190407632950108
-[*] Instance 22: 6.513409871093981
-[*] Instance 23: 7.063665662559607
-[*] Instance 24: 6.795706007340771
-[*] Instance 25: 7.839114177025888
-[*] Instance 26: 5.8208357301096685
-[*] Instance 27: 6.447116764199148
-[*] Instance 28: 7.598657474092378
-[*] Instance 29: 7.832098768732651
-[*] Instance 30: 7.383964743875479
-[*] Instance 31: 6.678262086762691
-[*] Instance 32: 6.767939505704573
-[*] Instance 33: 7.797615323318309
-[*] Instance 34: 7.494267657845058
-[*] Instance 35: 7.342637997280014
-[*] Instance 36: 7.6539977655241485
-[*] Instance 37: 7.941844856381331
-[*] Instance 38: 7.748529963962081
-[*] Instance 39: 6.945263011384768
-[*] Instance 40: 6.865245893193787
-[*] Instance 41: 7.028634915389418
-[*] Instance 42: 6.345468005657508
-[*] Instance 43: 8.41727163237863
-[*] Instance 44: 6.57536242167639
-[*] Instance 45: 6.665514652710986
-[*] Instance 46: 7.359943502813268
-[*] Instance 47: 7.350092646868171
-[*] Instance 48: 6.745313654729171
-[*] Instance 49: 7.2666148332155736
-[*] Instance 50: 7.364938541629861
-[*] Instance 51: 7.192557398971058
-[*] Instance 52: 7.618121539702273
-[*] Instance 53: 7.032547871815853
-[*] Instance 54: 6.38516474132319
-[*] Instance 55: 6.809262792063862
-[*] Instance 56: 7.478273524759703
-[*] Instance 57: 6.706349901680022
-[*] Instance 58: 6.965262695949585
-[*] Instance 59: 6.852846613204226
-[*] Instance 60: 7.509715900774949
-[*] Instance 61: 6.133275478810665
-[*] Instance 62: 7.53518726580542
-[*] Instance 63: 6.628817261740695
-[*] Average:
-7.009090898847472
+Traceback (most recent call last):
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 66, in <module>
+    obj = eval_heuristic(node_positions[i])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 37, in eval_heuristic
+    next_node = select_next_node(
+                ^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/gpt.py", line 7, in select_next_node
+    # Calculate distance from destination node to each unvisited node
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/anaconda3/lib/python3.11/random.py", line 439, in sample
+    raise TypeError("Population must be a sequence.  "
+TypeError: Population must be a sequence.  For dicts or sets, use sorted(d).

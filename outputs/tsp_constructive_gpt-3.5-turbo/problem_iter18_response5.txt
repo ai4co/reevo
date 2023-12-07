@@ -1,42 +1,54 @@
-Code description: 
-
-In this algorithm, I propose a new approach for selecting the next node to visit based on a combination of factors: distance to the current node, distance to the destination node, and the number of unvisited neighbors. 
-
-The algorithm first calculates the distances from the current node to all unvisited nodes, then calculates the distances from each unvisited node to the destination node. It also counts the number of unvisited neighbors for each unvisited node.
-
-Then, for each unvisited node, it calculates a score as follows:
-- It normalizes the distance from the current node to the unvisited node by dividing it by the maximum distance in the distance matrix.
-- It normalizes the distance from the unvisited node to the destination node by dividing it by the maximum distance in the distance matrix.
-- It calculates a neighbor score by normalizing the number of unvisited neighbors by dividing it by the maximum distance in the distance matrix.
-
-The overall score for each unvisited node is calculated as a weighted sum of the normalized distances and the neighbor score. The weight factor can be adjusted to prioritize either the distance or the number of unvisited neighbors.
-
-Finally, the algorithm selects the node with the highest score as the next node to visit.
+Code description: In this improved version, I propose a novel selecting-next-node function called "Modified Probabilistic Degree-Biased Exploration". This heuristic combines the probabilistic selection based on node degree centrality from Algorithm 1 with the distance-based selection from Algorithm 2. The aim is to balance the exploration of less connected nodes with the consideration of direct distances and modified greedy squeezing distance. By incorporating both aspects, we can potentially find a better node to visit that balances both local and global information.
 
 ```python
 import numpy as np
+import networkx as nx
+import random
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    # Initialize variables
-    max_score = -np.inf
-    nxt_node = None
-    weight = 0.5
+    # Calculate degree centrality for each unvisited node
+    graph = nx.from_numpy_array(distance_matrix)
+    degree_centralities = nx.degree_centrality(graph)
     
-    # Calculate the score for each unvisited node
+    # Compute the sum of degree centrality values for unvisited nodes
+    sum_degree = sum([degree_centralities[node] for node in unvisited_nodes])
+    
+    # Calculate direct distance from current node to each unvisited node
+    direct_distances = distance_matrix[current_node, list(unvisited_nodes)]
+    
+    # Calculate distance from destination node to each unvisited node
+    destination_distances = distance_matrix[destination_node, list(unvisited_nodes)]
+    
+    # Calculate Modified Greedy Squeezing distance for each unvisited node
+    mgs_distance = {}
     for node in unvisited_nodes:
-        distance_current_node = distance_matrix[current_node][node]
-        distance_destination_node = distance_matrix[node][destination_node]
-        num_unvisited_neighbors = np.sum(distance_matrix[node,:] > 0)
+        direct_distance = distance_matrix[current_node, destination_node]
+        node_distance = distance_matrix[current_node, node]
         
-        distance_current_node_norm = distance_current_node / np.max(distance_matrix)
-        distance_destination_node_norm = distance_destination_node / np.max(distance_matrix)
-        neighbors_norm = num_unvisited_neighbors / np.max(distance_matrix)
+        # Calculate the weight based on the number of neighboring unvisited nodes
+        weight = 1
+        for neighbor in unvisited_nodes:
+            if neighbor != node and neighbor in distance_matrix[node]:
+                weight += 1
+
+        mgs_distance[node] = direct_distance / (node_distance * weight)
         
-        score = (1 - weight) * distance_current_node_norm + weight * (distance_destination_node_norm + neighbors_norm)
-        
-        if score > max_score:
-            max_score = score
-            nxt_node = node
+    # Calculate cumulative probabilities based on degree centrality
+    cum_prob = 0
+    prob_dist = {}
+    for node in unvisited_nodes:
+        prob = degree_centralities[node] / sum_degree
+        prob_dist[node] = prob
+        cum_prob += prob
+    
+    # Calculate combined scores for each unvisited node
+    scores = {}
+    for node in unvisited_nodes:
+        scores[node] = prob_dist[node] + 0.4 * direct_distances[node] - 0.3 * destination_distances[node] + 0.3 * mgs_distance[node]
+    
+    # Find the node with the highest score
+    nxt_node = max(scores, key=scores.get)
     
     return nxt_node
 ```
+

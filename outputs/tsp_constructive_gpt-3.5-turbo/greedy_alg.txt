@@ -2,9 +2,10 @@
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    """
-    Select the next node to visit from the unvisited nodes using a greedy algorithm.
-    
+    """ 
+    Select the next node to visit from the unvisited nodes using the greedy algorithm.
+    The greedy algorithm selects the unvisited node that has the shortest distance to the current node.
+
     Parameters
     ----------
     current_node : int
@@ -15,20 +16,21 @@ def select_next_node(current_node: int, destination_node: int, unvisited_nodes: 
         The set of unvisited nodes.
     distance_matrix : np.ndarray
         The distance matrix of shape (n_nodes, n_nodes).
-    
+
     Returns
     -------
     nxt_node : int
         The next node to visit.
     """
-    next_node = None
-    min_distance = float('inf')
+    min_dist = np.inf
+    nxt_node = None
     
     for node in unvisited_nodes:
-        distance = distance_matrix[current_node, node]
-        if distance < min_distance:
-            min_distance = distance
-            next_node = node
+        dist = distance_matrix[current_node][node]
+        
+        if dist < min_dist:
+            min_dist = dist
+            nxt_node = node
     
-    return next_node
+    return nxt_node
 ```

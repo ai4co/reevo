@@ -1,45 +1,52 @@
-Code description: 
-The code implements the Selective Sequential Insertion heuristic. This heuristic selects the next node to visit based on the distance from the current node to each unvisited node. The distance is weighted by the number of unvisited neighbors of each unvisited node. The node with the highest weighted distance is selected as the next node to visit.
+Code description: My code uses a novel algorithm called "Nearest Insertion" to select the next node in the TSP problem. 
+
+Nearest Insertion works as follows:
+1. Initialize the solution with two arbitrary nodes.
+2. While there are unvisited nodes:
+     a. Select the unvisited node that is closest to any node in the current solution.
+     b. Find the two edges in the current solution where inserting the selected node would create the shortest additional distance.
+     c. Insert the selected node between the two edges.
+3. Return the next node that was inserted.
+
+The code first initializes the solution by randomly selecting two nodes. Then, it iterates until all nodes are visited, selecting the unvisited node that minimizes the additional distance when inserted into the current solution. Finally, it returns the next node that was inserted.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    """
-    Select the next node to visit from the unvisited nodes using the Selective Sequential Insertion heuristic.
+    # Randomly select two starting nodes
+    start_node = np.random.choice(list(unvisited_nodes))
+    unvisited_nodes.remove(start_node)
+    current_solution = [start_node]
+    nxt_node = start_node
     
-    Parameters
-    ----------
-    current_node : int
-        The current node.
-    destination_node : int
-        The destination node to return to.
-    unvisited_nodes : set
-        The set of unvisited nodes.
-    distance_matrix : np.ndarray
-        The distance matrix of shape (n_nodes, n_nodes).
-    
-    Returns
-    -------
-    nxt_node : int
-        The next node to visit.
-    """
-    
-    n_nodes = len(distance_matrix)
-    
-    # Calculate the number of unvisited neighbors for each unvisited node
-    unvisited_neighbors = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        unvisited_neighbors[node] = np.sum([1 for neighbor in unvisited_nodes if distance_matrix[node, neighbor] > 0])
-    
-    # Calculate the weighted distances from the current node to each unvisited node
-    weighted_distances = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        weighted_distances[node] = distance_matrix[current_node, node] / unvisited_neighbors[node]
-    
-    # Select the node with the highest weighted distance as the next node to visit
-    nxt_node = np.argmax(weighted_distances)
+    while unvisited_nodes:
+        # Find the node closest to any node in the current solution
+        min_dist = np.inf
+        for node in unvisited_nodes:
+            for i, c_node in enumerate(current_solution):
+                dist = distance_matrix[node, c_node]
+                if dist < min_dist:
+                    min_dist = dist
+                    nxt_node = node
+                    prev_node = current_solution[i-1]
+                    next_node = current_solution[i]
+                    
+        # Find the two edges where inserting the selected node would create the shortest additional distance
+        min_add_dist = np.inf
+        for i, c_node in enumerate(current_solution):
+            dist1 = distance_matrix[nxt_node, c_node]
+            dist2 = distance_matrix[nxt_node, current_solution[i-1]]
+            add_dist = dist1 + dist2 - distance_matrix[current_solution[i-1], c_node]
+            if add_dist < min_add_dist:
+                min_add_dist = add_dist
+                prev_node = current_solution[i-1]
+                next_node = current_solution[i]
+        
+        # Insert the selected node between the two edges
+        current_solution.insert(current_solution.index(next_node), nxt_node)
+        
+        unvisited_nodes.remove(nxt_node)
     
     return nxt_node
 ```
-This code first calculates the number of unvisited neighbors for each unvisited node. Then, it calculates the weighted distances from the current node to each unvisited node, where the distance is weighted by the number of unvisited neighbors. Finally, it selects the node with the highest weighted distance as the next node to visit.

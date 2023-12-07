@@ -1,68 +1,9 @@
 [*] Running ...
 [*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/dataset/val50_dataset.npy with 64 instances.
-[*] Instance 0: 25.798854843438303
-[*] Instance 1: 25.091844812408414
-[*] Instance 2: 25.66205589427145
-[*] Instance 3: 27.09499429506853
-[*] Instance 4: 26.347383733984763
-[*] Instance 5: 27.264382603071795
-[*] Instance 6: 26.07004332380172
-[*] Instance 7: 27.57609073624584
-[*] Instance 8: 26.53637486988414
-[*] Instance 9: 26.726551098488603
-[*] Instance 10: 29.244827576883225
-[*] Instance 11: 26.98607390387596
-[*] Instance 12: 23.78611279266616
-[*] Instance 13: 33.64450761735349
-[*] Instance 14: 24.597464171038045
-[*] Instance 15: 26.6217198054271
-[*] Instance 16: 24.8065862873833
-[*] Instance 17: 24.21011458503889
-[*] Instance 18: 32.38455718581289
-[*] Instance 19: 27.412853266479328
-[*] Instance 20: 24.60546213036923
-[*] Instance 21: 28.65557930004832
-[*] Instance 22: 27.714294437580577
-[*] Instance 23: 27.104629733204533
-[*] Instance 24: 25.95141264597016
-[*] Instance 25: 24.72239944287375
-[*] Instance 26: 25.116564479371025
-[*] Instance 27: 26.197194081684508
-[*] Instance 28: 27.154006354500453
-[*] Instance 29: 30.57705209664642
-[*] Instance 30: 25.537157810071452
-[*] Instance 31: 25.189533743688624
-[*] Instance 32: 23.43375215415828
-[*] Instance 33: 27.08787234372069
-[*] Instance 34: 28.455526014860876
-[*] Instance 35: 28.6193101175569
-[*] Instance 36: 26.135611167148173
-[*] Instance 37: 25.80019770809186
-[*] Instance 38: 25.64480861061962
-[*] Instance 39: 23.936603114466813
-[*] Instance 40: 27.679741670977823
-[*] Instance 41: 24.82566342945309
-[*] Instance 42: 23.79113039668736
-[*] Instance 43: 22.30280821384749
-[*] Instance 44: 27.272597496293425
-[*] Instance 45: 26.902381993232417
-[*] Instance 46: 24.390608478113233
-[*] Instance 47: 26.33649469092055
-[*] Instance 48: 26.070307776924707
-[*] Instance 49: 24.72771268248163
-[*] Instance 50: 26.567036367073044
-[*] Instance 51: 26.383120170027965
-[*] Instance 52: 26.265731861964664
-[*] Instance 53: 26.013117123154025
-[*] Instance 54: 24.549092659646792
-[*] Instance 55: 27.80470759037372
-[*] Instance 56: 26.086064181041376
-[*] Instance 57: 24.9917642548385
-[*] Instance 58: 26.955171748617833
-[*] Instance 59: 25.06130894936635
-[*] Instance 60: 24.548665452249125
-[*] Instance 61: 26.147183602970117
-[*] Instance 62: 27.352054532191648
-[*] Instance 63: 24.59196811522674
-[*] Average:
-26.298731161358248
+Traceback (most recent call last):
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 66, in <module>
+    obj = eval_heuristic(node_positions[i])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/eval.py", line 44, in eval_heuristic
+    unvisited.remove(next_node)
+KeyError: 15

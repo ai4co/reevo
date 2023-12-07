@@ -1,66 +1,32 @@
-Begin by giving a concise and clear description of your code, followed by the code itself.
-
-Code description: The code implements a novel heuristic called Weighted Distance and Uncertainty with Neighborhood Exploration. This heuristic selects the next node to visit based on the weighted distance from the current node to each unvisited node, considering both the uncertainty score and the degree of each unvisited node. In addition, it explores the neighborhood of the current node and considers the distance, uncertainty score, and degree of the neighboring nodes. The node with the highest weighted distance, considering all these factors, is selected as the next node to visit.
+Code description: In this algorithm, I propose a novel approach to select the next node based on a combination of the attractiveness and diversity of the unvisited nodes. Attractiveness is calculated using the approach from Algorithm 2, while diversity is calculated as the difference between the distance from the current node to an unvisited node and the average distance from the current node to all unvisited nodes. The node with the maximum combined value of attractiveness and diversity is selected as the next node to visit.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    """
-    Select the next node to visit from the unvisited nodes using the Weighted Distance and Uncertainty with Neighborhood Exploration heuristic.
+    # Initialize parameters
+    pheromone_matrix = np.full_like(distance_matrix, 0.01)  # Initialize pheromone matrix with small values
+
+    # Calculate distances from current node to unvisited nodes
+    distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    Parameters
-    ----------
-    current_node : int
-        The current node.
-    destination_node : int
-        The destination node to return to.
-    unvisited_nodes : set
-        The set of unvisited nodes.
-    distance_matrix : np.ndarray
-        The distance matrix of shape (n_nodes, n_nodes).
+    # Normalize distances
+    norm_distances = distances / np.max(distances)
+
+    # Calculate attractiveness of each unvisited node
+    attractiveness = (1 - norm_distances) + pheromone_matrix[current_node, list(unvisited_nodes)]
     
-    Returns
-    -------
-    nxt_node : int
-        The next node to visit.
-    """
+    # Calculate diversity of each unvisited node
+    avg_distance = np.mean(distances)
+    diversity = distances - avg_distance
     
-    n_nodes = len(distance_matrix)
+    # Combine attractiveness and diversity
+    combined_values = attractiveness + diversity
     
-    # Calculate the degree for each unvisited node
-    degree = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        degree[node] = np.sum(distance_matrix[node,:] > 0)
-    
-    # Calculate the uncertainty scores for each unvisited node
-    uncertainty_scores = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        variability = np.std(distance_matrix[:, node])
-        uncertainty_scores[node] = variability
-    
-    # Calculate the weighted distances from the current node to each unvisited node, considering uncertainty score and degree
-    weighted_distances = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        weighted_distance = distance_matrix[current_node, node] * degree[node] * uncertainty_scores[node]
-        weighted_distances[node] = weighted_distance
-    
-    # Explore the neighborhood of the current node
-    neighboring_nodes = set()
-    for node in unvisited_nodes:
-        if distance_matrix[current_node, node] > 0:
-            neighboring_nodes.add(node)
-    
-    # Calculate the weighted distances from the neighboring nodes to each unvisited node, considering uncertainty score and degree
-    for node in neighboring_nodes:
-        for neighbor in unvisited_nodes:
-            if distance_matrix[node, neighbor] > 0:
-                weighted_distance = distance_matrix[node, neighbor] * degree[neighbor] * uncertainty_scores[neighbor]
-                weighted_distances[neighbor] += weighted_distance
-    
-    # Select the node with the highest weighted distance as the next node to visit
-    nxt_node = np.argmax(weighted_distances)
-    
+    # Select next node based on maximum combined value
+    nxt_node = list(unvisited_nodes)[np.argmax(combined_values)]
+
     return nxt_node
 ```
 
+Note: In this code, I have extended the Algorithm 2 by introducing a measure of diversity. The diversity measure takes into account the difference between the distance from the current node to an unvisited node and the average distance from the current node to all unvisited nodes. This allows the algorithm to balance between selecting nodes that are both attractive and diverse.

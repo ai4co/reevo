@@ -1,60 +1,47 @@
-Code description: The proposed algorithm, named "Greedy with Clustering and Prioritization" (GCP), selects the next node based on a combination of greedy strategy, clustering, and prioritization. 
-
-First, the algorithm calculates the average distance between each unvisited node and its closest neighbor. This information is used to determine the clusters of nodes, with each cluster containing a set of nodes that are close to each other. 
-
-Next, the algorithm prioritizes the clusters based on their size. It assigns a priority score to each cluster, with larger clusters receiving higher scores. 
-
-Finally, the algorithm selects the next node to visit based on the clusters' priority scores. It chooses a node from the highest priority cluster.
+Code description: 
+The modified selecting-next-node function aims to improve the selection of the next node by incorporating multiple factors and considering the balance between them. It takes into account the distance from the current node to each unvisited node, the distance from the destination node to each unvisited node, and the degree centrality of each unvisited node. By combining these factors, the function aims to select the next node that is not only close in distance but also well-connected to the rest of the nodes.
 
 ```python
 import numpy as np
+import networkx as nx
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    """
-    Select the next node to visit from the unvisited nodes using Greedy with Clustering and Prioritization heuristic.
+    # Calculate distance from current node to each unvisited node
+    current_distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    Parameters
-    ----------
-    current_node : int
-        The current node.
-    destination_node : int
-        The destination node to return to.
-    unvisited_nodes : set
-        The set of unvisited nodes.
-    distance_matrix : np.ndarray
-        The distance matrix of shape (n_nodes, n_nodes).
+    # Calculate distance from destination node to each unvisited node
+    destination_distances = distance_matrix[destination_node, list(unvisited_nodes)]
     
-    Returns
-    -------
-    nxt_node : int
-        The next node to visit.
-    """
+    # Calculate degree centrality for each unvisited node
+    graph = nx.from_numpy_array(distance_matrix)
+    degree_centralities = nx.degree_centrality(graph)
     
-    # Calculate the average distance between each unvisited node and its closest neighbor
-    closest_neighbor_distances = np.min(distance_matrix[unvisited_nodes][:, unvisited_nodes], axis=1)
-    
-    # Determine the clusters of nodes based on the average distance
-    clusters = [[]]
-    cluster_indices = []
-    cluster_index = 0
-    
+    # Calculate Modified Greedy Squeezing distance for each unvisited node
+    mgs_distance = {}
     for node in unvisited_nodes:
-        if closest_neighbor_distances[node] > np.percentile(closest_neighbor_distances, 75):
-            clusters.append([])
-            cluster_index += 1
+        direct_distance = distance_matrix[current_node, destination_node]
+        node_distance = distance_matrix[current_node, node]
         
-        clusters[cluster_index].append(node)
-        cluster_indices.append(cluster_index)
+        # Calculate the weight based on the number of neighboring unvisited nodes
+        weight = 1
+        for neighbor in unvisited_nodes:
+            if neighbor != node and neighbor in distance_matrix[node]:
+                weight += 1
+
+        mgs_distance[node] = direct_distance / (node_distance * weight)
+        
+    # Calculate Neighbor Distance for each unvisited node
+    neighbor_distance = {}
+    for node in unvisited_nodes:
+        neighbor_distances = distance_matrix[node, list(unvisited_nodes - set([node]))]
+        neighbor_distance[node] = np.mean(neighbor_distances)
+        
+    # Calculate combined scores for each unvisited node
+    combined_scores = 0.5 * current_distances + 0.3 * destination_distances + 0.4 * np.array(list(mgs_distance.values())) + 0.2 * np.array(list(neighbor_distance.values())) + 0.1 * np.array([degree_centralities[node] for node in unvisited_nodes])
     
-    # Prioritize clusters based on their size
-    cluster_sizes = np.array([len(cluster) for cluster in clusters])
-    priority_scores = cluster_sizes / np.sum(cluster_sizes)
-    
-    # Select a node from the highest priority cluster as the next node to visit
-    max_priority_cluster_index = np.argmax(priority_scores)
-    cluster_nodes = clusters[max_priority_cluster_index]
-    nxt_node = np.random.choice(cluster_nodes)
+    # Find the node with the highest combined score
+    nxt_node = list(unvisited_nodes)[np.argmax(combined_scores)]
     
     return nxt_node
 ```
-Note: The algorithm uses np.percentile to determine the threshold for clustering. In this implementation, it considers nodes with distances higher than the 75th percentile as potential cluster boundaries, but you can adjust this threshold to fit your specific problem.
+

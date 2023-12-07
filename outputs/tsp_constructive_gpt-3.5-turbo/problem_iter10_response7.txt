@@ -1,13 +1,18 @@
-Code description: 
+Code description: In this code, I propose an algorithm that selects the next node based on a combination of the Modified Greedy Squeezing (MGS) distance and the number of neighbor nodes. The goal is to choose a node that has a balance between being close to the current node and having a higher number of neighbor nodes. 
 
-The proposed algorithm, called "Weighted Expected Improvement with Local Search", combines the key ideas from both algorithms to design a better heuristic. This algorithm calculates the expected improvement for each unvisited node based on the weighted distance, uncertainty score, and degree of the neighboring nodes. The algorithm then selects the node with the highest expected improvement as the next node to visit. The algorithm also incorporates the local search process from Algorithm 1 to explore the neighborhood of the current node for additional potential improvements.
+First, we calculate the MGS distance for each unvisited node by dividing the direct distance from the current node to the destination node by the product of the distance from the current node to the unvisited node and the number of neighboring unvisited nodes.
+
+Next, we calculate the score for each unvisited node by multiplying the MGS distance by the logarithm of the number of neighboring unvisited nodes. This score reflects the balance between distance and the number of neighbor nodes.
+
+Finally, we select the node with the highest score as the next node to visit and return it.
 
 ```python
 import numpy as np
+import math
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
     """
-    Select the next node to visit using the Weighted Expected Improvement with Local Search heuristic.
+    Select the next node to visit from the unvisited nodes.
     
     Parameters
     ----------
@@ -25,45 +30,24 @@ def select_next_node(current_node: int, destination_node: int, unvisited_nodes: 
     nxt_node : int
         The next node to visit.
     """
+    direct_distance = distance_matrix[current_node][destination_node]
     
-    n_nodes = len(distance_matrix)
-    
-    # Calculate the degree for each unvisited node
-    degree = np.zeros(n_nodes)
+    mgs_distance = {}
     for node in unvisited_nodes:
-        degree[node] = np.sum(distance_matrix[node,:] > 0)
-    
-    # Calculate the uncertainty scores for each unvisited node
-    uncertainty_scores = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        variability = np.std(distance_matrix[:, node])
-        uncertainty_scores[node] = variability
-    
-    # Calculate the expected improvements for each unvisited node, considering weighted distance, uncertainty score, and degree
-    expected_improvements = np.zeros(n_nodes)
-    for node in unvisited_nodes:
-        expected_improvement = 0
+        node_distance = distance_matrix[current_node][node]
         
-        # Calculate the weighted distance from the current node to the unvisited node
-        weighted_distance = distance_matrix[current_node, node] * degree[node] * uncertainty_scores[node]
-        
-        # Explore the neighborhood of the current node
-        neighboring_nodes = set()
+        weight = 1
         for neighbor in unvisited_nodes:
-            if distance_matrix[current_node, neighbor] > 0:
-                neighboring_nodes.add(neighbor)
+            if neighbor != node and neighbor in distance_matrix[node]:
+                weight += 1
         
-        # Calculate the weighted distance from the neighboring nodes to the unvisited node
-        for neighbor in neighboring_nodes:
-            weighted_distance_neighbor = distance_matrix[neighbor, node] * degree[node] * uncertainty_scores[node]
-            weighted_distance += weighted_distance_neighbor
-        
-        expected_improvement = weighted_distance / len(neighboring_nodes)
-        expected_improvements[node] = expected_improvement
+        mgs_distance[node] = direct_distance / (node_distance * weight)
     
-    # Select the node with the highest expected improvement as the next node to visit
-    nxt_node = np.argmax(expected_improvements)
+    scores = {}
+    for node in unvisited_nodes:
+        scores[node] = mgs_distance[node] * math.log(len(distance_matrix[node]))
     
+    nxt_node = max(scores, key=scores.get)
+
     return nxt_node
 ```
-

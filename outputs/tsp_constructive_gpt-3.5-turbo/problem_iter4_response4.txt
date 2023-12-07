@@ -1,32 +1,61 @@
-Code description: The following code implements a novel selecting-next-node function called "Weighted Random Selection". 
+Code description: In this code, I will design a novel selecting-next-node function using the Ant Colony Optimization (ACO) approach to solve the Traveling Salesman Problem (TSP). The goal is to select the next node based on the combination of the attractiveness of each unvisited node and the pheromone levels, similar to Algorithm 2. However, I will introduce a novel pheromone update mechanism to enhance the exploration and exploitation capabilities.
 
-The function selects the next node based on a combination of the distance to the current node and a weight assigned to each unvisited node. 
+I will start by initializing a parameter called evaporation_rate, which determines the rate at which pheromone evaporates. In each iteration, I will calculate the attractiveness of each unvisited node based on the modified distance matrix and the pheromone levels, similar to Algorithm 2.
 
-The algorithm starts by calculating the distances from the current node to all unvisited nodes. It then assigns a weight to each unvisited node based on its distance. The weight is calculated as the product of the inverse of the distance and a random number between 0 and 1. This random number introduces exploration to the selection process. 
+To enhance exploration, I will update the pheromone levels using a novel mechanism called "pheromone reinforcement". For every node visited, I will update the pheromone level between the current node and all unvisited nodes based on the attractiveness of the unvisited nodes. The pheromones will be reinforced more for nodes that have higher attractiveness.
 
-The function then normalizes the weights by dividing each weight by the sum of all weights. This ensures that the weight values represent probabilities.
-
-Finally, the function selects the next node based on the normalized weights. The node is selected randomly using the calculated probabilities. The probability of each node determines the likelihood of selection. If there are multiple nodes with the same probability, one of them is randomly chosen. 
-
-The function returns the index of the selected node.
+Finally, I will select the next node based on the attractiveness and pheromone levels. I will use a combination of attractiveness and pheromone levels to calculate the probability distribution for selecting the next node. The pheromone levels will have a higher weight in the calculation to enhance exploitation, while attractiveness will enhance exploration. I will select the next node probabilistically based on the probability distribution calculated.
 
 ```python
 import numpy as np
-import random
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    # Calculate distances from the current node to all unvisited nodes
-    unvisited_distances = distance_matrix[current_node, list(unvisited_nodes)]
-
-    # Calculate the weights for all unvisited nodes based on the inverse of the distances and random exploration
-    weights = (1 / unvisited_distances) * np.random.rand(len(unvisited_distances))
-
-    # Normalize the weights to probabilities
-    probabilities = weights / np.sum(weights)
-
-    # Select the next node based on the probabilities
-    next_node = np.random.choice(list(unvisited_nodes), p=probabilities)
-
-    return next_node
+    """
+    Select the next node to visit from the unvisited nodes.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    
+    nxt_node = None
+    evaporation_rate = 0.01  # Rate at which pheromone evaporates
+    
+    # Calculate modified distance matrix
+    unvisited_count_matrix = distance_matrix.copy()
+    unvisited_count_matrix[:, list(unvisited_nodes)] += len(unvisited_nodes) - 1
+    
+    # Calculate attractiveness of each unvisited node
+    attractiveness = (1 / unvisited_count_matrix[current_node, list(unvisited_nodes)])
+    
+    # Update pheromone levels using pheromone reinforcement
+    pheromone_matrix = np.full_like(distance_matrix, 0.01)  # Initialize pheromone matrix with small values
+    for node in unvisited_nodes:
+        reinforce_val = attractiveness[node]
+        pheromone_matrix[current_node, node] += reinforce_val
+    
+    # Calculate probability distribution for selecting the next node
+    pheromone_weight = 2.0  # Weight for pheromone levels
+    attractiveness_weight = 1.0  # Weight for attractiveness
+    total_weights = np.power(pheromone_matrix[current_node, list(unvisited_nodes)], pheromone_weight) * np.power(attractiveness, attractiveness_weight)
+    probability = total_weights / np.sum(total_weights)
+    
+    # Select next node based on probability distribution
+    nxt_node = np.random.choice(list(unvisited_nodes), p=probability)
+    
+    return nxt_node
 ```
 
+Note: This code introduces a novel pheromone update mechanism called "pheromone reinforcement" to enhance exploration and exploitation. The key idea is to update the pheromone levels based on the attractiveness of the unvisited nodes.

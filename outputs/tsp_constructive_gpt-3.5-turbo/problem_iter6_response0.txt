@@ -1,37 +1,28 @@
-Code description: The following code implements a novel selecting-next-node function called "Probabilistic Score Selection".
-
-The function selects the next node based on a probabilistic scoring mechanism that takes into account the distance from the current node to the unvisited node, the distance from the unvisited node to the destination node, and the distance from the current node to the destination node. 
-
-The algorithm starts by initializing an empty list called scores to store the scores of each unvisited node. 
-
-Then, for each unvisited node, the function calculates the score by summing the distance from the current node to the unvisited node, the distance from the unvisited node to the destination node, and the distance from the current node to the destination node. 
-
-The function appends the inverted score (1/score) to the scores list.
-
-Next, the function calculates the sum of all inverted scores.
-
-Then, the function calculates the probabilities of selecting each unvisited node by dividing the inverted score of each node by the sum of all inverted scores.
-
-Finally, the function selects the next node probabilistically by using the probabilities calculated above. Each unvisited node has a probability of being selected proportional to its inverse score.
-
-The function returns the index of the selected node.
+Code description: In this code, we will propose a new heuristic for selecting the next node in the Traveling Salesman Problem (TSP) by considering the trade-off between distance and attractiveness. We will assign different weights to distance and attractiveness based on their importance, and select the node with the highest score as the next node to visit.
 
 ```python
 import numpy as np
 
 def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-    scores = []
+    # Initialize parameters
+    alpha = 0.5  # Weight for distance
+    beta = 0.5  # Weight for attractiveness
 
-    for node in unvisited_nodes:
-        score = distance_matrix[current_node, node] + distance_matrix[node, destination_node] + distance_matrix[current_node, destination_node]
-        scores.append(1/score)
+    # Calculate distances from current node to unvisited nodes
+    distances = distance_matrix[current_node, list(unvisited_nodes)]
 
-    scores_sum = sum(scores)
+    # Calculate attractiveness of each unvisited node
+    attractiveness = np.exp(-distances)  # Using exponential function to convert distance to attractiveness
 
-    probabilities = [score/scores_sum for score in scores]
+    # Calculate node scores based on distance and attractiveness
+    node_scores = alpha * distances + beta * attractiveness
 
-    next_node_idx = np.random.choice(len(unvisited_nodes), p=probabilities)
-    next_node = list(unvisited_nodes)[next_node_idx]
+    # Find the index of the node with the highest score
+    max_score_idx = np.argmax(node_scores)
 
-    return next_node
+    # Find the corresponding node with the highest score
+    nxt_node = list(unvisited_nodes)[max_score_idx]
+
+    return nxt_node
 ```
+This new heuristic assigns weights to distance and attractiveness based on their relative importance. The distance is calculated using the distance matrix, and then converted to attractiveness using an exponential function. The node scores are computed based on the weighted sum of distance and attractiveness. The node with the highest score is selected as the next node to visit.

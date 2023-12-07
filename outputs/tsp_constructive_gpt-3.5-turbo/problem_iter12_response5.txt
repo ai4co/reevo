@@ -1,43 +1,29 @@
------
-Code description: 
-
-In this modified algorithm, we will calculate the urgency for each unvisited node based on the distance to the node and the number of unvisited neighbors. Additionally, we will consider the average distance between the current node and its neighbors as well as the average distance between the unvisited nodes and the neighbors. The next node will be selected based on both the urgency and the average distances.
-
-We will introduce a new parameter, `alpha`, to control the importance of the urgency in selecting the next node. A higher `alpha` value will prioritize urgency more, while a lower `alpha` value will prioritize average distances more. We will also introduce a new parameter, `beta`, to control the scaling factor of the urgency based on the number of unvisited neighbors. A higher `beta` value will amplify the urgency for nodes with fewer unvisited neighbors.
-
-In the modified algorithm, we will calculate the urgency for each unvisited node as `urgency = alpha * (distance / (len(neighbors_node) + beta))`. We will then select the node with the highest urgency. If there are multiple nodes with the same urgency, we will select the node with the shorter average distance to its neighbors.
+Code description: In this code, I propose a novel selecting-next-node function that incorporates a combination of factors to determine the next node to visit. The function considers both the distance from the current node to each unvisited node and the distance from each unvisited node to the destination node. Additionally, it takes into account the degree centrality of each unvisited node to prioritize well-connected nodes.
 
 ```python
 import numpy as np
+import networkx as nx
 
-def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray, alpha: float, beta: float) -> int:
-    # Initialize variables
-    max_urgency = -np.inf
-    min_avg_distance = np.inf
-    nxt_node = None
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    # Calculate distance from current node to each unvisited node
+    current_distances = distance_matrix[current_node, list(unvisited_nodes)]
     
-    # Calculate the average distance between the current node and its neighbors
-    neighbors = [node for node in unvisited_nodes if distance_matrix[current_node, node] < np.inf]
-    avg_distance = np.mean([distance_matrix[current_node, node] for node in neighbors])
+    # Calculate distance from destination node to each unvisited node
+    destination_distances = distance_matrix[destination_node, list(unvisited_nodes)]
     
-    # Calculate the urgency and average distances for each unvisited node
-    for node in unvisited_nodes:
-        if node != current_node:
-            distance = distance_matrix[current_node][node]
-            neighbors_node = [neigh for neigh in unvisited_nodes if distance_matrix[node, neigh] < np.inf]
-            
-            # Calculate the urgency for the node
-            urgency = alpha * (distance / (len(neighbors_node) + beta))
-            
-            # Calculate the average distance between the neighbors and the current unvisited node
-            avg_distance_new = np.mean([distance_matrix[node, neigh] for neigh in neighbors])
-            
-            # Update the best node if the urgency and average distance are better
-            if urgency > max_urgency or (urgency == max_urgency and avg_distance_new < min_avg_distance):
-                max_urgency = urgency
-                min_avg_distance = avg_distance_new
-                nxt_node = node
+    # Calculate degree centrality for each unvisited node
+    graph = nx.from_numpy_array(distance_matrix)
+    degree_centralities = nx.degree_centrality(graph)
+    
+    # Calculate combined score based on a weighted sum of the three factors
+    score = current_distances - 0.5 * destination_distances + 0.2 * np.array([degree_centralities[node] for node in unvisited_nodes])
+    
+    # Find the node with the smallest score
+    nxt_node = list(unvisited_nodes)[np.argmin(score)]
     
     return nxt_node
 ```
------
+
+This code combines the factors used in both Algorithm 1 and Algorithm 2. It calculates the distance from the current node to each unvisited node and the distance from each unvisited node to the destination node. It also calculates the degree centrality for each unvisited node. The final score is calculated as a weighted sum of the current distances, destination distances, and degree centralities.
+
+By incorporating these factors, the function aims to select the next node that is not only close in distance but also well-connected to the rest of the nodes in the graph.
