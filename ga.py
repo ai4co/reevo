@@ -21,6 +21,9 @@ class GA_LLM:
             
         self.population = self.init_population()
 
+        if cfg.problem_type != "constructive":
+            assert cfg.diversify == False, "Diversification is not supported for problem types other than constructive."
+        
         if cfg.diversify:
             self.greedy_obj = self.evaluate_greedy_alg()
             logging.info(f"Greedy Algorithm Objective Value: {self.greedy_obj}")
@@ -51,6 +54,9 @@ class GA_LLM:
 
         # Generate responses
         messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": self.initial_user + self.code_output_tip}]
+        
+        logging.info("Initial prompt: System Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + self.initial_user + self.code_output_tip)
+        
         responses = self.chat_completion(self.cfg.pop_size, self.cfg, messages)
         
         # Responses to population
@@ -341,6 +347,7 @@ class GA_LLM:
                 description1=parent_1["description"], description2=parent_2["description"],
                 )
             messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": crossover_prompt + self.code_output_tip}]
+            
             responses = self.chat_completion(1, self.cfg, messages)
             # Response to individual
             individual = self.response_to_individual(responses[0], response_id)
@@ -358,11 +365,11 @@ class GA_LLM:
             if np.random.uniform() < self.cfg.mutation_rate:
                 mutate_prompt = self.ga_mutate_prompt.format(code=individual["code"], description=individual["description"])
                 messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": mutate_prompt + self.code_output_tip}]
+                
                 responses = self.chat_completion(1, self.cfg, messages)
                 # Response to individual
                 mutated_individual = self.response_to_individual(responses[0], individual["response_id"])
                 population[i] = mutated_individual
-                # logging.info("Mutate user prompt: \n" + mutate_prompt)
         assert len(population) == self.cfg.pop_size
         return population
 
@@ -401,7 +408,7 @@ class GA_LLM:
     
     def diversify(self, population: list[dict]) -> list[dict]:
         """
-        Diversify the population by eliminate the greedy algorithms (obj == self.greedy_obj) and adding new ones.
+        Diversify the population by eliminating the greedy algorithms (obj == self.greedy_obj) and adding new ones.
         """
         self.iteration += 1
         
