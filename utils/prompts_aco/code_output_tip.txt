@@ -1,0 +1,15 @@
+Begin by giving a concise and clear description of your code, followed by the code itself. Your code should be formatted as a Python code string: "```python ... ```"
+An example is given below:
+
+-----
+Code description: This is a concise code description of your code.
+
+```python
+This is your Python code
+```
+-----
+
+Some helpful tips:
+(1) Do not modify the function signature.
+(2) Import necessary packages. Except for importing packages, you should write everything inside the function.
+(5) You write novel algorithms instead of using classic and greedy ones. For example, DO NOT simply use the inverse of distances as heuristic measures.
