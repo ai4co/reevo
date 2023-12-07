@@ -16,7 +16,7 @@ if __name__ == "__main__":
     problem_size = int(sys.argv[1])
     root_dir = sys.argv[2]
     
-    dataset_path = f"{root_dir}/problems/tsp_constructive/dataset/val{problem_size}_dataset.npy"
+    dataset_path = f"{root_dir}/problems/tsp_aco/dataset/val{problem_size}_dataset.npy"
     node_positions = np.load(dataset_path)
     n_instances = node_positions.shape[0]
     print(f"[*] Dataset loaded: {dataset_path} with {n_instances} instances.")

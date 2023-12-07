@@ -6,7 +6,7 @@ class ACO():
     def __init__(self, 
                  distances,
                  heuristic,
-                 n_ants=20, 
+                 n_ants=30, 
                  decay=0.9,
                  alpha=1,
                  beta=1,
@@ -27,11 +27,6 @@ class ACO():
         self.lowest_cost = float('inf')
 
         self.device = device
-    
-    def sample(self):
-        paths, log_probs = self.gen_path(require_prob=True)
-        costs = self.gen_path_costs(paths)
-        return costs, log_probs
 
     @torch.no_grad()
     def run(self, n_iterations):

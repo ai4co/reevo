@@ -6,14 +6,14 @@ from scipy.spatial import distance_matrix
 from gpt import scoring_function
 
 
-N_ITERATIONS = 20
-N_ANTS = 20
+N_ITERATIONS = 100
+N_ANTS = 30
 
 
 if __name__ == "__main__":
     root_dir = sys.argv[1]
-    for problem_size in [20, 50, 100, 200, 500, 1000]:
-        dataset_path = f"{root_dir}/problems/tsp_constructive/dataset/test{problem_size}_dataset.npy"
+    for problem_size in [20, 50, 100]:
+        dataset_path = f"{root_dir}/problems/tsp_aco/dataset/test{problem_size}_dataset.npy"
         node_positions = np.load(dataset_path)
         n_instances = node_positions.shape[0]
         objs = []
