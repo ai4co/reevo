@@ -1,0 +1,4 @@
+- problem=cvrp_aco
+- problem_type=aco
+- model=gpt-3.5-turbo
+- diversify=False
