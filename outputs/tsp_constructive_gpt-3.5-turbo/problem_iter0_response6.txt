@@ -1,9 +1,0 @@
-Code description: 
-
-This code implements a novel selecting-next-node function for solving the Traveling Salesman Problem (TSP) using a constructive heuristic. The approach is a combination of the Nearest Neighbor and Random Insertion heuristics.
-
-The Nearest Neighbor heuristic selects the next node as the unvisited node that is closest to the current node. However, this often leads to suboptimal solutions. To improve upon this, the Random Insertion heuristic is used to intelligently insert a random node from the unvisited nodes into the current partial solution.
-
-The function first calculates the distances from the current node to all unvisited nodes using the distance matrix. It then selects the nearest unvisited node as the first candidate for the next node. From the remaining unvisited nodes, a random node is chosen and inserted into the partial solution, considering its impact on the overall tour length. This process is repeated several times to generate multiple candidate next nodes. Finally, the candidate next nodes are ranked based on their tour lengths, and the node with the shortest tour length is selected as the next node.
-
-```python

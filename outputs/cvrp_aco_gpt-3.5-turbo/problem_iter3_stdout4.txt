@@ -1,7 +1,0 @@
-[*] Running ...
-[*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/cvrp_aco/dataset/val20_dataset.npy with 5 instances.
-Traceback (most recent call last):
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/cvrp_aco/eval.py", line 31, in <module>
-    heuristics = scoring_function(dist_mat, demand, CAPACITY) + 1e-6
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: scoring_function() missing 3 required positional arguments: 'distance_weight', 'demand_weight', and 'capacity_weight'

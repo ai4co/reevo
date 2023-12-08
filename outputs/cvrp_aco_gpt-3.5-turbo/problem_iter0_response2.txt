@@ -1,9 +1,0 @@
-Code description: 
-
-In this code, I will design a scoring function for the Capacitated Vehicle Routing Problem (CVRP). The function takes as input the distance matrix, demands of nodes, and the vehicle capacity. The goal is to assign heuristic measures to each edge in the distance matrix, indicating how promising it is before constructing a solution. 
-
-To achieve this, I will calculate two heuristic measures for each edge: distance score and demand score. The distance score represents the inverse of the distance between two nodes, giving a higher score to shorter distances. The demand score represents the ratio of the demand of the destination node to the remaining vehicle capacity after visiting the source node. This score reflects the feasibility of adding the destination node to the route.
-
-Finally, I will combine these two scores to calculate a composite score for each edge. The composite score will be used as the heuristic measure.
-
-```python

@@ -1,8 +1,0 @@
-[*] Running ...
-[*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_aco/dataset/val20_dataset.npy with 5 instances.
-Traceback (most recent call last):
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_aco/eval.py", line 28, in <module>
-    heuristics = scoring_function(dist_mat)
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_aco/gpt.py", line 46, in scoring_function
-TypeError: unsupported operand type(s) for /: 'dict_values' and 'dict_values'

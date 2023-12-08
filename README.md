@@ -11,6 +11,9 @@ python main.py problem=tsp_constructive problem_type=constructive model=gpt-4-11
 # for tsp_aco
 python main.py problem=tsp_aco problem_type=aco model=gpt-3.5-turbo diversify=False
 
+# for cvrp_aco
+python main.py problem=cvrp_aco problem_type=aco model=gpt-3.5-turbo diversify=False
+
 
 ```
 ### Dependency

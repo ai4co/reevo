@@ -1,4 +1,0 @@
-Code description: 
-The scoring function calculates the heuristic measures for all edges in the graph based on the distance between nodes, demands of nodes, and the vehicle capacity. The function assigns higher scores to edges with shorter distances and lower demands, as well as edges that do not exceed the vehicle capacity. 
-
-The scoring function uses a linear transformation of the distance between nodes, demands, and the vehicle capacity to calculate the heuristic measures. The function normalizes the distance and demand values and then calculates the heuristic measure as the product of the normalized distance, normalized demand, and the complement of the ratio between the demand and the vehicle capacity. This ensures that edges with shorter distances, lower demands, and lower demand-to-capacity ratios receive higher scores.
