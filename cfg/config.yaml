@@ -16,7 +16,7 @@ temperature: 1  # temperature for chat completion
 suffix: GPT  # suffix for generated files (indicates LLM model)
 
 # Main GA loop parameters
-max_iter: 20 # number of outer loop iterations for GA. When implementing "diversify" option, this number is the double of the actual number of iterations
+max_fe: 100 # maximum number of function evaluations
 pop_size: 10 # population size for GA
 mutation_rate: 0.3 # mutation rate for GA
 diversify: True # whether to diversify population
