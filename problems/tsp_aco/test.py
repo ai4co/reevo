@@ -25,5 +25,5 @@ if __name__ == "__main__":
             heuristics = scoring_function(dist_mat)
             aco = ACO(dist_mat, heuristics, n_ants=N_ANTS)
             obj = aco.run(N_ITERATIONS)
-            objs.append(obj)
+            objs.append(obj.item())
         print(f"[*] Average for {problem_size}: {np.mean(objs)}")

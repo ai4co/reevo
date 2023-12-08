@@ -14,14 +14,14 @@ class ACO():
                  ):
         
         self.problem_size = len(distances)
-        self.distances  = torch.tensor(distances) if not isinstance(distances, torch.Tensor) else distances
+        self.distances  = torch.tensor(distances, device=device) if not isinstance(distances, torch.Tensor) else distances
         self.n_ants = n_ants
         self.decay = decay
         self.alpha = alpha
         self.beta = beta
         
         self.pheromone = torch.ones_like(self.distances)
-        self.heuristic = torch.tensor(heuristic) if not isinstance(heuristic, torch.Tensor) else heuristic
+        self.heuristic = torch.tensor(heuristic, device=device) if not isinstance(heuristic, torch.Tensor) else heuristic
 
         self.shortest_path = None
         self.lowest_cost = float('inf')
