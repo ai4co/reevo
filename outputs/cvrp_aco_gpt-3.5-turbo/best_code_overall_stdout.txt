@@ -1,6 +1,6 @@
-[*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/cvrp_aco/dataset/test20_dataset.npy with 64 instances.
 [*] Average for 20: 5.013792782788805
-[*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/cvrp_aco/dataset/test50_dataset.npy with 64 instances.
 [*] Average for 50: 10.729739934284153
-[*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/cvrp_aco/dataset/test100_dataset.npy with 64 instances.
 [*] Average for 100: 18.77777232625369
+[*] Average for 200: 33.887965440021404
+[*] Average for 500: 74.68165216769965
+[*] Average for 1000: 142.15186901737889
