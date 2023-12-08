@@ -1,0 +1,42 @@
+Code description: 
+In this improved scoring function, I propose a novel approach that combines the demand, distance, and capacity constraints to calculate the heuristic measure for each edge. The goal is to prioritize edges that have a high demand, low distance, and are within the vehicle capacity.
+
+The function first calculates the maximum demand, maximum distance, and minimum demand to distance ratio in the distance matrix and demands array. It then initializes an empty array for the heuristic measures.
+
+The function iterates over all pairs of nodes (i, j) and calculates the heuristic measure for the edge connecting these nodes. For each edge, the heuristic measure is calculated as the product of the normalized demand of the customer nodes, the inverse of the distance between them, and the capacity constraint. The normalized demand is calculated by dividing the demand of each node by the maximum demand.
+
+The resulting heuristic measures are returned as an array.
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+    
+    max_demand = np.max(demands[1:])
+    max_distance = np.max(distance_matrix)
+    min_demand_to_distance = np.min(demands[1:] / distance_matrix[1:, 1:])
+    
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            if i != j:
+                distance = distance_matrix[i, j]
+                
+                demand_i = demands[i]
+                demand_j = demands[j]
+                
+                normalized_demand_i = demand_i / max_demand
+                normalized_demand_j = demand_j / max_demand
+                
+                if i == 0:
+                    heuristics[i, j] = (normalized_demand_j / distance) * min_demand_to_distance * CAPACITY
+                elif j == 0:
+                    heuristics[i, j] = (normalized_demand_i / distance) * min_demand_to_distance * CAPACITY
+                else:
+                    heuristics[i, j] = (normalized_demand_i * normalized_demand_j / distance) * min_demand_to_distance * CAPACITY
+    
+    return heuristics
+```
+

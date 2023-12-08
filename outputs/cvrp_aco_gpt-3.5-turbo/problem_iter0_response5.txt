@@ -1,0 +1,19 @@
+Code description:
+In this code, we will calculate heuristic measures for each edge based on the distance and demand information. The heuristic measure will reflect how promising each edge is for constructing a feasible solution. We will use a static scoring function based on the concept of savings. The savings calculation is a common heuristic measure used in CVRP. The idea is to calculate the potential savings in distance if two nodes are connected directly instead of going through the depot. The higher the potential savings, the higher the heuristic measure.
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+    heuristics = np.zeros((n_nodes, n_nodes))
+
+    # Calculate potential savings for each pair of nodes
+    for i in range(1, n_nodes):
+        for j in range(i+1, n_nodes):
+            savings = distance_matrix[0][i] + distance_matrix[0][j] - distance_matrix[i][j]
+            heuristics[i][j] = savings
+    
+    return heuristics
+```
+

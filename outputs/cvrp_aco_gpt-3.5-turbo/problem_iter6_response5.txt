@@ -1,0 +1,53 @@
+Code description: This improved scoring function aims to incorporate additional features into the heuristic measures. Specifically, I will introduce a new feature called "nearest neighbor demand ratio" which calculates the demand ratio of the nearest neighbor of each node. This feature can provide information on the clustering of nodes based on their demands. Additionally, I will adjust the weight coefficients of the distance, demand, position, and nearest neighbor demand ratio features to optimize their contribution to the heuristics.
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+
+    max_distance = np.max(distance_matrix)
+    max_demand = np.max(demands[1:])
+    
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    # Set weight coefficients for distance, demand, position, and nearest neighbor demand ratio (optimized values)
+    distance_weight = 0.4
+    demand_weight = 0.2
+    position_weight = 0.1
+    neighbor_demand_ratio_weight = 0.3
+
+    for i in range(1, n_nodes):
+        nearest_neighbor_demand_ratio = np.inf
+        
+        for j in range(1, n_nodes):
+            if j != i:
+                demand_ratio = demands[j] / CAPACITY
+                if demand_ratio < 1 and demand_ratio < nearest_neighbor_demand_ratio:
+                    nearest_neighbor_demand_ratio = demand_ratio
+        
+        for j in range(i + 1, n_nodes):
+            distance = distance_matrix[i, j]
+            demand_ratio = demands[j] / CAPACITY
+
+            if demand_ratio > 1 or nearest_neighbor_demand_ratio > 1:
+                heuristics[i, j] = -max_distance
+            else:
+                normalized_distance = distance / max_distance
+                normalized_demand_ratio = demand_ratio / max_demand
+                normalized_position = (j - 1) / (n_nodes - 1)
+                normalized_neighbor_demand_ratio = nearest_neighbor_demand_ratio / max_demand
+
+                heuristics[i, j] = (
+                    distance_weight * normalized_distance +
+                    demand_weight * normalized_demand_ratio +
+                    position_weight * normalized_position +
+                    neighbor_demand_ratio_weight * normalized_neighbor_demand_ratio
+                )
+            
+            # Symmetrically set heuristics for the lower triangle of the matrix
+            heuristics[j, i] = heuristics[i, j]
+
+    return heuristics
+```
+

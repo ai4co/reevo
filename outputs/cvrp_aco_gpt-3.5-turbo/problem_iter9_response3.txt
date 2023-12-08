@@ -1,0 +1,89 @@
+Code description: In this modified scoring function, I will incorporate the factors from Algorithm 1 and Algorithm 2 to create a more effective scoring function. I will consider the distance, demand, position, degree centrality, demand density, and depot distance factors. The weights of each factor will be adjusted to optimize their contributions to the final heuristic measures. Additionally, I will initialize the heuristics matrix outside the loop for efficiency purposes.
+
+```python
+import numpy as np
+import networkx as nx
+from sklearn.cluster import KMeans
+from scipy.spatial import distance
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+    
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    distance_weight = 0.2
+    demand_weight = 0.2
+    centrality_weight = 0.15
+    spatial_weight = 0.1
+    demand_density_weight = 0.15
+    depot_distance_weight = 0.2
+    
+    # Calculate degree centrality of each node
+    G = nx.from_numpy_array(distance_matrix)
+    centrality = nx.degree_centrality(G)
+    
+    # Calculate clustering factors
+    kmeans = KMeans(n_clusters=3)
+    cluster_labels = kmeans.fit_predict(distance_matrix[1:, 1:])
+    
+    cluster_distances = np.zeros((n_nodes, n_nodes))
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            if cluster_labels[i-1] == cluster_labels[j-1]:
+                cluster_distances[i, j] = distance_matrix[i, j]
+                cluster_distances[j, i] = distance_matrix[j, i]
+            else:
+                cluster_distances[i, j] = np.max(distance_matrix)
+                cluster_distances[j, i] = np.max(distance_matrix)
+    
+    # Calculate demand density
+    demand_density = np.zeros(n_nodes)
+    for i in range(1, n_nodes):
+        neighbor_demand_sum = demands[i]
+        neighbor_count = 1
+        
+        for j in range(1, n_nodes):
+            if j != i and distance_matrix[i, j] < np.max(distance_matrix):
+                neighbor_demand_sum += demands[j]
+                neighbor_count += 1
+        
+        demand_density[i] = neighbor_demand_sum / (np.max(distance_matrix) * neighbor_count)
+    
+    # Calculate distance to depot
+    depot_distance = np.zeros(n_nodes)
+    for i in range(n_nodes):
+        depot_distance[i] = distance.euclidean(distance_matrix[i, :], distance_matrix[0, :])
+    
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            distance = distance_matrix[i, j]
+            demand_sum = demands[i] + demands[j]
+            
+            normalized_distance = distance / np.max(distance_matrix)
+            normalized_demand_sum = demand_sum / np.max(demands)
+            normalized_centrality = centrality[j]
+            normalized_spatial = cluster_distances[i, j] / np.max(distance_matrix)
+            normalized_demand_density = demand_density[j] / np.max(demand_density)
+            normalized_depot_distance = depot_distance[j] / np.max(depot_distance)
+            
+            heuristics[i, j] = (
+                distance_weight * normalized_distance +
+                demand_weight * normalized_demand_sum +
+                centrality_weight * normalized_centrality +
+                spatial_weight * normalized_spatial +
+                demand_density_weight * normalized_demand_density +
+                depot_distance_weight * normalized_depot_distance
+            )
+            
+            # Symmetrically set heuristics for the lower triangle of the matrix
+            heuristics[j, i] = heuristics[i, j]
+    
+    return heuristics
+```
+
+In this modified code, I have made the following changes:
+1. Changed `centrality_weight` from 0.1 to 0.15 to give more importance to degree centrality.
+2. Removed the normalization step for `normalized_demand_sum` and `normalized_demand_density` as it was unnecessary since the division is already done with the maximum demand and demand density values.
+3. Modified the comments for better code readability.
+
+These modifications are made in order to enhance the heuristic measures and optimize the contributions of each factor in the final scoring function.

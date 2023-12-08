@@ -1,0 +1,11 @@
+Code description: 
+
+In this scoring function, we will assign higher heuristic scores to edges that are more likely to lead to feasible and effective solutions. The scoring function consists of three components: distance score, demand score, and capacity score.
+
+The distance score is based on the inverse of the distance between two nodes. The closer the nodes, the higher the score.
+
+The demand score is based on the difference between the demand of the two nodes. If the difference is small, it means that the nodes have similar demand and can be served together, so the score is higher.
+
+The capacity score is based on the remaining capacity of the vehicle after serving the first node. If the remaining capacity is close to the capacity limit, it means that the vehicle can only serve a few more nodes, so the score is higher.
+
+The scoring function combines these three scores to assign a final heuristic score to each edge.

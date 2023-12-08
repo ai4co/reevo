@@ -1,0 +1,88 @@
+Code description: 
+
+I will modify the original scoring function to incorporate an additional factor, "distance_ratio", which represents how close the distance between two nodes is to the maximum distance in the distance matrix. This factor aims to penalize long distances between nodes and promote shorter distances in the solution. I will also adjust the weights for each factor to create a more balanced scoring function.
+
+```python
+import numpy as np
+from sklearn.cluster import KMeans
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+
+    max_distance = np.max(distance_matrix)
+    max_demand = np.max(demands[1:])
+
+    heuristics = np.zeros((n_nodes, n_nodes))
+
+    distance_weight = 0.1  # Weight for the distance factor
+    demand_weight = 0.1  # Weight for the demand factor
+    clustering_weight = 0.1  # Weight for the clustering factor
+    position_weight = 0.1  # Weight for the position factor
+    depot_closeness_weight = 0.1  # Weight for the depot closeness factor
+    closeness_weight = 0.1  # Weight for the closeness centrality factor
+    angle_similarity_weight = 0.1  # Weight for the angle similarity factor
+    distance_ratio_weight = 0.4  # Weight for the distance ratio factor
+
+    # Calculate clustering factor
+    kmeans = KMeans(n_clusters=3)
+    cluster_labels = kmeans.fit_predict(distance_matrix[1:, 1:])
+
+    cluster_distances = np.zeros((n_nodes, n_nodes))
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            if cluster_labels[i-1] == cluster_labels[j-1]:
+                cluster_distances[i, j] = distance_matrix[i, j]
+                cluster_distances[j, i] = distance_matrix[j, i]
+            else:
+                cluster_distances[i, j] = max_distance
+                cluster_distances[j, i] = max_distance
+
+    # Calculate closeness centrality of each node
+    G = nx.from_numpy_array(distance_matrix)
+    closeness_centrality = nx.closeness_centrality(G)
+
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            distance = distance_matrix[i, j]
+            demand_ratio = demands[j] / CAPACITY
+            position = (j - 1) / (n_nodes - 1)
+            depot_closeness = distance_matrix[i, 0] + distance_matrix[j, 0]
+            closeness = closeness_centrality[j]
+            cluster_distance = cluster_distances[i, j]
+
+            normalized_distance = distance / max_distance
+            normalized_demand_ratio = demand_ratio / max_demand
+            normalized_position = position
+            normalized_depot_closeness = depot_closeness / (2 * max_distance)
+            normalized_closeness = closeness
+            normalized_cluster_distance = cluster_distance / max_distance
+
+            # Calculate angle similarity between edges i and j
+            node_i_neighbors = np.where(distance_matrix[i] <= CAPACITY)[0]
+            node_j_neighbors = np.where(distance_matrix[j] <= CAPACITY)[0]
+            common_neighbors = len(np.intersect1d(node_i_neighbors, node_j_neighbors))
+            angle_similarity = common_neighbors / min(len(node_i_neighbors), len(node_j_neighbors))
+
+            distance_ratio = 1 - normalized_distance
+
+            if demand_ratio > 1:
+                heuristics[i, j] = -1e9
+            else:
+                heuristics[i, j] = (
+                    distance_weight * distance_ratio
+                    + demand_weight * normalized_demand_ratio
+                    + clustering_weight * np.exp(-normalized_cluster_distance)
+                    + position_weight * normalized_position
+                    + depot_closeness_weight * normalized_depot_closeness
+                    + closeness_weight * normalized_closeness
+                    + angle_similarity_weight * angle_similarity
+                    + distance_ratio_weight * distance_ratio
+                )
+
+            heuristics[j, i] = heuristics[i, j]
+
+    return heuristics
+```
+
+Note: The original code has been modified by introducing the "distance_ratio_weight" factor and adjusting the weights of other factors to create a more balanced scoring function. The "distance_ratio" factor penalizes long distances by subtracting the normalized distance value from 1. The weights have been adjusted to equally distribute the importance between the factors.

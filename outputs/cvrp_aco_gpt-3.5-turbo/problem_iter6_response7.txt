@@ -1,0 +1,73 @@
+Code description: In this improved scoring function, I will incorporate the idea of both the clustering structure of the nodes and the closeness centrality into the heuristics calculation. I will make the following modifications to the given algorithm:
+1. I will use spectral clustering instead of K-means clustering to capture the clustering structure of the nodes.
+2. I will normalize the clustering factor using the maximum cluster distance.
+3. I will normalize the closeness centrality by dividing it by the maximum centrality value.
+4. I will eliminate the demand ratio constraint and instead use the demand factor as a penalty if the demand exceeds the vehicle's capacity.
+5. I will change the weights of the factors based on their relative importance.
+
+```python
+import numpy as np
+from sklearn.cluster import SpectralClustering
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+    
+    max_distance = np.max(distance_matrix)
+    max_demand = np.max(demands[1:])
+    max_centrality = 1.0  # Maximum closeness centrality is 1.0
+
+    heuristics = np.zeros((n_nodes, n_nodes))
+    distance_weight = 0.4  # Weight for the distance factor
+    demand_weight = 0.2  # Weight for the demand factor
+    clustering_weight = 0.3  # Weight for the clustering factor
+    closeness_weight = 0.1  # Weight for the closeness centrality factor
+
+    # Calculate clustering factor
+    spectral = SpectralClustering(n_clusters=3, affinity='precomputed', n_init=10, random_state=0)
+    cluster_labels = spectral.fit_predict(distance_matrix[1:, 1:])
+
+    cluster_distances = np.zeros((n_nodes, n_nodes))
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            if cluster_labels[i-1] == cluster_labels[j-1]:
+                cluster_distances[i, j] = distance_matrix[i, j]
+                cluster_distances[j, i] = distance_matrix[j, i]
+            else:
+                cluster_distances[i, j] = max_distance
+                cluster_distances[j, i] = max_distance
+
+    # Calculate closeness centrality of each node
+    G = nx.from_numpy_array(distance_matrix)
+    closeness_centrality = nx.closeness_centrality(G)
+
+    # Calculate heuristic measures
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            distance = distance_matrix[i, j]
+            demand = demands[j]
+            cluster_distance = cluster_distances[i, j]
+            closeness = closeness_centrality[j] / max_centrality
+
+            inverted_distance = 1 / (distance + 1)  # Add 1 to avoid division by zero
+            normalized_demand = demand / max_demand
+            normalized_cluster_distance = cluster_distance / max_distance
+
+            if demand > CAPACITY:
+                demand_factor = -1
+            else:
+                demand_factor = 1
+
+            heuristics[i, j] = (
+                distance_weight * inverted_distance
+                + demand_weight * normalized_demand * demand_factor
+                + clustering_weight * (1 - normalized_cluster_distance)
+                + closeness_weight * closeness
+            )
+
+            # Symmetrically set heuristics for the lower triangle of the matrix
+            heuristics[j, i] = heuristics[i, j]
+
+    return heuristics
+```
+

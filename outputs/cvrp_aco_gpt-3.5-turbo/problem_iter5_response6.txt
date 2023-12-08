@@ -1,0 +1,65 @@
+Code description: In this improved scoring function, I will combine the ideas from Algorithm 1 and Algorithm 2 to create a more effective heuristic measure. The scoring function will consider distance, demand, position, clustering, and depot closeness to assign scores to each edge. By incorporating these factors, the function will provide a more accurate estimation of the potential of each edge.
+
+```python
+import numpy as np
+from sklearn.cluster import KMeans
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+    
+    max_distance = np.max(distance_matrix)
+    max_demand = np.max(demands[1:])
+    
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    # Set weight coefficients for distance, demand, position, clustering, and depot closeness
+    distance_weight = 0.3
+    demand_weight = 0.4
+    position_weight = 0.1
+    clustering_weight = 0.1
+    depot_closeness_weight = 0.1
+    
+    # Calculate clustering factor
+    kmeans = KMeans(n_clusters=3)
+    cluster_labels = kmeans.fit_predict(distance_matrix[1:, 1:])
+    
+    cluster_distances = np.zeros((n_nodes, n_nodes))
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            if cluster_labels[i-1] == cluster_labels[j-1]:
+                cluster_distances[i, j] = distance_matrix[i, j]
+                cluster_distances[j, i] = distance_matrix[j, i]
+            else:
+                cluster_distances[i, j] = max_distance
+                cluster_distances[j, i] = max_distance
+    
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            distance = distance_matrix[i, j]
+            demand_ratio = demands[j] / CAPACITY
+            position = (j - 1) / (n_nodes - 1)
+            depot_closeness = distance_matrix[i, 0] + distance_matrix[j, 0]
+            cluster_distance = cluster_distances[i, j]
+            
+            # Normalize distance, demand, position, and depot closeness
+            normalized_distance = distance / max_distance
+            normalized_demand_ratio = demand_ratio / max_demand
+            normalized_position = position
+            normalized_depot_closeness = depot_closeness / (2 * max_distance)
+            
+            if demand_ratio > 1:
+                heuristics[i, j] = -1e9
+            else:
+                distance_ratio = 1 - normalized_distance
+                clustering_factor = np.exp(-cluster_distance / max_distance)
+                
+                heuristics[i, j] = (distance_weight * distance_ratio + demand_weight * normalized_demand_ratio +
+                                    position_weight * normalized_position + clustering_weight * clustering_factor +
+                                    depot_closeness_weight * normalized_depot_closeness)
+            
+            # Symmetrically set heuristics for the lower triangle of the matrix
+            heuristics[j, i] = heuristics[i, j]
+    
+    return heuristics
+```
+

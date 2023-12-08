@@ -1,0 +1,121 @@
+Code description: 
+
+In this improved scoring function, I will modify the weights of the different features used in the original algorithm. I will also add a new feature called "distance to depot" which measures the Euclidean distance from each node to the depot. I will adjust the weights for each feature to create a more balanced scoring function.
+
+```python
+import numpy as np
+import networkx as nx
+from sklearn.cluster import KMeans
+from scipy.spatial import distance
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+
+    max_distance = np.max(distance_matrix)
+    max_demand = np.max(demands[1:])
+
+    heuristics = np.zeros((n_nodes, n_nodes))
+
+    distance_weight = 0.2
+    demand_weight = 0.2
+    centrality_weight = 0.2
+    spatial_weight = 0.2
+    demand_density_weight = 0.2
+    depot_distance_weight = 0.2
+
+    # Calculate degree centrality of each node
+    G = nx.from_numpy_array(distance_matrix)
+    centrality = nx.degree_centrality(G)
+
+    # Calculate clustering factor
+    kmeans = KMeans(n_clusters=3)
+    cluster_labels = kmeans.fit_predict(distance_matrix[1:, 1:])
+
+    cluster_distances = np.zeros((n_nodes, n_nodes))
+    for i in range(1, n_nodes):
+        for j in range(1, n_nodes):
+            if cluster_labels[i-1] == cluster_labels[j-1]:
+                cluster_distances[i, j] = distance_matrix[i, j]
+            else:
+                cluster_distances[i, j] = max_distance
+
+    # Calculate demand density
+    demand_density = np.zeros(n_nodes)
+    for i in range(1, n_nodes):
+        neighbor_demand_sum = demands[i]
+        neighbor_count = 1
+        
+        for j in range(1, n_nodes):
+            if j != i and distance_matrix[i, j] < max_distance:
+                neighbor_demand_sum += demands[j]
+                neighbor_count += 1
+        
+        demand_density[i] = neighbor_demand_sum / (max_distance * neighbor_count)
+
+    # Calculate distance to depot
+    depot_distance = np.zeros(n_nodes)
+    for i in range(n_nodes):
+        depot_distance[i] = distance.euclidean(distance_matrix[i, :], distance_matrix[0, :])
+
+    # Calculate heuristic measures
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            if i != j:
+                demand_sum = demands[i] + demands[j]
+                euclidean_distance = distance_matrix[i, j]
+
+                if i == 0:
+                    normalized_demand = demands[j] / max_demand
+                    position = (j - 1) / (n_nodes - 1)
+
+                    heuristic_demand = normalized_demand ** demand_weight
+                    heuristic_distance = distance_weight / euclidean_distance
+                    heuristic_position = (1 - (demand_weight + distance_weight)) * position
+                    heuristic_centrality = centrality[j] ** centrality_weight
+                    heuristic_spatial = cluster_distances[i, j] / max_distance
+                    heuristic_demand_density = demand_density[j] / np.max(demand_density[1:])
+                    heuristic_depot_distance = depot_distance[j] / np.max(depot_distance[1:])
+
+                    heuristics[i, j] = (heuristic_demand + heuristic_distance + heuristic_position + heuristic_centrality + heuristic_spatial + heuristic_demand_density + heuristic_depot_distance)
+                elif j == 0:
+                    normalized_demand = demands[i] / max_demand
+                    position = (i - 1) / (n_nodes - 1)
+
+                    heuristic_demand = normalized_demand ** demand_weight
+                    heuristic_distance = distance_weight / euclidean_distance
+                    heuristic_position = (1 - (demand_weight + distance_weight)) * position
+                    heuristic_centrality = centrality[i] ** centrality_weight
+                    heuristic_spatial = cluster_distances[i, j] / max_distance
+                    heuristic_demand_density = demand_density[i] / np.max(demand_density[1:])
+                    heuristic_depot_distance = depot_distance[i] / np.max(depot_distance[1:])
+
+                    heuristics[i, j] = (heuristic_demand + heuristic_distance + heuristic_position + heuristic_centrality + heuristic_spatial + heuristic_demand_density + heuristic_depot_distance)
+                else:
+                    normalized_demand_sum = demand_sum / max_demand
+                    position = (j - 1) / (n_nodes - 1)
+
+                    heuristic_demand = normalized_demand_sum ** demand_weight
+                    heuristic_distance = distance_weight / euclidean_distance
+                    heuristic_position = (1 - (demand_weight + distance_weight)) * position
+                    heuristic_centrality = centrality[j] ** centrality_weight
+                    heuristic_spatial = cluster_distances[i, j] / max_distance
+                    heuristic_demand_density = demand_density[j] / np.max(demand_density[1:])
+                    heuristic_depot_distance = depot_distance[j] / np.max(depot_distance[1:])
+
+                    if demand_sum > CAPACITY:
+                        capacity_penalty = CAPACITY / demand_sum
+                        heuristic_capacity_penalty = 1 - (centrality_weight * capacity_penalty)
+                        heuristics[i, j] = (heuristic_demand + heuristic_distance + heuristic_position + heuristic_centrality + heuristic_spatial + heuristic_demand_density + heuristic_depot_distance) * heuristic_capacity_penalty
+                    else:
+                        heuristics[i, j] = (heuristic_demand + heuristic_distance + heuristic_position + heuristic_centrality + heuristic_spatial + heuristic_demand_density + heuristic_depot_distance)
+
+    return heuristics
+```
+
+Here, I modified the weights of the different features used in the original algorithm to have more balance. I also added a new feature called "distance to depot" which calculates the Euclidean distance from each node to the depot. This additional feature provides information about the proximity of each node to the depot, which can be useful in the routing problem.
+
+The weights for all features (distance, demand, centrality, spatial proximity, demand density, and depot distance) are set to 0.2, creating a more balanced distribution of importance among the features.
+
+I also added a calculation to determine the Euclidean distance of each node to the depot and included it as a feature in the heuristic measures.
+
+Overall, these modifications aim to improve the scoring function by considering a balanced combination of important factors, including both demand-related factors and spatial factors.

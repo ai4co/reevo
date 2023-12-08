@@ -1,0 +1,89 @@
+Code description: 
+
+The code provided is a scoring function that assigns heuristic measures to each edge of the distance matrix based on various factors. The factors considered include distance, demand, clustering, position, depot closeness, and closeness centrality. The heuristic measures are calculated based on the weights assigned to each factor.
+
+Improvements:
+In this modified scoring function, we will incorporate an additional factor called "angle similarity". The angle similarity measures the similarity in direction between two edges and can help in optimizing the routing of vehicles. The closer the angle between two edges, the higher the similarity score.
+
+```python
+import numpy as np
+from sklearn.cluster import KMeans
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+
+    max_distance = np.max(distance_matrix)
+    max_demand = np.max(demands[1:])
+
+    heuristics = np.zeros((n_nodes, n_nodes))
+
+    distance_weight = 0.15  # Weight for the distance factor
+    demand_weight = 0.15  # Weight for the demand factor
+    clustering_weight = 0.1  # Weight for the clustering factor
+    position_weight = 0.1  # Weight for the position factor
+    depot_closeness_weight = 0.15  # Weight for the depot closeness factor
+    closeness_weight = 0.15  # Weight for the closeness centrality factor
+    angle_similarity_weight = 0.1  # Weight for the angle similarity factor
+
+    # Calculate clustering factor
+    kmeans = KMeans(n_clusters=3)
+    cluster_labels = kmeans.fit_predict(distance_matrix[1:, 1:])
+
+    cluster_distances = np.zeros((n_nodes, n_nodes))
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            if cluster_labels[i-1] == cluster_labels[j-1]:
+                cluster_distances[i, j] = distance_matrix[i, j]
+                cluster_distances[j, i] = distance_matrix[j, i]
+            else:
+                cluster_distances[i, j] = max_distance
+                cluster_distances[j, i] = max_distance
+
+    # Calculate closeness centrality of each node
+    G = nx.from_numpy_array(distance_matrix)
+    closeness_centrality = nx.closeness_centrality(G)
+
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            distance = distance_matrix[i, j]
+            demand_ratio = demands[j] / CAPACITY
+            position = (j - 1) / (n_nodes - 1)
+            depot_closeness = distance_matrix[i, 0] + distance_matrix[j, 0]
+            closeness = closeness_centrality[j]
+            cluster_distance = cluster_distances[i, j]
+
+            normalized_distance = distance / max_distance
+            normalized_demand_ratio = demand_ratio / max_demand
+            normalized_position = position
+            normalized_depot_closeness = depot_closeness / (2 * max_distance)
+            normalized_closeness = closeness
+            normalized_cluster_distance = cluster_distance / max_distance
+
+            # Calculate angle similarity between edges i and j
+            node_i_neighbors = np.where(distance_matrix[i] <= CAPACITY)[0]
+            node_j_neighbors = np.where(distance_matrix[j] <= CAPACITY)[0]
+            common_neighbors = len(set(node_i_neighbors).intersection(set(node_j_neighbors)))
+            angle_similarity = common_neighbors / min(len(node_i_neighbors), len(node_j_neighbors))
+
+            if demand_ratio > 1:
+                heuristics[i, j] = -1e9
+            else:
+                distance_ratio = 1 - normalized_distance
+                clustering_factor = np.exp(-normalized_cluster_distance)
+                heuristics[i, j] = (
+                    distance_weight * distance_ratio
+                    + demand_weight * normalized_demand_ratio
+                    + clustering_weight * clustering_factor
+                    + position_weight * normalized_position
+                    + depot_closeness_weight * normalized_depot_closeness
+                    + closeness_weight * normalized_closeness
+                    + angle_similarity_weight * angle_similarity
+                )
+
+            heuristics[j, i] = heuristics[i, j]
+
+    return heuristics
+```
+
+In this modified scoring function, we have added a weight for the angle similarity factor. The angle similarity is calculated by finding the common neighbors of nodes i and j and dividing it by the minimum number of neighbors between the two nodes. The angle similarity is then multiplied by the angle similarity weight and added to the final heuristic measure. This addition will help in optimizing the routing by considering the similarity in the direction of the edges.

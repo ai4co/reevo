@@ -1,0 +1,39 @@
+Code description: 
+In this improved scoring function, I will take into consideration both the distance and demand of the nodes connected by each edge. The purpose is to find edges that have a shorter distance and a higher demand, as these edges are more likely to be part of an optimal solution. 
+
+First, I will initialize an empty array to store the heuristic measures. Then, I will iterate over all pairs of nodes (i, j) and calculate the heuristic measure for the edge connecting these nodes. 
+
+For each edge, the heuristic measure will be calculated as the product of two components: the normalized distance and the normalized demand ratio.
+
+The normalized distance will be obtained by dividing the distance between the nodes by the maximum distance in the distance matrix. This will ensure that the range of values for the distance component is between 0 and 1.
+
+The normalized demand ratio will be obtained by dividing the demand of the second node (j) by the vehicle capacity. This will give us the proportion of the capacity used if this edge is selected. This ratio will then be divided by the maximum demand in the demands array (excluding the demand of the depot). This will ensure that the range of values for the demand component is between 0 and 1.
+
+The final heuristic measure for each edge will be the product of the normalized distance and the normalized demand ratio.
+
+The resulting heuristic measures will be returned as an array.
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+
+    max_distance = np.max(distance_matrix)
+    max_demand = np.max(demands[1:])  # Exclude demand of depot
+
+    heuristics = np.zeros((n_nodes, n_nodes))
+
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            if i != j:
+                distance = distance_matrix[i, j]
+                demand_ratio = demands[j] / CAPACITY
+
+                normalized_distance = distance / max_distance
+                normalized_demand_ratio = demand_ratio / max_demand
+
+                heuristics[i, j] = normalized_distance * normalized_demand_ratio
+
+    return heuristics
+```

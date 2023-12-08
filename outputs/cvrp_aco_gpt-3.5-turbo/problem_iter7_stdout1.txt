@@ -1,0 +1,22 @@
+[*] Running ...
+[*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/cvrp_aco/dataset/val20_dataset.npy with 5 instances.
+Traceback (most recent call last):
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/cvrp_aco/eval.py", line 31, in <module>
+    heuristics = scoring_function(dist_mat, demand, CAPACITY) + 1e-6
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/cvrp_aco/gpt.py", line 26, in scoring_function
+    if cluster_labels[i-1] == cluster_labels[j-1]:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/anaconda3/lib/python3.11/site-packages/sklearn/cluster/_dbscan.py", line 446, in fit_predict
+    self.fit(X, sample_weight=sample_weight)
+  File "/Users/yhr/anaconda3/lib/python3.11/site-packages/sklearn/cluster/_dbscan.py", line 368, in fit
+    X = self._validate_data(X, accept_sparse="csr")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/anaconda3/lib/python3.11/site-packages/sklearn/base.py", line 565, in _validate_data
+    X = check_array(X, input_name="X", **check_params)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yhr/anaconda3/lib/python3.11/site-packages/sklearn/utils/validation.py", line 921, in check_array
+    _assert_all_finite(
+  File "/Users/yhr/anaconda3/lib/python3.11/site-packages/sklearn/utils/validation.py", line 161, in _assert_all_finite
+    raise ValueError(msg_err)
+ValueError: Input X contains infinity or a value too large for dtype('float64').

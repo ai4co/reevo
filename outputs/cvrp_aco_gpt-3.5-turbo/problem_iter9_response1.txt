@@ -1,0 +1,74 @@
+Code description: 
+This novel scoring function combines the best features from Algorithm 1 and Algorithm 2. It considers factors such as distance, demand, position, clustering, capacity constraints, depot closeness, closeness centrality, and angle similarity to assign heuristic measures to edges. The weights are adjusted to enhance the importance of the local search factor, capacity penalty, clustering, depot closeness, and angle similarity.
+
+```python
+import numpy as np
+from sklearn.cluster import KMeans
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+
+    max_distance = np.max(distance_matrix)
+    max_demand = np.max(demands[1:])
+
+    heuristics = np.zeros((n_nodes, n_nodes))
+
+    local_search_weight = 0.6 # Adjusted weight for the local search factor
+    distance_weight = 0.3 # Unchanged weight for the distance factor
+    clustering_weight = 0.1 # Unchanged weight for the clustering factor
+    capacity_penalty_weight = 0.3 # Adjusted weight for the capacity penalty factor
+    depot_closeness_weight = 0.15 # Unchanged weight for the depot closeness factor
+    closeness_weight = 0.15 # Unchanged weight for the closeness centrality factor
+    angle_similarity_weight = 0.1 # Adjusted weight for the angle similarity factor
+
+    G = nx.from_numpy_array(distance_matrix)
+    degree_centrality = nx.degree_centrality(G)
+
+    kmeans = KMeans(n_clusters=3)
+    cluster_labels = kmeans.fit_predict(distance_matrix[1:, 1:])
+
+    cluster_distances = np.zeros((n_nodes, n_nodes))
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            if cluster_labels[i-1] == cluster_labels[j-1]:
+                cluster_distances[i, j] = distance_matrix[i, j]
+                cluster_distances[j, i] = distance_matrix[j, i]
+            else:
+                cluster_distances[i, j] = max_distance
+                cluster_distances[j, i] = max_distance
+
+    closeness_centrality = nx.closeness_centrality(G)
+
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            distance = distance_matrix[i, j]
+            demand_ratio = demands[j] / CAPACITY
+            remaining_capacity = CAPACITY - demands[j]
+            position = (j - 1) / (n_nodes - 1)
+            depot_closeness = distance_matrix[i, 0] + distance_matrix[j, 0]
+            closeness = closeness_centrality[j]
+            cluster_distance = cluster_distances[i, j]
+
+            if demand_ratio > 1:
+                heuristics[i, j] = -1e9
+            else:
+                local_search_factor = (1 - distance / max_distance) / (degree_centrality[i] + degree_centrality[j])
+                distance_factor = distance_weight * (1 / distance)
+                clustering_factor = np.exp(-cluster_distances[i, j] / max_distance)
+                capacity_penalty_factor = capacity_penalty_weight * max(0, remaining_capacity / CAPACITY)
+                depot_closeness_factor = depot_closeness_weight * (1 - depot_closeness / (2 * max_distance))
+                closeness_factor = closeness_weight * closeness
+
+                # Calculate angle similarity between edges i and j
+                node_i_neighbors = np.where(distance_matrix[i] <= CAPACITY)[0]
+                node_j_neighbors = np.where(distance_matrix[j] <= CAPACITY)[0]
+                common_neighbors = len(set(node_i_neighbors).intersection(set(node_j_neighbors)))
+                angle_similarity = angle_similarity_weight * (common_neighbors / min(len(node_i_neighbors), len(node_j_neighbors)))
+
+                heuristics[i, j] = local_search_weight * local_search_factor + distance_factor + clustering_weight * clustering_factor - capacity_penalty_factor + depot_closeness_factor + closeness_factor + angle_similarity
+                heuristics[j, i] = heuristics[i, j]
+
+    return heuristics
+```
+

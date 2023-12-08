@@ -1,0 +1,66 @@
+Code description: In this improved scoring function, I will combine the distance, demand, position, load balance, clustering, and degree centrality factors to assign heuristic measures to each edge. I will assign appropriate weights to each factor based on their relative importance. To further improve efficiency, I will initialize the heuristics matrix outside of the loops and use vectorized operations whenever possible.
+
+```python
+import numpy as np
+from sklearn.cluster import KMeans
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+    max_distance = np.max(distance_matrix)
+    
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    distance_weight = 0.25  # Weight for the distance factor
+    demand_weight = 0.2  # Weight for the demand factor
+    position_weight = 0.15  # Weight for the position factor
+    load_balance_weight = 0.15  # Weight for the load balance factor
+    clustering_weight = 0.15  # Weight for the clustering factor
+    centrality_weight = 0.1  # Weight for the degree centrality factor
+    
+    # Set the demand ratio for the depot to zero
+    demands_ratio = demands / CAPACITY
+    demands_ratio[0] = 0
+    
+    # Calculate load balance factor
+    cumulative_demands = np.cumsum(demands[1:])
+    load_balance_factor = np.abs(cumulative_demands - np.sum(demands[1:])) / np.sum(demands[1:])
+    
+    # Calculate clustering factor
+    kmeans = KMeans(n_clusters=3)
+    cluster_labels = kmeans.fit_predict(distance_matrix[1:, 1:])
+    cluster_distances = np.where(np.tile(cluster_labels, (n_nodes-1, 1)) == np.transpose(np.tile(cluster_labels, (n_nodes-1, 1))), distance_matrix[1:, 1:], max_distance)
+    
+    # Calculate degree centrality of each node
+    G = nx.from_numpy_array(distance_matrix)
+    centrality = nx.degree_centrality(G)
+    
+    # Calculate heuristic measures
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            distance = distance_matrix[i, j]
+            demand_ratio_j = demands_ratio[j]
+            normalized_distance = distance / max_distance
+            normalized_demand_ratio = demand_ratio_j / np.max(demands_ratio)
+            normalized_position = (j - 1) / (n_nodes - 1)
+            inverted_distance = 1 / distance
+            clustering_factor = np.exp(-cluster_distances[i-1, j-1] / max_distance)
+            centrality_factor = centrality[j]
+            
+            heuristic_distance = distance_weight * inverted_distance
+            heuristic_demand = demand_weight * normalized_demand_ratio
+            heuristic_position = position_weight * normalized_position
+            heuristic_load_balance = load_balance_weight * (1 - load_balance_factor[j])
+            heuristic_clustering = clustering_weight * clustering_factor
+            heuristic_centrality = centrality_weight * centrality_factor
+            
+            if demand_ratio_j > 1:
+                heuristics[i, j] = -max_distance
+            else:
+                heuristics[i, j] = heuristic_distance + heuristic_demand + heuristic_position + heuristic_load_balance + heuristic_clustering + heuristic_centrality
+            heuristics[j, i] = heuristics[i, j]
+
+    return heuristics
+```
+
+With this improved scoring function, we consider a combination of factors such as distance, demand, position, load balance, clustering, and degree centrality to assign heuristic measures to each edge. The weights for each factor are assigned based on their relative importance. We also initialize the heuristics matrix outside the loops for efficiency and utilize vectorized operations whenever possible.

@@ -1,0 +1,6 @@
+Code description: 
+In this code, I will calculate the heuristic measure for each edge in the graph based on the distance between nodes and their demands. The heuristic measure will be a combination of distance-based scores and demand-based scores. A higher heuristic measure indicates a more promising edge.
+
+The code will calculate the distance between nodes using the distance matrix and normalize it between 0 and 1. Then, it will calculate the demand ratio for each edge and normalize it between 0 and 1. Finally, it will combine the distance score and demand score to calculate the heuristic measure for each edge.
+
+```python

@@ -1,0 +1,28 @@
+Code description: 
+
+This code assigns a score to each edge in the distance matrix based on the demand of the nodes connected by the edge. The score is defined as the ratio of the demand of the two connected nodes to the capacity of the vehicle. Higher scores indicate higher demand relative to the vehicle capacity.
+
+If the demand of one of the nodes is zero (representing the depot), the score is set to zero for that edge since there is no actual demand to be considered.
+
+Code:
+
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    for i in range(1, n_nodes):
+        for j in range(i+1, n_nodes):
+            demand_i = demands[i]
+            demand_j = demands[j]
+            
+            if demand_i == 0 or demand_j == 0:
+                heuristics[i][j] = 0
+                heuristics[j][i] = 0
+            else:
+                score = (demand_i + demand_j) / CAPACITY
+                heuristics[i][j] = score
+                heuristics[j][i] = score
+    
+    return heuristics

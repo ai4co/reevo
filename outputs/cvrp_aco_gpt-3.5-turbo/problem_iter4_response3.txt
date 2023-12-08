@@ -1,0 +1,45 @@
+Code description: The goal of this modified scoring function is to incorporate an additional factor that takes into account the degree centrality of each node in the graph. Degree centrality is a measure of how well connected a node is to other nodes in the graph. Nodes with higher degree centrality are generally more important in terms of connectivity and can potentially yield better solutions when constructing a solution. 
+
+```python
+import numpy as np
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+
+    max_distance = np.max(distance_matrix)
+    max_demand = np.max(demands[1:])
+
+    heuristics = np.zeros((n_nodes, n_nodes))
+
+    distance_weight = 0.45  # Weight for the distance factor
+    demand_weight = 0.25  # Weight for the demand factor
+    centrality_weight = 0.3  # Weight for the centrality factor
+
+    # Calculate degree centrality of each node
+    G = nx.from_numpy_array(distance_matrix)
+    centrality = nx.degree_centrality(G)
+
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            distance = distance_matrix[i, j]
+            demand_ratio = demands[j] / CAPACITY
+
+            normalized_distance = distance / max_distance
+            normalized_demand_ratio = demand_ratio / max_demand
+            normalized_position = (j - 1) / (n_nodes - 1)
+
+            heuristic_distance = normalized_distance ** distance_weight
+            heuristic_demand = normalized_demand_ratio ** demand_weight
+            heuristic_position = normalized_position * (1 - distance_weight - demand_weight)
+
+            # Calculate centrality factor
+            centrality_factor = centrality[j]
+
+            heuristics[i, j] = heuristic_distance + heuristic_demand + heuristic_position + centrality_weight * centrality_factor
+            heuristics[j, i] = heuristics[i, j]
+
+    return heuristics
+```
+
+In this modified scoring function, an additional `centrality_weight` parameter is introduced to determine the importance of the centrality factor. The degree centrality of each node is calculated using the `degree_centrality()` function from the `networkx` library. The centrality factor is then incorporated into the heuristic measure by multiplying it with the `centrality_weight`. The final heuristic measure is the sum of the distance, demand, position, and centrality factors.

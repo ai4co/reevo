@@ -1,0 +1,26 @@
+Code description: 
+
+The crossover algorithm combines the key elements of both Algorithm 1 and Algorithm 2 to create a more effective scoring function. It calculates the heuristic measure for each edge based on both the distance between nodes and their demands. The heuristic score is calculated as the product of the inverse of the distance and the demand ratio. Additionally, edges with demand exceeding the vehicle capacity are assigned a score of zero. 
+
+The improved algorithm includes the following modifications:
+1. Preprocessing the distance matrix to set the diagonal elements to a very large number, instead of relying on the input matrix having this property.
+2. Using the np.where function to selectively assign a score of zero to edges with demand exceeding the vehicle capacity.
+3. Avoiding unnecessary computation by calculating the inverted distance as the reciprocal of the distance matrix element, rather than using the division operator.
+4. Simplifying the calculation of the demand ratio by dividing the demand by the vehicle capacity, instead of using demands[j] / CAPACITY.
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+    
+    distance_matrix = np.where(distance_matrix > 0, distance_matrix, np.inf)
+    
+    demand_ratio = demands[1:] / CAPACITY
+    
+    heuristics = (1 / distance_matrix) * demand_ratio
+    
+    heuristics = np.where((demand_ratio > 1)[:, np.newaxis], 0, heuristics)
+    
+    return heuristics
+```

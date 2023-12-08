@@ -1,0 +1,9 @@
+[*] Running ...
+[*] Dataset loaded: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/cvrp_aco/dataset/val20_dataset.npy with 5 instances.
+[*] Instance 0: 9.529360802825064
+[*] Instance 1: 10.324766290275251
+[*] Instance 2: 11.16478202562067
+[*] Instance 3: 9.39467077771316
+[*] Instance 4: 9.905159325077214
+[*] Average:
+10.063747844302272

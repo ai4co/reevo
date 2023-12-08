@@ -1,0 +1,60 @@
+Code description: In this improved scoring function, I will incorporate both the clustering factor and the degree centrality factor into the scoring calculation. I will adjust the weights of each factor based on their importance and relevance to the problem. Additionally, I will initialize the heuristics matrix outside the loop for efficiency.
+
+```python
+import numpy as np
+from sklearn.cluster import KMeans
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+    
+    max_distance = np.max(distance_matrix)
+    
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    distance_weight = 0.45  # Weight for the distance factor
+    demand_weight = 0.25  # Weight for the demand factor
+    clustering_weight = 0.15  # Weight for the clustering factor
+    centrality_weight = 0.15  # Weight for the centrality factor
+    
+    # Calculate clustering factor
+    kmeans = KMeans(n_clusters=3)
+    cluster_labels = kmeans.fit_predict(distance_matrix[1:, 1:])
+    
+    cluster_distances = np.zeros((n_nodes, n_nodes))
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            if cluster_labels[i-1] == cluster_labels[j-1]:
+                cluster_distances[i, j] = distance_matrix[i, j]
+                cluster_distances[j, i] = distance_matrix[j, i]
+            else:
+                cluster_distances[i, j] = max_distance
+                cluster_distances[j, i] = max_distance
+    
+    # Calculate degree centrality of each node
+    G = nx.from_numpy_array(distance_matrix)
+    centrality = nx.degree_centrality(G)
+    
+    # Calculate heuristic measures
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            distance = distance_matrix[i, j]
+            demand_ratio = demands[j] / CAPACITY
+            cluster_distance = cluster_distances[i, j]
+            
+            if demand_ratio > 1:
+                heuristics[i, j] = 0
+            else:
+                inverted_distance = 1 / distance
+                clustering_factor = np.exp(-cluster_distance / max_distance)
+                centrality_factor = centrality[j]
+                
+                heuristics[i, j] = distance_weight * inverted_distance + demand_weight * demand_ratio + clustering_weight * clustering_factor + centrality_weight * centrality_factor
+            
+            # Symmetrically set heuristics for the lower triangle of the matrix
+            heuristics[j, i] = heuristics[i, j]
+    
+    return heuristics
+```
+
+This improved scoring function combines the best features from Algorithm 1 and Algorithm 2. It incorporates the clustering factor that identifies nodes belonging to the same cluster and assigns higher scores to edges that connect these nodes. It also includes the degree centrality factor, which measures the importance of each node based on its connectivity. The weights of each factor can be adjusted based on their relevance to the problem and desired focus.

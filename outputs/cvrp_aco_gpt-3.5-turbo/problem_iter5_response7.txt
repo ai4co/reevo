@@ -1,0 +1,56 @@
+Code description: In this modified scoring function, I will incorporate the idea of closeness centrality into the heuristics calculation. Closeness centrality measures how close a node is to all other nodes in the graph. By incorporating closeness centrality as a factor, we can consider the accessibility and connectedness of each node when calculating the heuristic measures.
+
+```python
+import numpy as np
+import networkx as nx
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+
+    max_distance = np.max(distance_matrix)
+    max_demand = np.max(demands[1:])
+
+    heuristics = np.zeros((n_nodes, n_nodes))
+
+    distance_weight = 0.25  # Weight for the distance factor
+    demand_weight = 0.15  # Weight for the demand factor
+    position_weight = 0.2  # Weight for the position factor
+    depot_closeness_weight = 0.2  # Weight for the depot closeness factor
+    closeness_weight = 0.2  # Weight for the closeness centrality factor
+
+    # Calculate degree centrality and closeness centrality of each node
+    G = nx.from_numpy_array(distance_matrix)
+    degree_centrality = nx.degree_centrality(G)
+    closeness_centrality = nx.closeness_centrality(G)
+
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            distance = distance_matrix[i, j]
+            demand_ratio = demands[j] / CAPACITY
+            position = (j - 1) / (n_nodes - 1)
+            depot_closeness = distance_matrix[i, 0] + distance_matrix[j, 0]
+            closeness = closeness_centrality[j]
+
+            normalized_distance = distance / max_distance
+            normalized_demand_ratio = demand_ratio / max_demand
+            normalized_position = position
+            normalized_depot_closeness = depot_closeness / (2 * max_distance)
+            normalized_closeness = closeness
+
+            if demand_ratio > 1:
+                heuristics[i, j] = -1e9
+            else:
+                distance_ratio = 1 - normalized_distance
+                heuristics[i, j] = (
+                    distance_weight * distance_ratio
+                    + demand_weight * normalized_demand_ratio
+                    + position_weight * normalized_position
+                    + depot_closeness_weight * normalized_depot_closeness
+                    + closeness_weight * normalized_closeness
+                )
+
+            heuristics[j, i] = heuristics[i, j]
+
+    return heuristics
+```
+

@@ -1,0 +1,69 @@
+Code description: 
+
+In this improved scoring function, I will consider the distance, demand, position, and load balance of each node to assign heuristic measures to each edge. 
+I will normalize the distance and demand values to ensure consistency across different instances. 
+I will also introduce a penalty factor for nodes with demands exceeding the capacity of the vehicle.
+To improve efficiency, I will initialize the heuristics matrix outside of the loops and utilize vectorized operations as much as possible.
+
+```python
+import numpy as np
+from sklearn.cluster import KMeans
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+    max_distance = np.max(distance_matrix)
+    max_demand = np.max(demands[1:])
+    
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    # Set weight coefficients for distance, demand, position, load balance, and remaining capacity
+    distance_weight = 0.3
+    demand_weight = 0.2
+    position_weight = 0.2
+    load_balance_weight = 0.2
+    capacity_weight = 0.1
+    
+    # Calculate demand ratio and remaining capacity
+    demand_ratio = demands[1:] / CAPACITY
+    remaining_capacity = CAPACITY - demands[1:]
+    
+    # Calculate load balance factor
+    cumulative_demands = np.cumsum(demands[1:])
+    load_balance_factor = np.abs(cumulative_demands - np.sum(demands[1:])) / np.sum(demands[1:])
+    
+    # Calculate clustering factor
+    kmeans = KMeans(n_clusters=3)
+    cluster_labels = kmeans.fit_predict(distance_matrix[1:, 1:])
+    cluster_distances = np.where(np.tile(cluster_labels, (n_nodes-1, 1)) == np.transpose(np.tile(cluster_labels, (n_nodes-1, 1))), distance_matrix[1:, 1:], max_distance)
+    
+    # Calculate heuristic measures
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            distance = distance_matrix[i, j]
+            demand_ratio_j = demand_ratio[j-1]
+            normalized_distance = distance / max_distance
+            normalized_demand_ratio = demand_ratio_j / max_demand
+            normalized_position = (j - 1) / (n_nodes - 1)
+            inverted_distance = 1 / distance
+            clustering_factor = np.exp(-cluster_distances[i-1, j-1] / max_distance)
+            
+            heuristic_distance = distance_weight * inverted_distance
+            heuristic_demand = demand_weight * normalized_demand_ratio
+            heuristic_position = position_weight * normalized_position
+            heuristic_load_balance = load_balance_weight * (1 - load_balance_factor[j-1])
+            heuristic_capacity = capacity_weight * remaining_capacity[j-1]
+            
+            if demand_ratio_j > 1:
+                heuristics[i, j] = -max_distance
+            else:
+                heuristics[i, j] = heuristic_distance + heuristic_demand + heuristic_position + heuristic_load_balance + heuristic_capacity
+            heuristics[j, i] = heuristics[i, j]
+
+    return heuristics
+```
+
+**Note:** I made the following modifications to the original code:
+1. Replaced the nested loops with vectorized operations for calculating the load balance factor and cluster distances.
+2. Removed unnecessary loop variables and optimized variable calculations.
+3. Corrected indexing errors in the cluster distances calculation.
+4. Introduced penalty for demand ratio > 1 in the heuristics assignment.

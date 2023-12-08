@@ -1,0 +1,39 @@
+Code description: 
+For the given Capacitated Vehicle Routing Problem (CVRP), the goal is to design a scoring function that assigns heuristic scores to each edge in the distance matrix. The heuristic scores aim to indicate how promising each edge is in terms of constructing a feasible solution.
+
+The scoring function takes the distance matrix, demands array, and the vehicle capacity as input. It calculates the heuristic scores for each edge based on the distance between nodes and the demand of the nodes. Lower distance and lower demand differences between nodes result in higher scores, indicating the edge's promising nature.
+
+Here's the code that implements the scoring function:
+
+```python
+import numpy as np
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    # Get the number of nodes
+    n_nodes = distance_matrix.shape[0]
+    
+    # Initialize the heuristic matrix with zeros
+    heuristics = np.zeros((n_nodes, n_nodes))
+    
+    # Iterate over all edges in the distance matrix
+    for i in range(n_nodes):
+        for j in range(n_nodes):
+            # Skip if it is the same node or going back to the depot
+            if i == j or i == 0 or j == 0:
+                continue
+            
+            # Calculate the demand difference of the two nodes
+            demand_diff = np.abs(demands[i] - demands[j])
+            
+            # Calculate the heuristic score based on distance and demand difference
+            heuristic_score = 1 / (distance_matrix[i, j] * demand_diff)
+            
+            # Assign the heuristic score to the corresponding edge
+            heuristics[i, j] = heuristic_score
+    
+    return heuristics
+```
+
+This code calculates the heuristic score for each edge (i, j) in the distance matrix using the formula `1 / (distance * demand_diff)`, where `distance` is the distance between nodes i and j, and `demand_diff` is the absolute difference in demands between nodes i and j. The heuristic score is inversely proportional to the distance and the demand difference, so lower values indicate more promising edges.
+
+The function initializes a matrix of zeros to store the heuristic scores and iterates over all edges in the distance matrix. It skips the same node, going back to the depot, and sets the score for other edges based on the calculation. Finally, it returns the heuristic matrix with the assigned scores.

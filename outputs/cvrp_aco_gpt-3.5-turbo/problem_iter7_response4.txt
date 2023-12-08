@@ -1,0 +1,68 @@
+Code description: 
+
+In this modified scoring function, I will incorporate the idea of both the clustering structure of the nodes and the centrality measure into the heuristics calculation. I will use the Louvain community detection algorithm to capture the clustering structure of the nodes. I will normalize the clustering factor using the maximum cluster distance. I will normalize the centrality measure by dividing it by the maximum centrality value. I will eliminate the demand ratio constraint and instead use the demand factor as a penalty if the demand exceeds the vehicle's capacity. I will adjust the weights of the factors based on their relative importance.
+
+```python
+import numpy as np
+import networkx as nx
+import community
+
+def scoring_function(distance_matrix: np.ndarray, demands: np.ndarray, CAPACITY: int) -> np.ndarray:
+    n_nodes = distance_matrix.shape[0]
+    max_distance = np.max(distance_matrix)
+    max_demand = np.max(demands[1:])
+    max_centrality = 1.0  # Maximum closeness centrality is 1.0
+
+    heuristics = np.zeros((n_nodes, n_nodes))
+    distance_weight = 0.4  # Weight for the distance factor
+    demand_weight = 0.2  # Weight for the demand factor
+    clustering_weight = 0.3  # Weight for the clustering factor
+    centrality_weight = 0.1  # Weight for the centrality factor
+
+    # Calculate clustering factor
+    G = nx.from_numpy_array(distance_matrix)
+    partition = community.best_partition(G)
+    cluster_distances = np.zeros((n_nodes, n_nodes))
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            if partition[i] == partition[j]:
+                cluster_distances[i, j] = distance_matrix[i, j]
+                cluster_distances[j, i] = distance_matrix[j, i]
+            else:
+                cluster_distances[i, j] = max_distance
+                cluster_distances[j, i] = max_distance
+
+    # Calculate centrality measure of each node
+    centrality = nx.closeness_centrality(G)
+
+    # Calculate heuristic measures
+    for i in range(1, n_nodes):
+        for j in range(i + 1, n_nodes):
+            distance = distance_matrix[i, j]
+            demand = demands[j]
+            cluster_distance = cluster_distances[i, j]
+            centrality_value = centrality[j] / max_centrality
+
+            inverted_distance = 1 / (distance + 1)  # Add 1 to avoid division by zero
+            normalized_demand = demand / max_demand
+            normalized_cluster_distance = cluster_distance / max_distance
+
+            if demand > CAPACITY:
+                demand_factor = -1
+            else:
+                demand_factor = 1
+
+            heuristics[i, j] = (
+                distance_weight * inverted_distance
+                + demand_weight * normalized_demand * demand_factor
+                + clustering_weight * (1 - normalized_cluster_distance)
+                + centrality_weight * centrality_value
+            )
+
+            # Symmetrically set heuristics for the lower triangle of the matrix
+            heuristics[j, i] = heuristics[i, j]
+
+    return heuristics
+```
+
+In this modified scoring function, I have replaced the spectral clustering with the Louvain community detection algorithm to capture the clustering structure of the nodes. I have calculated the clustering factor by assigning the maximum distance between clusters and normalizing it by the maximum distance in the distance matrix. I have replaced the closeness centrality with the centrality measure calculated using the closeness_centrality function from the NetworkX library. I have normalized the centrality measure by dividing it by the maximum centrality value. I have eliminated the demand ratio constraint and instead used a demand factor as a penalty if the demand exceeds the vehicle's capacity. Finally, I have adjusted the weights of the factors based on their relative importance.
