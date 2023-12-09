@@ -10,7 +10,7 @@ from ga import GA_LLM
 ROOT_DIR = os.getcwd()
 logging.basicConfig(level=logging.DEBUG)
 
-@hydra.main(config_path="cfg", config_name="config")
+@hydra.main(version_base=None, config_path="cfg", config_name="config")
 def main(cfg):
     workspace_dir = Path.cwd()
     # Set logging level

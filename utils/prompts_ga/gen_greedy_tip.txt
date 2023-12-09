@@ -3,4 +3,4 @@ Write a vanilla "greedy" algorithm for this problem. Enclose your code in triple
 Some helpful tips:
 - Adhere to the function signature.
 - Import necessary packages. Except for importing packages, you should write everything inside the function.
-- You DO NOT update the input variables. For example, you DO NOT remove the selected node from the unvisited nodes.
+- You must keep the input variables unchanged. For example, ensure the selected node remains within the unvisited nodes.

@@ -1,19 +1,5 @@
-Begin by giving a concise and clear description of your code, followed by the code itself.
-Enclose your code in triple backticks like this: "```python ... ```"
-
-Overall, your output follows the below format delimited by triple dashes:
-
----
-Code description: This is a concise code description of your code.
-
-```python
-This is your Python code
-```
----
-
 Some helpful tips:
 - Adhere to the function signature.
 - Import necessary packages. Except for importing packages, you should write everything inside the function.
 - We only construct a solution once, so introducing stochasticity is not helpful.
-- You must keep the input variables unchanged. For example, ensure the selected node remains within the unvisited nodes.
 - You must focus on developing novel algorithms instead of relying on classic and greedy ones. For example, avoid using the Nearest Neighbor heuristic.
