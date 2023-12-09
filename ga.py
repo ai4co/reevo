@@ -30,6 +30,9 @@ class GA_LLM:
         
         self.ga_crossover_prompt = file_to_string(f'{root_dir}/utils/prompts_ga/crossover.txt')
         self.ga_mutate_prompt = file_to_string(f'{root_dir}/utils/prompts_ga/mutate.txt')
+        
+        self.print_cross_prompt = True # Print crossover prompt for the first iteration
+        self.print_mutate_prompt = True # Print mutate prompt for the first iteration
 
         
     def init_population(self) -> list[dict]:
@@ -45,18 +48,15 @@ class GA_LLM:
         self.output_file = f"{self.root_dir}/problems/{self.problem}/{self.cfg.suffix.lower()}.py"
         
         # Loading all text prompts
-        system = file_to_string(f'{prompt_dir}/system.txt')
+        self.system_prompt = file_to_string(f'{prompt_dir}/system.txt')
         initial_user = file_to_string(f'{prompt_dir}/initial_user.txt')
-        self.code_output_tip = file_to_string(f'{prompt_dir}/code_output_tip.txt')
         func_signature = file_to_string(f'{problem_dir}/func_signature.txt')
-        self.system_prompt = system.format(problem_description=self.problem_description)
-        self.initial_user = initial_user.format(func_signature=func_signature)
+        self.code_output_tip = file_to_string(f'{prompt_dir}/code_output_tip.txt')
+        self.initial_user = initial_user.format(func_signature=func_signature, problem_description=self.problem_description)
 
         # Generate responses
         messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": self.initial_user + self.code_output_tip}]
-        
-        logging.info("Initial prompt: System Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + self.initial_user + self.code_output_tip)
-        
+        logging.info("Initial prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + self.initial_user + self.code_output_tip)
         responses = self.chat_completion(self.cfg.pop_size, self.cfg, messages)
         
         # Responses to population
@@ -75,6 +75,7 @@ class GA_LLM:
         logging.info(f"Iteration {self.iteration}: Min obj: {self.best_obj_overall}, Best Code Path: {self.best_code_path_overall}")
         self.iteration += 1
         return population
+
     
     def evaluate_greedy_alg(self) -> float:
         """
@@ -82,27 +83,32 @@ class GA_LLM:
         """
         # Loading all text prompts
         greedy_alg_tip = file_to_string(f'{self.root_dir}/utils/prompts_ga/gen_greedy_tip.txt')
-        messages = [{"role": "system", "content": self.system_prompt + greedy_alg_tip}, {"role": "user", "content": self.initial_user}]
-        logging.info("Greedy Algorithm Prompt: ")
-        logging.info("Initial prompt: System Prompt: \n" + self.system_prompt + greedy_alg_tip + "\nUser Prompt: \n" + self.initial_user)
+        messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": self.initial_user + greedy_alg_tip}]
+        logging.info("Greedy Algorithm Prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + self.initial_user + greedy_alg_tip)
+        
         # Generate responses
         responses = self.chat_completion(1, self.cfg, messages)
+        
         # Response to individual
         individual = self.response_to_individual(responses[0], 0, file_name="greedy_alg")
+        
         # Run code and evaluate population
         population = self.evaluate_population([individual])
         return population[0]["obj"]
+
     
     def response_to_individual(self, response, response_id, file_name=None) -> dict:
         """
         Convert response to individual. Applied to crossover and mutation.
         """
         content = response.message.content
+        
         # Write response to file
         file_name = f"problem_iter{self.iteration}_response{response_id}.txt" if file_name is None else file_name + ".txt"
         with open(file_name, 'w') as file:
             file.writelines(content + '\n')
 
+        # Extract code and description from response
         code_string, desc_string = self.extract_code_description(content)
         std_out_filepath = f"problem_iter{self.iteration}_stdout{response_id}.txt" if file_name is None else file_name + "_stdout.txt"
         individual = {
@@ -116,6 +122,7 @@ class GA_LLM:
         if not (code_string and desc_string):
             logging.info(f"Iteration {self.iteration}, response_id {response_id}: Extract None; invalid response!")
         return individual
+
         
     def responses_to_population(self, responses) -> list[dict]:
         """
@@ -126,6 +133,7 @@ class GA_LLM:
             individual = self.response_to_individual(response, response_id)
             population.append(individual)
         return population
+
 
     def evaluate_population(self, population: list[dict]) -> list[float]:
         """
@@ -200,9 +208,6 @@ class GA_LLM:
         
         with open(self.output_file, 'w') as file:
             file.writelines(individual["code"] + '\n')
-            
-        # Copy the generated code to hydra output directory for bookkeeping
-        # shutil.copy(self.output_file, f"problem_iter{self.iteration}_code{response_id}.py")
 
         # Execute the python file with flags
         with open(individual["stdout_filepath"], 'w') as f:
@@ -273,6 +278,7 @@ class GA_LLM:
         logging.info(f"Iteration {self.iteration}: Min obj: {self.best_obj_overall}, Best Code Path: {self.best_code_path_overall}")
         logging.info(f"Iteration {self.iteration}: Function Evals: {self.function_evals}")
         self.iteration += 1
+
 
     @staticmethod
     def fitness_sharing(similarity_matrix: np.ndarray, fitness: list[float], sigma_share: float=0.9) -> list[float]:
@@ -352,15 +358,24 @@ class GA_LLM:
             # Select two individuals
             parent_1 = population[i]
             parent_2 = population[i+1]
+            
             # Crossover
             crossover_prompt_user = self.ga_crossover_prompt.format(
-                code1=parent_1["code"], code2=parent_2["code"],
-                description1=parent_1["description"], description2=parent_2["description"],
+                problem_description=self.problem_description,
+                code1=parent_1["code"],
+                code2=parent_2["code"],
+                description1=parent_1["description"],
+                description2=parent_2["description"],
                 )
             messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": crossover_prompt_user + self.code_output_tip}]
             
+            # Print crossover prompt for the first iteration
+            if self.print_cross_prompt:
+                logging.info("Crossover Prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + crossover_prompt_user + self.code_output_tip)
+                self.print_cross_prompt = False
+            
+            # Generate response and convert response to individual
             responses = self.chat_completion(1, self.cfg, messages)
-            # Response to individual
             individual = self.response_to_individual(responses[0], response_id)
             crossed_population.append(individual)
             response_id += 1
@@ -372,13 +387,23 @@ class GA_LLM:
     def mutate(self, population: list[dict]) -> list[dict]:
         for i in range(len(population)):
             individual = population[i]
+            
             # Mutate
             if np.random.uniform() < self.cfg.mutation_rate:
-                mutate_prompt = self.ga_mutate_prompt.format(code=individual["code"], description=individual["description"])
+                mutate_prompt = self.ga_mutate_prompt.format(
+                    problem_description=self.problem_description,
+                    code=individual["code"],
+                    description=individual["description"]
+                    )
                 messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": mutate_prompt + self.code_output_tip}]
                 
+                # Print mutate prompt for the first iteration
+                if self.print_mutate_prompt:
+                    logging.info("Mutate Prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + mutate_prompt + self.code_output_tip)
+                    self.print_mutate_prompt = False
+                
+                # Generate response and convert response to individual
                 responses = self.chat_completion(1, self.cfg, messages)
-                # Response to individual
                 mutated_individual = self.response_to_individual(responses[0], individual["response_id"])
                 population[i] = mutated_individual
         assert len(population) == self.cfg.pop_size
@@ -416,7 +441,8 @@ class GA_LLM:
         embeddings = [_data.embedding for _data in response.data]
         similarity_matrix = cosine_similarity(embeddings)
         return similarity_matrix
-    
+
+
     @staticmethod
     def adjust_similarity_matrix(similarity_matrix: np.ndarray, population: list[dict]) -> np.ndarray:
         """
@@ -430,17 +456,17 @@ class GA_LLM:
         return similarity_matrix
 
 
+
     def diversify(self, population: list[dict]) -> list[dict]:
         """
         Diversify the population by eliminating the greedy algorithms (obj == self.greedy_obj) and adding new ones.
         """
-        self.iteration += 1 # iteration added for bookkeeping
-        
         # Eliminate greedy algorithms or those with execution errors
         population = [individual for individual in population if individual["obj"] != self.greedy_obj and individual["exec_success"]]
         n = self.cfg.pop_size - len(population)
-        logging.info(f"Eliminated {n} greedy algorithms.")
+        logging.info(f"Eliminated {n} greedy or invalid algorithms.")
         
+        # Return if no new individuals are needed
         if n == 0:
             return population
         
@@ -456,4 +482,7 @@ class GA_LLM:
         
         # Add new population to population
         population.extend(new_population)
+        
+        # Update best overall
+        self.update_iter()
         return population
