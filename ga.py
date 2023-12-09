@@ -160,9 +160,19 @@ class GA_LLM:
         for response_id, inner_run in enumerate(inner_runs):
             if inner_run is None: # If code execution fails, skip
                 continue
-            inner_run.communicate(timeout=60) # Wait for code execution to finish
+            try:
+                inner_run.communicate(timeout=60) # Wait for code execution to finish
+            except subprocess.TimeoutExpired as e:
+                logging.info(f"Error for response_id {response_id}: {e}")
+                individual = population[response_id]
+                individual["exec_success"] = False
+                individual["obj"] = float("inf")
+                individual["fitness"] = 0
+                individual["traceback_msg"] = str(e)
+                inner_run.kill()
+                continue
+
             individual = population[response_id]
-            
             stdout_filepath = individual["stdout_filepath"]
             with open(stdout_filepath, 'r') as f:  # read the stdout file
                 stdout_str = f.read() 
