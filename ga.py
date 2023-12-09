@@ -49,8 +49,8 @@ class GA_LLM:
         initial_user = file_to_string(f'{prompt_dir}/initial_user.txt')
         self.code_output_tip = file_to_string(f'{prompt_dir}/code_output_tip.txt')
         func_signature = file_to_string(f'{problem_dir}/func_signature.txt')
-        self.system_prompt = system.format(func_signature=func_signature)
-        self.initial_user = initial_user.format(problem_description=self.problem_description)
+        self.system_prompt = system.format(problem_description=self.problem_description)
+        self.initial_user = initial_user.format(func_signature=func_signature)
 
         # Generate responses
         messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": self.initial_user + self.code_output_tip}]
@@ -81,8 +81,10 @@ class GA_LLM:
         Generate and evaluate the greedy algorithm for the problem, e.g. Nearest Neighbor for TSP.
         """
         # Loading all text prompts
-        greedy_alg_prompt = file_to_string(f'{self.root_dir}/utils/prompts_ga/gen_greedy.txt')
-        messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": self.initial_user + greedy_alg_prompt}]
+        greedy_alg_tip = file_to_string(f'{self.root_dir}/utils/prompts_ga/gen_greedy_tip.txt')
+        messages = [{"role": "system", "content": self.system_prompt + greedy_alg_tip}, {"role": "user", "content": self.initial_user}]
+        logging.info("Greedy Algorithm Prompt: ")
+        logging.info("Initial prompt: System Prompt: \n" + self.system_prompt + greedy_alg_tip + "\nUser Prompt: \n" + self.initial_user)
         # Generate responses
         responses = self.chat_completion(1, self.cfg, messages)
         # Response to individual
@@ -104,7 +106,7 @@ class GA_LLM:
         code_string, desc_string = self.extract_code_description(content)
         std_out_filepath = f"problem_iter{self.iteration}_stdout{response_id}.txt" if file_name is None else file_name + "_stdout.txt"
         individual = {
-            "stdout_filepath": f"problem_iter{self.iteration}_stdout{response_id}.txt",
+            "stdout_filepath": std_out_filepath,
             "code_path": f"problem_iter{self.iteration}_code{response_id}.py",
             "description": desc_string,
             "code": code_string,
@@ -150,7 +152,7 @@ class GA_LLM:
         for response_id, inner_run in enumerate(inner_runs):
             if inner_run is None: # If code execution fails, skip
                 continue
-            inner_run.communicate() # Wait for code execution to finish
+            inner_run.communicate(timeout=60) # Wait for code execution to finish
             individual = population[response_id]
             
             stdout_filepath = individual["stdout_filepath"]
@@ -351,11 +353,11 @@ class GA_LLM:
             parent_1 = population[i]
             parent_2 = population[i+1]
             # Crossover
-            crossover_prompt = self.ga_crossover_prompt.format(
+            crossover_prompt_user = self.ga_crossover_prompt.format(
                 code1=parent_1["code"], code2=parent_2["code"],
                 description1=parent_1["description"], description2=parent_2["description"],
                 )
-            messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": crossover_prompt + self.code_output_tip}]
+            messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": crossover_prompt_user + self.code_output_tip}]
             
             responses = self.chat_completion(1, self.cfg, messages)
             # Response to individual

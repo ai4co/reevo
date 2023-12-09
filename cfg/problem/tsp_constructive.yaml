@@ -1,3 +1,3 @@
 problem_name: tsp_constructive
 problem_size: 50
-description: The task is to solve Traveling Salesman Problem (TSP) with constructive heuristics. TSP requires finding the shortest path that visits all given nodes and returns to the starting node.
+description: The task is to solve Traveling Salesman Problem (TSP) with deterministic constructive heuristics. TSP requires finding the shortest path that visits all given nodes and returns to the starting node.

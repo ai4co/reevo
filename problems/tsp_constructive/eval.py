@@ -2,7 +2,6 @@ import math
 import numpy as np
 import sys
 import argparse
-import numpy as np
 from scipy.spatial import distance_matrix
 
 from gpt import select_next_node
@@ -39,6 +38,7 @@ def eval_heuristic(node_positions: np.ndarray) -> float:
             destination_node=start_node,
             unvisited_nodes=unvisited,
             distance_matrix=dist_mat,
+            node_positions=node_positions,
         )
         solution.append(next_node)
         unvisited.remove(next_node)

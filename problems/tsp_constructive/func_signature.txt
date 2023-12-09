@@ -1,6 +1,6 @@
-def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray, node_positions: np.ndarray) -> int:
     """
-    Select the next node to visit from the unvisited nodes.
+    For TSP, select the next node to visit from the unvisited nodes. All nodes are uniformly distributed in [0, 1]^2 unit square.
     
     Parameters
     ----------
@@ -12,6 +12,8 @@ def select_next_node(current_node: int, destination_node: int, unvisited_nodes: 
         The set of unvisited nodes.
     distance_matrix : np.ndarray
         The distance matrix of shape (n_nodes, n_nodes).
+    node_positions : np.ndarray
+        The node positions of shape (n_nodes, 2)
     
     Returns
     -------

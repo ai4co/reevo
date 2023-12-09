@@ -1,1 +1,3 @@
-Write a selecting-next-node function for the following problem: {problem_description}.
+Write a selecting-next-node function and adhere to the function signature below:
+
+{func_signature}
