@@ -18,20 +18,23 @@ class GA_LLM:
         self.iteration = 0
         self.function_evals = 0
         self.elitist = None
+        self.best_obj_overall = float("inf")
         
         self.invalid_responses = 0 # Number of invalid responses
         self.total_responses = 0 # Number of total responses
-
-        self.population = self.init_population()
-
-        if cfg.problem_type != "constructive":
-            assert cfg.diversify == False, "Diversification is not supported for problem types other than constructive."
+        
+        self.init_prompt()
         
         if cfg.diversify:
             while True:
                 self.greedy_obj = self.evaluate_greedy_alg()
                 if self.greedy_obj != float("inf"):
                     break
+
+        self.init_population()
+
+        if cfg.problem_type != "constructive":
+            assert cfg.diversify == False, "Diversification is not supported for problem types other than constructive."
 
             logging.info(f"Greedy Algorithm Objective Value: {self.greedy_obj}")
         
@@ -41,8 +44,7 @@ class GA_LLM:
         self.print_cross_prompt = True # Print crossover prompt for the first iteration
         self.print_mutate_prompt = True # Print mutate prompt for the first iteration
 
-        
-    def init_population(self) -> list[dict]:
+    def init_prompt(self) -> None:
         self.problem = self.cfg.problem.problem_name
         self.problem_description = self.cfg.problem.description
         self.problem_size = self.cfg.problem.problem_size
@@ -60,6 +62,8 @@ class GA_LLM:
         self.system_prompt = file_to_string(f'{prompt_dir}/system.txt').format(func_signature=func_signature)
         self.initial_user = file_to_string(f'{prompt_dir}/initial_user.txt').format(problem_description=self.problem_description)
 
+        
+    def init_population(self) -> None:
         # Generate responses
         messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": self.initial_user + self.code_output_tip}]
         logging.info("Initial prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + self.initial_user + self.code_output_tip)
@@ -78,9 +82,9 @@ class GA_LLM:
         self.best_desc_overall = population[best_sample_idx]["description"]
         self.best_code_path_overall = population[best_sample_idx]["code_path"]
 
-        logging.info(f"Iteration {self.iteration}: Min obj: {self.best_obj_overall}, Best Code Path: {self.best_code_path_overall}")
-        self.iteration += 1
-        return population
+        # Update iteration
+        self.population = population
+        self.update_iter()
 
     
     def evaluate_greedy_alg(self) -> float:
@@ -311,7 +315,6 @@ class GA_LLM:
         logging.info(f"Min obj: {self.best_obj_overall}, Best Code Path: {self.best_code_path_overall}")
         logging.info(f"Function Evals: {self.function_evals}")
         logging.info(f"Invalid Responses: {self.invalid_responses}, Total Responses: {self.total_responses}")
-        logging.info(f"Invalid Response Rate: {self.invalid_responses}/{self.total_responses}")
         self.iteration += 1
 
 
