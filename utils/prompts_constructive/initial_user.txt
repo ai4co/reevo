@@ -1,1 +1,5 @@
-Write a selecting-next-node function for the following problem: {problem_description}.
+Write a selecting-next-node function for {problem_description}.
+Your function determines which node to visit at each time step.
+The function signature is as follows:
+{func_signature}
+

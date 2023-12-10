@@ -43,7 +43,11 @@ class G2A:
         
         self.print_cross_prompt = True # Print crossover prompt for the first iteration
         self.print_mutate_prompt = True # Print mutate prompt for the first iteration
-
+        
+        if cfg.diversify:
+            greedy_count = len([individual for individual in self.population if individual["obj"] == self.greedy_obj])
+            logging.info(f"Greedy Algorithm Count: {greedy_count} out of {len(self.population)}")
+        
     def init_prompt(self) -> None:
         self.problem = self.cfg.problem.problem_name
         self.problem_description = self.cfg.problem.description
@@ -59,8 +63,11 @@ class G2A:
         # Loading all text prompts
         func_signature = file_to_string(f'{problem_dir}/func_signature.txt')
         self.code_output_tip = file_to_string(f'{prompt_dir}/code_output_tip.txt')
-        self.system_prompt = file_to_string(f'{prompt_dir}/system.txt').format(func_signature=func_signature)
-        self.initial_user = file_to_string(f'{prompt_dir}/initial_user.txt').format(problem_description=self.problem_description)
+        self.system_prompt = file_to_string(f'{self.root_dir}/utils/prompts_general/system.txt')
+        self.initial_user = file_to_string(f'{prompt_dir}/initial_user.txt').format(
+            problem_description=self.problem_description,
+            func_signature=func_signature
+            )
 
         
     def init_population(self) -> None:
@@ -92,7 +99,7 @@ class G2A:
         Generate and evaluate the greedy algorithm for the problem, e.g. Nearest Neighbor for TSP.
         """
         # Loading all text prompts
-        greedy_alg_tip = file_to_string(f'{self.root_dir}/utils/prompts_ga/gen_greedy_tip.txt')
+        greedy_alg_tip = file_to_string(f'{self.root_dir}/utils/prompts_general/gen_greedy_tip.txt')
         messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": self.initial_user + greedy_alg_tip}]
         logging.info("Greedy Algorithm Prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + self.initial_user + greedy_alg_tip)
         
@@ -229,7 +236,7 @@ class G2A:
         code_string = re.search(pattern_code, response, re.DOTALL)
         code_string = code_string.group(1).strip() if code_string is not None else None
         # Regex patterns to extract code description enclosed in GPT response
-        pattern_desc = r'Code description: (.*?)```python'
+        pattern_desc = r'(.*?)```python'
         desc_string = re.search(pattern_desc, response, re.DOTALL)
         desc_string = desc_string.group(1).strip() if desc_string is not None else None
         return code_string, desc_string

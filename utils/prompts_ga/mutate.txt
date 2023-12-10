@@ -1,4 +1,5 @@
-You are provided with an algorithms below, with its description and code. Please mutate and modify this algorithm to provide a better one.
+Your task is: {problem_description}
+You are provided with an algorithm below, with its description and code. Please mutate and modify this algorithm to provide a better one.
 
 ### Algorithm ###
 

@@ -1,15 +1,6 @@
-Begin by giving a concise and clear description of your code, followed by the code itself. Your code should be formatted as a Python code string: "```python ... ```"
-An example is given below:
-
------
-Code description: This is a concise code description of your code.
-
-```python
-This is your Python code
-```
------
+You begin by giving a concise and clear description of your code, followed by the code itself. **NOTE**: Your code should be formatted as a Python code string: "```python ... ```"
 
 Some helpful tips:
-(1) Do not modify the function signature.
-(2) Import necessary packages. Except for importing packages, you should write everything inside the function.
-(3) Note that your scoring function outputs heuristic measures before solution construction. Therefore, no information about partial solutions can be utilized.
+- Strictly adhere to the function signature.
+- Import necessary packages. Except for importing packages, you should write everything inside the function.
+- Your scoring function outputs heuristic measures before solution construction. Therefore, NO information about partial solutions can be utilized.

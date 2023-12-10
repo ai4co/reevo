@@ -1,16 +1,7 @@
-Begin by giving a concise and clear description of your code, followed by the code itself. Your code should be formatted as a Python code string: "```python ... ```"
-An example is given below:
-
------
-Code description: This is a concise description of your code.
-
-```python
-This is your Python code
-```
------
+You begin by giving a concise and clear description of your code, followed by the code itself. **NOTE**: Your code should be formatted as a Python code string: "```python ... ```"
 
 Some helpful tips:
-(1) Do not modify the function signature.
-(2) Import necessary packages. Except for importing packages, you should write everything inside the function.
-(3) We only construct a solution once, so introducing stochasticity is not helpful.
-(4) You write novel algorithms instead of using classic and greedy ones. For example, DO NOT write Nearest Neighbor heuristic.
+- Strictly adhere to the function signature.
+- Import necessary packages. Except for importing packages, you should write everything inside the function.
+- We only construct a solution once, so try better designs than introducing stochasticity.
+- You write novel algorithms instead of using classic and greedy ones. For example, do NOT write Nearest Neighbor heuristic.

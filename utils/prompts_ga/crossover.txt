@@ -1,3 +1,4 @@
+Your task is: {problem_description}
 You are provided with two algorithms below, each with its description and code. Please crossover these two algorithms and write a better one.
 
 ### Algorithm 1 ###
