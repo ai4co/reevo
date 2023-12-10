@@ -52,11 +52,10 @@ class GA_LLM:
         self.output_file = f"{self.root_dir}/problems/{self.problem}/{self.cfg.suffix.lower()}.py"
         
         # Loading all text prompts
-        self.system_prompt = file_to_string(f'{prompt_dir}/system.txt')
-        initial_user = file_to_string(f'{prompt_dir}/initial_user.txt')
         func_signature = file_to_string(f'{problem_dir}/func_signature.txt')
         self.code_output_tip = file_to_string(f'{prompt_dir}/code_output_tip.txt')
-        self.initial_user = initial_user.format(func_signature=func_signature, problem_description=self.problem_description)
+        self.system_prompt = file_to_string(f'{prompt_dir}/system.txt').format(func_signature=func_signature)
+        self.initial_user = file_to_string(f'{prompt_dir}/initial_user.txt').format(problem_description=self.problem_description)
 
         # Generate responses
         messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": self.initial_user + self.code_output_tip}]
@@ -428,9 +427,7 @@ class GA_LLM:
     def evolve(self):
         while self.function_evals < self.cfg.max_fe:
             # Diversify
-            if self.diversify:
-                self.population = self.diversify(self.population)
-                self.update_iter()
+            if self.cfg.diversify: self.diversify()
             # Select
             population_to_select = self.population if self.elitist is None else [self.elitist] + self.population # add elitist to population for selection
             selected_population = self.select(population_to_select)
@@ -474,23 +471,23 @@ class GA_LLM:
 
 
 
-    def diversify(self, population) -> list[dict]:
+    def diversify(self):
         """
         Diversify the population by eliminating the greedy algorithms (obj == self.greedy_obj) and adding new ones.
         """
-        population = self.population
         # Eliminate greedy algorithms or those with execution errors
-        population = [individual for individual in population if individual["obj"] != self.greedy_obj and individual["exec_success"]]
-        n = self.cfg.pop_size - len(population)
-        logging.info(f"Eliminated {n} greedy or invalid algorithms.")
+        preserved_population = [individual for individual in self.population if individual["obj"] != self.greedy_obj and individual["exec_success"]]
+        n_eliminated = self.cfg.pop_size - len(preserved_population)
+        logging.info(f"Eliminated {n_eliminated} greedy or invalid algorithms.")
         
         # Return if no new individuals are needed
-        if n == 0:
-            return population
+        if n_eliminated == 0:
+            self.update_iter()
+            return
         
         # Generate new responses
         messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": self.initial_user + self.code_output_tip}]
-        responses = self.chat_completion(n, self.cfg, messages)
+        responses = self.chat_completion(n_eliminated, self.cfg, messages)
         
         # Responses to population
         new_population = self.responses_to_population(responses)
@@ -499,6 +496,5 @@ class GA_LLM:
         new_population = self.evaluate_population(new_population)
         
         # Add new population to population
-        population.extend(new_population)
-
-        return population
+        self.population = preserved_population + new_population
+        self.update_iter()
