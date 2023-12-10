@@ -18,7 +18,10 @@ class GA_LLM:
         self.iteration = 0
         self.function_evals = 0
         self.elitist = None
-                
+        
+        self.invalid_responses = 0 # Number of invalid responses
+        self.total_responses = 0 # Number of total responses
+
         self.population = self.init_population()
 
         if cfg.problem_type != "constructive":
@@ -102,8 +105,9 @@ class GA_LLM:
     
     def response_to_individual(self, response, response_id, file_name=None) -> dict:
         """
-        Convert response to individual. Applied to crossover and mutation.
+        Convert response to individual
         """
+        self.total_responses += 1
         content = response.message.content
         
         # Write response to file
@@ -114,6 +118,14 @@ class GA_LLM:
         # Extract code and description from response
         code_string, desc_string = self.extract_code_description(content)
         std_out_filepath = f"problem_iter{self.iteration}_stdout{response_id}.txt" if file_name is None else file_name + "_stdout.txt"
+
+        if code_string is None:
+            logging.info(f"Iteration {self.iteration}, response_id {response_id}: Extract None; invalid response!")
+            self.invalid_responses += 1
+        elif desc_string is None:
+            desc_string = "This is an algorithm that solves the problem." # Default description
+            logging.info(f"Iteration {self.iteration}, response_id {response_id}: Extract no description; use default description.")
+        
         individual = {
             "stdout_filepath": std_out_filepath,
             "code_path": f"problem_iter{self.iteration}_code{response_id}.py",
@@ -122,8 +134,7 @@ class GA_LLM:
             "response": content,
             "response_id": response_id,
         }
-        if not (code_string and desc_string):
-            logging.info(f"Iteration {self.iteration}, response_id {response_id}: Extract None; invalid response!")
+
         return individual
 
         
@@ -137,26 +148,40 @@ class GA_LLM:
             population.append(individual)
         return population
 
+    @staticmethod
+    def mark_invalid_individual(individual: dict, traceback_msg: str) -> dict:
+        """
+        Mark an individual as invalid.
+        """
+        individual["exec_success"] = False
+        individual["obj"] = float("inf")
+        individual["fitness"] = 0
+        individual["traceback_msg"] = traceback_msg
+        return individual
 
     def evaluate_population(self, population: list[dict]) -> list[float]:
         """
         Evaluate population by running code in parallel and computing objective values and fitness.
         """
         inner_runs = []
-        # Run code and evaluate population
+        # Run code to evaluate
         for response_id in range(len(population)):
-            self.function_evals += 1
+            
+            # Skip if response is invalid
+            if population[response_id]["code"] is None:
+                population[response_id] = self.mark_invalid_individual(population[response_id], "Invalid response!")
+                inner_runs.append(None)
+                continue
+            
             logging.info(f"Iteration {self.iteration}: Running Code {response_id}")
+            self.function_evals += 1
+            
             try:
                 process = self.run_code(population[response_id], response_id)
                 inner_runs.append(process)
             except Exception as e: # If code execution fails
                 logging.info(f"Error for response_id {response_id}: {e}")
-                individual = population[response_id]
-                individual["exec_success"] = False
-                individual["obj"] = float("inf")
-                individual["fitness"] = 0
-                individual["traceback_msg"] = str(e)
+                population[response_id] = self.mark_invalid_individual(population[response_id], str(e))
                 inner_runs.append(None)
         
         # Update population with objective values and fitness
@@ -164,14 +189,10 @@ class GA_LLM:
             if inner_run is None: # If code execution fails, skip
                 continue
             try:
-                inner_run.communicate(timeout=60) # Wait for code execution to finish
+                inner_run.communicate(timeout=20) # Wait for code execution to finish
             except subprocess.TimeoutExpired as e:
                 logging.info(f"Error for response_id {response_id}: {e}")
-                individual = population[response_id]
-                individual["exec_success"] = False
-                individual["obj"] = float("inf")
-                individual["fitness"] = 0
-                individual["traceback_msg"] = str(e)
+                population[response_id] = self.mark_invalid_individual(population[response_id], str(e))
                 inner_run.kill()
                 continue
 
@@ -187,16 +208,13 @@ class GA_LLM:
                 individual["exec_success"] = True
                 try:
                     individual["obj"] = float(stdout_str.split('\n')[-2])
-                    assert individual["obj"] != 0, "Objective value <= 0 is not supported."
+                    assert individual["obj"] > 0, "Objective value <= 0 is not supported."
                     individual["fitness"] = 1 / individual["obj"]
                 except:
-                    individual["obj"] = float("inf")
-                    individual["fitness"] = 0
+                    population[response_id] = self.mark_invalid_individual(population[response_id], "Invalid std out / objective value!")
             else: # Otherwise, also provide execution traceback error feedback
-                individual["traceback_msg"] = traceback_msg
-                individual["exec_success"] = False
-                individual["obj"] = float("inf")
-                individual["fitness"] = 0
+                population[response_id] = self.mark_invalid_individual(population[response_id], traceback_msg)
+
             logging.info(f"Iteration {self.iteration}, response_id {response_id}: Objective value: {individual['obj']}")
         return population
 
@@ -289,8 +307,11 @@ class GA_LLM:
                 self.elitist = population[best_sample_idx]
                 logging.info(f"Iteration {self.iteration}: Elitist: {self.elitist['obj']}")
         
-        logging.info(f"Iteration {self.iteration}: Min obj: {self.best_obj_overall}, Best Code Path: {self.best_code_path_overall}")
-        logging.info(f"Iteration {self.iteration}: Function Evals: {self.function_evals}")
+        logging.info(f"Iteration {self.iteration} finished...")
+        logging.info(f"Min obj: {self.best_obj_overall}, Best Code Path: {self.best_code_path_overall}")
+        logging.info(f"Function Evals: {self.function_evals}")
+        logging.info(f"Invalid Responses: {self.invalid_responses}, Total Responses: {self.total_responses}")
+        logging.info(f"Invalid Response Rate: {self.invalid_responses}/{self.total_responses}")
         self.iteration += 1
 
 
@@ -351,7 +372,7 @@ class GA_LLM:
         # logging.info("Fitness before sharing: \n" + str(fitness))
         
         fitness = self.fitness_sharing(similarity_matrix, fitness)
-        # logging.info("Fitness after sharing: \n" + str(fitness))
+        logging.info("Fitness after sharing: \n" + str(fitness))
         
         fitness_sum = sum(fitness)
         fitness_prob = [f / fitness_sum for f in fitness]
