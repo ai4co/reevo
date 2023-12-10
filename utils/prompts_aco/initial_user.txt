@@ -1,3 +1,3 @@
-Write a scoring function for the following problem: {problem_description}. 
+Write a scoring function and adhere to the function signature below:
 
-The scoring function maps inputs into a heuristic matrix. We will randomly sample solutions based on your output heuristic matrix, where the elements represent unnormalized probabilities.
+{func_signature}

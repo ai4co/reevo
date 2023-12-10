@@ -1,9 +1,7 @@
-You are an expert in the domain of optimization heuristics. You are going to design <novel> heuristics to solve optimization problems as effective as possible.
-Your goal is to write a novel static scoring function. The function outputs heuristic measures indicating how good is each edge before actually solving a problem instance. You also concisely describe your code before writing it.
-The function signature is as follows:
+You are an expert in designing novel heuristics to solve optimization problems as effective as possible.
 
------
+Your goal is to write a novel static scoring function for following problem:
+{problem_description}
 
-{func_signature}
-
------
+Your function outputs heuristic measures indicating how promising is each solution component before solution construction.
+More specifically, your scoring function maps inputs into a heuristic matrix. The user will randomly sample solutions based on your output heuristic matrix, whose elements represent unnormalized probabilities.

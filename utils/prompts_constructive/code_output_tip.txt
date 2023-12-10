@@ -1,17 +1,5 @@
-Begin by giving a concise and clear description of your code, followed by the code itself. Your code should be formatted as a Python code string: "```python ... ```"
-An example is given below:
-
------
-Code description: This is a concise code description of your code.
-
-```python
-This is your Python code
-```
------
-
 Some helpful tips:
-(1) Do not modify the function signature.
-(2) Import necessary packages. Except for importing packages, you should write everything inside the function.
-(3) We only construct a solution once, so introducing stochasticity is not helpful.
-(4) You DO NOT update the input variables. For example, you DO NOT remove the selected node from the unvisited nodes.
-(5) You write novel algorithms instead of using classic and greedy ones. For example, DO NOT write Nearest Neighbor heuristic.
+- Adhere to the function signature.
+- Import necessary packages. Except for importing packages, you should write everything inside the function.
+- We only construct a solution once, so introducing stochasticity is not helpful.
+- You write novel algorithms instead of using classic and greedy ones. For example, DO NOT write Nearest Neighbor heuristic!

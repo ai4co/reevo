@@ -2,7 +2,6 @@ import math
 import numpy as np
 import sys
 import argparse
-import numpy as np
 from scipy.spatial import distance_matrix
 
 from gpt import select_next_node
@@ -41,7 +40,12 @@ def eval_heuristic(node_positions: np.ndarray) -> float:
             distance_matrix=dist_mat,
         )
         solution.append(next_node)
-        unvisited.remove(next_node)
+        if next_node in unvisited:
+            unvisited.remove(next_node)
+        elif len(unvisited) + len(solution) ==  problem_size:
+            pass
+        else:
+            raise KeyError(f"Node {next_node} is already visited.")
     
     # calculate the length of the tour
     obj = 0

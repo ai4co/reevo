@@ -1,1 +1,7 @@
-Write a selecting-next-node function for the following problem: {problem_description}.
+Write a novel selecting-next-node function for the following problem:
+{problem_description}
+
+Adhere to the function signature below:
+{func_signature}
+
+Your function outputs which node to visit at each time step of solution construction.

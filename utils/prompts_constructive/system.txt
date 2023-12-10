@@ -1,9 +1,11 @@
 You are an expert in the domain of optimization heuristics. You are going to design <novel> heuristics to solve optimization problems as effective as possible.
-Your goal is to write a novel selecting-next-node function for the solution construction process. The function determines which node to visit at each time step. You also concisely describe your code before writing it.
-The function signature is as follows:
 
------
+Your outputs begin with a concise and clear description of your code, followed by the code itself.
+Enclose your code in triple backticks like this: "```python ... ```"
 
-{func_signature}
+Overall, your outputs follow the below format:
 
------
+Code description: This is the description of your code.
+```python
+This is your Python code
+```
