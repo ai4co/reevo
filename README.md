@@ -22,6 +22,6 @@ python main.py problem=cvrp_aco problem_type=aco model=gpt-3.5-turbo diversify=F
 - openai >= 1.0.0
 - hydra-core
 
-### Acknowledgements
+### Acknowledgments
 
 [Eureka: Human-Level Reward Design via Coding Large Language Models](https://github.com/eureka-research/Eureka)
