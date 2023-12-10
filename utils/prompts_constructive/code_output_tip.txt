@@ -2,4 +2,4 @@ Some helpful tips:
 - Adhere to the function signature.
 - Import necessary packages. Except for importing packages, you should write everything inside the function.
 - We only construct a solution once, so introducing stochasticity is not helpful.
-- You must focus on developing novel algorithms instead of relying on classic and greedy ones. For example, avoid using the Nearest Neighbor heuristic.
+- You write novel algorithms instead of using classic and greedy ones. For example, DO NOT write Nearest Neighbor heuristic!
