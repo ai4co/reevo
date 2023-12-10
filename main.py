@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 import subprocess
 
-from ga import GA_LLM
+from ga import G2A
 
 ROOT_DIR = os.getcwd()
 logging.basicConfig(level=logging.DEBUG)
@@ -18,7 +18,7 @@ def main(cfg):
     logging.info(f"Project Root: {ROOT_DIR}")
     logging.info(f"Using LLM: {cfg.model}")
     
-    ga = GA_LLM(cfg, ROOT_DIR)
+    ga = G2A(cfg, ROOT_DIR)
     best_code_overall, best_desc_overall, best_code_path_overall = ga.evolve()
     logging.info(f"Best Code Overall: {best_code_overall}")
     logging.info(f"Best Description Overall: {best_desc_overall}")
