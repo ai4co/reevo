@@ -1,18 +1,15 @@
-Begin by giving a concise and clear description of your code, followed by the code itself.
-Enclose your code in triple backticks like this: "```python ... ```"
+Begin by giving a concise and clear description of your code, followed by the code itself. Your code should be formatted as a Python code string: "```python ... ```"
+An example is given below:
 
+-----
+Code description: This is a concise code description of your code.
 
-Overall, your output follows the below format delimited by triple dashes:
-
----
-Code description: This is a concise code description.
 ```python
 This is your Python code
 ```
----
+-----
 
 Some helpful tips:
-- Adhere to the function signature.
-- Import necessary packages. Except for importing packages, you should write everything inside the function.
-- Note that your scoring function outputs heuristic measures before solution construction. Therefore, no information about partial solutions can be utilized.
-- Leave your output unnormalized.
+(1) Do not modify the function signature.
+(2) Import necessary packages. Except for importing packages, you should write everything inside the function.
+(3) Note that your scoring function outputs heuristic measures before solution construction. Therefore, no information about partial solutions can be utilized.
