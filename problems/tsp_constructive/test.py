@@ -39,10 +39,14 @@ def eval_heuristic(node_positions: np.ndarray) -> float:
             destination_node=start_node,
             unvisited_nodes=unvisited,
             distance_matrix=dist_mat,
-            node_positions=node_positions,
         )
         solution.append(next_node)
-        unvisited.remove(next_node)
+        if next_node in unvisited:
+            unvisited.remove(next_node)
+        elif len(unvisited) + len(solution) ==  problem_size:
+            pass
+        else:
+            raise KeyError(f"Node {next_node} is already visited.")
     
     # calculate the length of the tour
     obj = 0
