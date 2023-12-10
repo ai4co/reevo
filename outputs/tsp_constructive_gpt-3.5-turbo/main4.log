@@ -1,0 +1,823 @@
+[2023-12-10 14:42:20,548][root][INFO] - Workspace: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/outputs/main/2023-12-10_14-42-20
+[2023-12-10 14:42:20,548][root][INFO] - Project Root: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer
+[2023-12-10 14:42:20,548][root][INFO] - Using LLM: gpt-3.5-turbo
+[2023-12-10 14:42:20,567][root][INFO] - Problem: tsp_constructive
+[2023-12-10 14:42:20,567][root][INFO] - Problem description: The task is to solve Traveling Salesman Problem (TSP) with constructive heuristics. TSP requires finding the shortest path that visits all given nodes and returns to the starting node.
+[2023-12-10 14:42:20,568][root][INFO] - Initial prompt: 
+System Prompt: 
+You are an expert in the domain of optimization heuristics. You are going to design <novel> heuristics to solve optimization problems as effective as possible.
+Your goal is to write a novel selecting-next-node function for the solution construction process. The function determines which node to visit at each time step. You also concisely describe your code before writing it.
+
+The function signature is as follows:
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    """
+    For TSP, select the next node to visit from the unvisited nodes.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    node_positions : np.ndarray
+        The node positions of shape (n_nodes, 2)
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    ...
+    return nxt_node
+User Prompt: 
+Write a selecting-next-node function for the following problem: The task is to solve Traveling Salesman Problem (TSP) with constructive heuristics. TSP requires finding the shortest path that visits all given nodes and returns to the starting node..Begin by giving a concise and clear description of your code, followed by the code itself. Your code should be formatted as a Python code string: "```python ... ```"
+An example is given below:
+
+-----
+Code description: This is a concise description of your code.
+
+```python
+This is your Python code
+```
+-----
+
+Some helpful tips:
+(1) Do not modify the function signature.
+(2) Import necessary packages. Except for importing packages, you should write everything inside the function.
+(3) We only construct a solution once, so introducing stochasticity is not helpful.
+(4) You write novel algorithms instead of using classic and greedy ones. For example, DO NOT write Nearest Neighbor heuristic.
+[2023-12-10 14:42:44,403][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:42:44,415][root][INFO] - Iteration 0, response_id 0: Extract None; invalid response!
+[2023-12-10 14:42:44,416][root][INFO] - Iteration 0, response_id 1: Extract None; invalid response!
+[2023-12-10 14:42:44,416][root][INFO] - Iteration 0, response_id 3: Extract None; invalid response!
+[2023-12-10 14:42:44,417][root][INFO] - Iteration 0: Running Code 0
+[2023-12-10 14:42:44,417][root][INFO] - Error for response_id 0: unsupported operand type(s) for +: 'NoneType' and 'str'
+[2023-12-10 14:42:44,417][root][INFO] - Iteration 0: Running Code 1
+[2023-12-10 14:42:44,417][root][INFO] - Error for response_id 1: unsupported operand type(s) for +: 'NoneType' and 'str'
+[2023-12-10 14:42:44,417][root][INFO] - Iteration 0: Running Code 2
+[2023-12-10 14:42:44,629][root][INFO] - Iteration 0: Code Run 2 successful!
+[2023-12-10 14:42:44,629][root][INFO] - Iteration 0: Running Code 3
+[2023-12-10 14:42:44,629][root][INFO] - Error for response_id 3: unsupported operand type(s) for +: 'NoneType' and 'str'
+[2023-12-10 14:42:44,629][root][INFO] - Iteration 0: Running Code 4
+[2023-12-10 14:42:44,852][root][INFO] - Iteration 0: Code Run 4 successful!
+[2023-12-10 14:42:44,852][root][INFO] - Iteration 0: Running Code 5
+[2023-12-10 14:42:45,131][root][INFO] - Iteration 0: Code Run 5 execution error!
+[2023-12-10 14:42:45,131][root][INFO] - Iteration 0: Running Code 6
+[2023-12-10 14:42:45,451][root][INFO] - Iteration 0: Code Run 6 successful!
+[2023-12-10 14:42:45,452][root][INFO] - Iteration 0: Running Code 7
+[2023-12-10 14:42:45,708][root][INFO] - Iteration 0: Code Run 7 successful!
+[2023-12-10 14:42:45,709][root][INFO] - Iteration 0: Running Code 8
+[2023-12-10 14:42:45,968][root][INFO] - Iteration 0: Code Run 8 successful!
+[2023-12-10 14:42:45,969][root][INFO] - Iteration 0: Running Code 9
+[2023-12-10 14:42:46,166][root][INFO] - Iteration 0: Code Run 9 execution error!
+[2023-12-10 14:42:46,166][root][INFO] - Iteration 0, response_id 2: Objective value: 26.485011982875797
+[2023-12-10 14:42:46,173][root][INFO] - Iteration 0, response_id 4: Objective value: 20.184182080439687
+[2023-12-10 14:42:46,173][root][INFO] - Iteration 0, response_id 5: Objective value: inf
+[2023-12-10 14:42:46,174][root][INFO] - Iteration 0, response_id 6: Objective value: 9.20301913332748
+[2023-12-10 14:42:46,174][root][INFO] - Iteration 0, response_id 7: Objective value: 6.926479847917209
+[2023-12-10 14:42:46,174][root][INFO] - Iteration 0, response_id 8: Objective value: 26.68017432328262
+[2023-12-10 14:42:46,211][root][INFO] - Iteration 0, response_id 9: Objective value: inf
+[2023-12-10 14:42:46,211][root][INFO] - Iteration 0: Min obj: 6.926479847917209, Best Code Path: problem_iter0_code7.py
+[2023-12-10 14:42:46,212][root][INFO] - Greedy Algorithm Prompt: 
+System Prompt: 
+You are an expert in the domain of optimization heuristics. You are going to design <novel> heuristics to solve optimization problems as effective as possible.
+Your goal is to write a novel selecting-next-node function for the solution construction process. The function determines which node to visit at each time step. You also concisely describe your code before writing it.
+
+The function signature is as follows:
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    """
+    For TSP, select the next node to visit from the unvisited nodes.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    node_positions : np.ndarray
+        The node positions of shape (n_nodes, 2)
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    ...
+    return nxt_node
+User Prompt: 
+Write a selecting-next-node function for the following problem: The task is to solve Traveling Salesman Problem (TSP) with constructive heuristics. TSP requires finding the shortest path that visits all given nodes and returns to the starting node..You are going to write a vanilla "greedy" algorithm for this problem. Your code should be formatted as a Python code string: "```python ... ```". Output your formatted code and nothing else. Remember to import necessary packages.
+[2023-12-10 14:42:54,233][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:42:54,234][root][INFO] - Iteration 1, response_id 0: Extract None; invalid response!
+[2023-12-10 14:42:54,234][root][INFO] - Iteration 1: Running Code 0
+[2023-12-10 14:42:54,540][root][INFO] - Iteration 1: Code Run 0 successful!
+[2023-12-10 14:42:54,577][root][INFO] - Iteration 1, response_id 0: Objective value: 6.926479847917209
+[2023-12-10 14:42:54,577][root][INFO] - Greedy Algorithm Objective Value: 6.926479847917209
+[2023-12-10 14:42:54,578][root][INFO] - Eliminated 6 greedy or invalid algorithms.
+[2023-12-10 14:43:10,515][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:43:10,517][root][INFO] - Iteration 1, response_id 0: Extract None; invalid response!
+[2023-12-10 14:43:10,517][root][INFO] - Iteration 1, response_id 4: Extract None; invalid response!
+[2023-12-10 14:43:10,517][root][INFO] - Iteration 1, response_id 5: Extract None; invalid response!
+[2023-12-10 14:43:10,517][root][INFO] - Iteration 1: Running Code 0
+[2023-12-10 14:43:10,518][root][INFO] - Error for response_id 0: unsupported operand type(s) for +: 'NoneType' and 'str'
+[2023-12-10 14:43:10,518][root][INFO] - Iteration 1: Running Code 1
+[2023-12-10 14:43:10,666][root][INFO] - Iteration 1: Code Run 1 successful!
+[2023-12-10 14:43:10,666][root][INFO] - Iteration 1: Running Code 2
+[2023-12-10 14:43:10,880][root][INFO] - Iteration 1: Code Run 2 successful!
+[2023-12-10 14:43:10,880][root][INFO] - Iteration 1: Running Code 3
+[2023-12-10 14:43:11,100][root][INFO] - Iteration 1: Code Run 3 successful!
+[2023-12-10 14:43:11,100][root][INFO] - Iteration 1: Running Code 4
+[2023-12-10 14:43:11,110][root][INFO] - Error for response_id 4: unsupported operand type(s) for +: 'NoneType' and 'str'
+[2023-12-10 14:43:11,110][root][INFO] - Iteration 1: Running Code 5
+[2023-12-10 14:43:11,110][root][INFO] - Error for response_id 5: unsupported operand type(s) for +: 'NoneType' and 'str'
+[2023-12-10 14:43:11,111][root][INFO] - Iteration 1, response_id 1: Objective value: inf
+[2023-12-10 14:43:11,150][root][INFO] - Iteration 1, response_id 2: Objective value: 8.319800738350654
+[2023-12-10 14:43:11,150][root][INFO] - Iteration 1, response_id 3: Objective value: inf
+[2023-12-10 14:43:11,150][root][INFO] - Iteration 1: Min obj: 6.926479847917209, Best Code Path: problem_iter0_code7.py
+[2023-12-10 14:43:11,150][root][INFO] - Iteration 1: Function Evals: 17
+[2023-12-10 14:43:11,744][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+[2023-12-10 14:43:11,993][root][INFO] - Crossover Prompt: 
+System Prompt: 
+You are an expert in the domain of optimization heuristics. You are going to design <novel> heuristics to solve optimization problems as effective as possible.
+Your goal is to write a novel selecting-next-node function for the solution construction process. The function determines which node to visit at each time step. You also concisely describe your code before writing it.
+
+The function signature is as follows:
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    """
+    For TSP, select the next node to visit from the unvisited nodes.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    node_positions : np.ndarray
+        The node positions of shape (n_nodes, 2)
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    ...
+    return nxt_node
+User Prompt: 
+You are provided with two algorithms below, each with its description and code. Please crossover these two algorithms and write a better one.
+
+### Algorithm 1 ###
+
+Code description: This code uses a novel algorithm for selecting the next node in the TSP constructive heuristic. The algorithm calculates the expected cost of visiting each unvisited node from the current node. The expected cost is calculated as the average distance between the current node and the unvisited node, weighted by the distance to the destination node. The node with the lowest expected cost is selected as the next node to visit.
+
+```python
+import numpy as np
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    """
+    For TSP, select the next node to visit from the unvisited nodes.
+
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    
+    n_nodes = len(distance_matrix)
+
+    # Normalize distance matrix for path normalization factor
+    distances = distance_matrix[current_node] / distance_matrix[current_node][destination_node]
+
+    # Calculate expected cost for each unvisited node
+    expected_costs = []
+    for node in unvisited_nodes:
+        expected_cost = np.average(distances[node]) * distance_matrix[node][destination_node]
+        expected_costs.append(expected_cost)
+
+    # Select node with the lowest expected cost
+    nxt_node = list(unvisited_nodes)[np.argmin(expected_costs)]
+
+    return nxt_node
+```
+
+######
+
+
+### Algorithm 2 ###
+
+Code description: This algorithm selects the next node based on a combination of greedy and random search strategy. It starts by selecting the greedy choice, which is the unvisited node with the shortest distance from the current node. However, to introduce some randomness and exploration, the algorithm has a small probability of not making the greedy choice and instead selecting a random unvisited node. This allows the algorithm to explore different paths and avoid getting stuck in local optima.
+
+```python
+import numpy as np
+import random
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    """
+    For TSP, select the next node to visit from the unvisited nodes.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    
+    # Greedy exploration probability
+    greedy_prob = 0.9
+    
+    # Calculate distances from current node to unvisited nodes
+    distances = distance_matrix[current_node, list(unvisited_nodes)]
+    
+    if np.random.uniform() > greedy_prob:
+        # Select random unvisited node
+        nxt_node = random.choice(list(list(list(unvisited_nodes))))
+    else:
+        # Select unvisited node with shortest distance
+        nxt_node = list(unvisited_nodes)[np.argmin(distances)]
+    
+    return nxt_node
+```
+
+######
+Begin by giving a concise and clear description of your code, followed by the code itself. Your code should be formatted as a Python code string: "```python ... ```"
+An example is given below:
+
+-----
+Code description: This is a concise description of your code.
+
+```python
+This is your Python code
+```
+-----
+
+Some helpful tips:
+(1) Do not modify the function signature.
+(2) Import necessary packages. Except for importing packages, you should write everything inside the function.
+(3) We only construct a solution once, so introducing stochasticity is not helpful.
+(4) You write novel algorithms instead of using classic and greedy ones. For example, DO NOT write Nearest Neighbor heuristic.
+[2023-12-10 14:43:28,332][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:43:28,333][root][INFO] - Iteration 2, response_id 0: Extract None; invalid response!
+[2023-12-10 14:43:41,849][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:43:54,349][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:44:04,197][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:44:19,605][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:44:35,508][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:44:53,633][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:45:11,069][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:45:24,457][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:45:35,983][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:45:35,984][root][INFO] - Mutate Prompt: 
+System Prompt: 
+You are an expert in the domain of optimization heuristics. You are going to design <novel> heuristics to solve optimization problems as effective as possible.
+Your goal is to write a novel selecting-next-node function for the solution construction process. The function determines which node to visit at each time step. You also concisely describe your code before writing it.
+
+The function signature is as follows:
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    """
+    For TSP, select the next node to visit from the unvisited nodes.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    node_positions : np.ndarray
+        The node positions of shape (n_nodes, 2)
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    ...
+    return nxt_node
+User Prompt: 
+You are provided with an algorithms below, with its description and code. Please mutate and modify this algorithm to provide a better one.
+
+### Algorithm ###
+
+Code description: None
+
+```python
+None
+```
+
+######Begin by giving a concise and clear description of your code, followed by the code itself. Your code should be formatted as a Python code string: "```python ... ```"
+An example is given below:
+
+-----
+Code description: This is a concise description of your code.
+
+```python
+This is your Python code
+```
+-----
+
+Some helpful tips:
+(1) Do not modify the function signature.
+(2) Import necessary packages. Except for importing packages, you should write everything inside the function.
+(3) We only construct a solution once, so introducing stochasticity is not helpful.
+(4) You write novel algorithms instead of using classic and greedy ones. For example, DO NOT write Nearest Neighbor heuristic.
+[2023-12-10 14:45:56,514][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:45:56,515][root][INFO] - Iteration 2, response_id 0: Extract None; invalid response!
+[2023-12-10 14:46:22,723][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:46:37,778][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:46:37,778][root][INFO] - Iteration 2: Running Code 0
+[2023-12-10 14:46:37,933][root][INFO] - Iteration 2: Code Run 0 successful!
+[2023-12-10 14:46:37,933][root][INFO] - Iteration 2: Running Code 1
+[2023-12-10 14:46:38,105][root][INFO] - Iteration 2: Code Run 1 successful!
+[2023-12-10 14:46:38,105][root][INFO] - Iteration 2: Running Code 2
+[2023-12-10 14:46:38,301][root][INFO] - Iteration 2: Code Run 2 execution error!
+[2023-12-10 14:46:38,301][root][INFO] - Iteration 2: Running Code 3
+[2023-12-10 14:46:38,489][root][INFO] - Iteration 2: Code Run 3 successful!
+[2023-12-10 14:46:38,489][root][INFO] - Iteration 2: Running Code 4
+[2023-12-10 14:46:38,683][root][INFO] - Iteration 2: Code Run 4 successful!
+[2023-12-10 14:46:38,683][root][INFO] - Iteration 2: Running Code 5
+[2023-12-10 14:46:38,871][root][INFO] - Iteration 2: Code Run 5 successful!
+[2023-12-10 14:46:38,878][root][INFO] - Iteration 2: Running Code 6
+[2023-12-10 14:46:39,054][root][INFO] - Iteration 2: Code Run 6 successful!
+[2023-12-10 14:46:39,054][root][INFO] - Iteration 2: Running Code 7
+[2023-12-10 14:46:39,236][root][INFO] - Iteration 2: Code Run 7 successful!
+[2023-12-10 14:46:39,236][root][INFO] - Iteration 2: Running Code 8
+[2023-12-10 14:46:39,445][root][INFO] - Iteration 2: Code Run 8 successful!
+[2023-12-10 14:46:39,445][root][INFO] - Iteration 2: Running Code 9
+[2023-12-10 14:46:39,643][root][INFO] - Iteration 2: Code Run 9 successful!
+[2023-12-10 14:46:39,644][root][INFO] - Iteration 2, response_id 0: Objective value: inf
+[2023-12-10 14:46:39,644][root][INFO] - Iteration 2, response_id 1: Objective value: 10.828477965838486
+[2023-12-10 14:46:39,644][root][INFO] - Iteration 2, response_id 2: Objective value: inf
+[2023-12-10 14:46:39,644][root][INFO] - Iteration 2, response_id 3: Objective value: inf
+[2023-12-10 14:46:39,644][root][INFO] - Iteration 2, response_id 4: Objective value: 19.676581211033042
+[2023-12-10 14:46:39,644][root][INFO] - Iteration 2, response_id 5: Objective value: 8.017635675825133
+[2023-12-10 14:46:39,644][root][INFO] - Iteration 2, response_id 6: Objective value: 8.703927130344356
+[2023-12-10 14:46:39,720][root][INFO] - Iteration 2, response_id 7: Objective value: 32.85718729578895
+[2023-12-10 14:46:39,720][root][INFO] - Iteration 2, response_id 8: Objective value: inf
+[2023-12-10 14:46:39,720][root][INFO] - Iteration 2, response_id 9: Objective value: 8.674161182040159
+[2023-12-10 14:46:39,720][root][INFO] - Iteration 2: Min obj: 6.926479847917209, Best Code Path: problem_iter0_code7.py
+[2023-12-10 14:46:39,720][root][INFO] - Iteration 2: Function Evals: 27
+[2023-12-10 14:46:39,720][root][INFO] - Eliminated 4 greedy or invalid algorithms.
+[2023-12-10 14:46:51,042][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:46:51,042][root][INFO] - Iteration 3, response_id 0: Extract None; invalid response!
+[2023-12-10 14:46:51,043][root][INFO] - Iteration 3, response_id 2: Extract None; invalid response!
+[2023-12-10 14:46:51,043][root][INFO] - Iteration 3: Running Code 0
+[2023-12-10 14:46:51,043][root][INFO] - Error for response_id 0: unsupported operand type(s) for +: 'NoneType' and 'str'
+[2023-12-10 14:46:51,043][root][INFO] - Iteration 3: Running Code 1
+[2023-12-10 14:46:51,205][root][INFO] - Iteration 3: Code Run 1 successful!
+[2023-12-10 14:46:51,205][root][INFO] - Iteration 3: Running Code 2
+[2023-12-10 14:46:51,206][root][INFO] - Error for response_id 2: unsupported operand type(s) for +: 'NoneType' and 'str'
+[2023-12-10 14:46:51,206][root][INFO] - Iteration 3: Running Code 3
+[2023-12-10 14:46:51,397][root][INFO] - Iteration 3: Code Run 3 successful!
+[2023-12-10 14:46:51,397][root][INFO] - Iteration 3, response_id 1: Objective value: 19.344303763167165
+[2023-12-10 14:46:51,578][root][INFO] - Iteration 3, response_id 3: Objective value: 26.998422195486132
+[2023-12-10 14:46:51,578][root][INFO] - Iteration 3: Min obj: 6.926479847917209, Best Code Path: problem_iter0_code7.py
+[2023-12-10 14:46:51,578][root][INFO] - Iteration 3: Function Evals: 31
+[2023-12-10 14:46:52,624][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+[2023-12-10 14:47:11,773][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:47:34,769][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:47:34,770][root][INFO] - Iteration 4, response_id 1: Extract None; invalid response!
+[2023-12-10 14:47:51,914][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:48:08,486][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:48:28,677][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:48:46,802][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:49:08,919][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:49:29,535][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:49:47,211][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:50:02,681][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:50:25,618][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:50:46,514][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:50:46,515][root][INFO] - Iteration 4: Running Code 0
+[2023-12-10 14:50:46,674][root][INFO] - Iteration 4: Code Run 0 successful!
+[2023-12-10 14:50:46,674][root][INFO] - Iteration 4: Running Code 1
+[2023-12-10 14:50:46,915][root][INFO] - Iteration 4: Code Run 1 successful!
+[2023-12-10 14:50:46,916][root][INFO] - Iteration 4: Running Code 2
+[2023-12-10 14:50:47,110][root][INFO] - Iteration 4: Code Run 2 successful!
+[2023-12-10 14:50:47,111][root][INFO] - Iteration 4: Running Code 3
+[2023-12-10 14:50:47,291][root][INFO] - Iteration 4: Code Run 3 successful!
+[2023-12-10 14:50:47,292][root][INFO] - Iteration 4: Running Code 4
+[2023-12-10 14:50:47,496][root][INFO] - Iteration 4: Code Run 4 successful!
+[2023-12-10 14:50:47,497][root][INFO] - Iteration 4: Running Code 5
+[2023-12-10 14:50:47,810][root][INFO] - Iteration 4: Code Run 5 successful!
+[2023-12-10 14:50:47,810][root][INFO] - Iteration 4: Running Code 6
+[2023-12-10 14:50:48,001][root][INFO] - Iteration 4: Code Run 6 successful!
+[2023-12-10 14:50:48,030][root][INFO] - Iteration 4: Running Code 7
+[2023-12-10 14:50:48,242][root][INFO] - Iteration 4: Code Run 7 successful!
+[2023-12-10 14:50:48,242][root][INFO] - Iteration 4: Running Code 8
+[2023-12-10 14:50:48,457][root][INFO] - Iteration 4: Code Run 8 successful!
+[2023-12-10 14:50:48,457][root][INFO] - Iteration 4: Running Code 9
+[2023-12-10 14:50:48,631][root][INFO] - Iteration 4: Code Run 9 successful!
+[2023-12-10 14:50:48,631][root][INFO] - Iteration 4, response_id 0: Objective value: 6.926479847917209
+[2023-12-10 14:50:48,632][root][INFO] - Iteration 4, response_id 1: Objective value: 24.003580589720826
+[2023-12-10 14:50:48,632][root][INFO] - Iteration 4, response_id 2: Objective value: 26.69214341372042
+[2023-12-10 14:50:48,637][root][INFO] - Iteration 4, response_id 3: Objective value: inf
+[2023-12-10 14:50:48,637][root][INFO] - Iteration 4, response_id 4: Objective value: inf
+[2023-12-10 14:50:48,833][root][INFO] - Iteration 4, response_id 5: Objective value: 37.21633137805326
+[2023-12-10 14:50:48,833][root][INFO] - Iteration 4, response_id 6: Objective value: 10.829305172004336
+[2023-12-10 14:50:48,833][root][INFO] - Iteration 4, response_id 7: Objective value: 15.094974933654324
+[2023-12-10 14:50:48,833][root][INFO] - Iteration 4, response_id 8: Objective value: inf
+[2023-12-10 14:50:48,833][root][INFO] - Iteration 4, response_id 9: Objective value: 8.017635675825133
+[2023-12-10 14:50:48,834][root][INFO] - Iteration 4: Min obj: 6.926479847917209, Best Code Path: problem_iter0_code7.py
+[2023-12-10 14:50:48,834][root][INFO] - Iteration 4: Function Evals: 41
+[2023-12-10 14:50:48,834][root][INFO] - Eliminated 4 greedy or invalid algorithms.
+[2023-12-10 14:51:03,611][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:51:03,612][root][INFO] - Iteration 5, response_id 2: Extract None; invalid response!
+[2023-12-10 14:51:03,612][root][INFO] - Iteration 5: Running Code 0
+[2023-12-10 14:51:03,785][root][INFO] - Iteration 5: Code Run 0 successful!
+[2023-12-10 14:51:03,785][root][INFO] - Iteration 5: Running Code 1
+[2023-12-10 14:51:03,956][root][INFO] - Iteration 5: Code Run 1 successful!
+[2023-12-10 14:51:03,956][root][INFO] - Iteration 5: Running Code 2
+[2023-12-10 14:51:04,158][root][INFO] - Iteration 5: Code Run 2 successful!
+[2023-12-10 14:51:04,158][root][INFO] - Iteration 5: Running Code 3
+[2023-12-10 14:51:04,357][root][INFO] - Iteration 5: Code Run 3 successful!
+[2023-12-10 14:51:04,358][root][INFO] - Iteration 5, response_id 0: Objective value: inf
+[2023-12-10 14:51:04,358][root][INFO] - Iteration 5, response_id 1: Objective value: 6.926479847917209
+[2023-12-10 14:51:04,360][root][INFO] - Iteration 5, response_id 2: Objective value: inf
+[2023-12-10 14:51:04,499][root][INFO] - Iteration 5, response_id 3: Objective value: 26.998422195486132
+[2023-12-10 14:51:04,499][root][INFO] - Iteration 5: Min obj: 6.926479847917209, Best Code Path: problem_iter0_code7.py
+[2023-12-10 14:51:04,499][root][INFO] - Iteration 5: Function Evals: 45
+[2023-12-10 14:51:05,044][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+[2023-12-10 14:51:25,424][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:51:39,326][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:51:56,417][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:52:56,560][openai._base_client][INFO] - Retrying request to /chat/completions in 0.955499 seconds
+[2023-12-10 14:53:14,995][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:53:36,832][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:53:54,827][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:54:09,838][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:54:24,215][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:54:36,502][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:54:51,660][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:54:51,661][root][INFO] - Iteration 6: Running Code 0
+[2023-12-10 14:54:51,774][root][INFO] - Iteration 6: Code Run 0 successful!
+[2023-12-10 14:54:51,774][root][INFO] - Iteration 6: Running Code 1
+[2023-12-10 14:54:52,074][root][INFO] - Iteration 6: Code Run 1 successful!
+[2023-12-10 14:54:52,074][root][INFO] - Iteration 6: Running Code 2
+[2023-12-10 14:54:52,243][root][INFO] - Iteration 6: Code Run 2 successful!
+[2023-12-10 14:54:52,244][root][INFO] - Iteration 6: Running Code 3
+[2023-12-10 14:54:52,432][root][INFO] - Iteration 6: Code Run 3 successful!
+[2023-12-10 14:54:52,433][root][INFO] - Iteration 6: Running Code 4
+[2023-12-10 14:54:52,615][root][INFO] - Iteration 6: Code Run 4 successful!
+[2023-12-10 14:54:52,615][root][INFO] - Iteration 6: Running Code 5
+[2023-12-10 14:54:52,850][root][INFO] - Iteration 6: Code Run 5 successful!
+[2023-12-10 14:54:52,850][root][INFO] - Iteration 6: Running Code 6
+[2023-12-10 14:54:53,029][root][INFO] - Iteration 6: Code Run 6 successful!
+[2023-12-10 14:54:53,029][root][INFO] - Iteration 6: Running Code 7
+[2023-12-10 14:54:53,256][root][INFO] - Iteration 6: Code Run 7 successful!
+[2023-12-10 14:54:53,257][root][INFO] - Iteration 6: Running Code 8
+[2023-12-10 14:54:53,465][root][INFO] - Iteration 6: Code Run 8 successful!
+[2023-12-10 14:54:53,466][root][INFO] - Iteration 6: Running Code 9
+[2023-12-10 14:54:53,666][root][INFO] - Iteration 6: Code Run 9 successful!
+[2023-12-10 14:54:53,667][root][INFO] - Iteration 6, response_id 0: Objective value: 15.215664510410031
+[2023-12-10 14:54:53,667][root][INFO] - Iteration 6, response_id 1: Objective value: 14.795817551057203
+[2023-12-10 14:54:53,667][root][INFO] - Iteration 6, response_id 2: Objective value: 6.926479847917209
+[2023-12-10 14:54:53,667][root][INFO] - Iteration 6, response_id 3: Objective value: inf
+[2023-12-10 14:54:53,667][root][INFO] - Iteration 6, response_id 4: Objective value: 6.926479847917209
+[2023-12-10 14:54:53,667][root][INFO] - Iteration 6, response_id 5: Objective value: inf
+[2023-12-10 14:54:53,667][root][INFO] - Iteration 6, response_id 6: Objective value: 37.21633137805326
+[2023-12-10 14:54:53,667][root][INFO] - Iteration 6, response_id 7: Objective value: 32.27872990368807
+[2023-12-10 14:54:53,667][root][INFO] - Iteration 6, response_id 8: Objective value: 32.27872990368807
+[2023-12-10 14:54:53,711][root][INFO] - Iteration 6, response_id 9: Objective value: 8.982827628848787
+[2023-12-10 14:54:53,711][root][INFO] - Iteration 6: Min obj: 6.926479847917209, Best Code Path: problem_iter0_code7.py
+[2023-12-10 14:54:53,711][root][INFO] - Iteration 6: Function Evals: 55
+[2023-12-10 14:54:53,711][root][INFO] - Eliminated 4 greedy or invalid algorithms.
+[2023-12-10 14:55:07,194][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:55:07,195][root][INFO] - Iteration 7, response_id 1: Extract None; invalid response!
+[2023-12-10 14:55:07,195][root][INFO] - Iteration 7, response_id 2: Extract None; invalid response!
+[2023-12-10 14:55:07,196][root][INFO] - Iteration 7: Running Code 0
+[2023-12-10 14:55:07,357][root][INFO] - Iteration 7: Code Run 0 successful!
+[2023-12-10 14:55:07,358][root][INFO] - Iteration 7: Running Code 1
+[2023-12-10 14:55:07,358][root][INFO] - Error for response_id 1: unsupported operand type(s) for +: 'NoneType' and 'str'
+[2023-12-10 14:55:07,358][root][INFO] - Iteration 7: Running Code 2
+[2023-12-10 14:55:07,358][root][INFO] - Error for response_id 2: unsupported operand type(s) for +: 'NoneType' and 'str'
+[2023-12-10 14:55:07,358][root][INFO] - Iteration 7: Running Code 3
+[2023-12-10 14:55:07,581][root][INFO] - Iteration 7: Code Run 3 successful!
+[2023-12-10 14:55:07,581][root][INFO] - Iteration 7, response_id 0: Objective value: 6.926479847917209
+[2023-12-10 14:55:07,620][root][INFO] - Iteration 7, response_id 3: Objective value: inf
+[2023-12-10 14:55:07,620][root][INFO] - Iteration 7: Min obj: 6.926479847917209, Best Code Path: problem_iter0_code7.py
+[2023-12-10 14:55:07,620][root][INFO] - Iteration 7: Function Evals: 59
+[2023-12-10 14:55:08,247][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+[2023-12-10 14:55:26,373][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:55:48,595][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:56:06,310][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:56:20,959][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:56:36,455][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:56:56,280][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:57:07,649][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:57:22,598][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:57:39,189][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:57:57,316][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:57:57,317][root][INFO] - Iteration 8: Running Code 0
+[2023-12-10 14:57:57,460][root][INFO] - Iteration 8: Code Run 0 successful!
+[2023-12-10 14:57:57,460][root][INFO] - Iteration 8: Running Code 1
+[2023-12-10 14:57:57,662][root][INFO] - Iteration 8: Code Run 1 successful!
+[2023-12-10 14:57:57,663][root][INFO] - Iteration 8: Running Code 2
+[2023-12-10 14:57:57,835][root][INFO] - Iteration 8: Code Run 2 execution error!
+[2023-12-10 14:57:57,838][root][INFO] - Iteration 8: Running Code 3
+[2023-12-10 14:57:58,119][root][INFO] - Iteration 8: Code Run 3 successful!
+[2023-12-10 14:57:58,120][root][INFO] - Iteration 8: Running Code 4
+[2023-12-10 14:57:58,357][root][INFO] - Iteration 8: Code Run 4 successful!
+[2023-12-10 14:57:58,357][root][INFO] - Iteration 8: Running Code 5
+[2023-12-10 14:57:58,838][root][INFO] - Iteration 8: Code Run 5 successful!
+[2023-12-10 14:57:58,839][root][INFO] - Iteration 8: Running Code 6
+[2023-12-10 14:57:59,000][root][INFO] - Iteration 8: Code Run 6 successful!
+[2023-12-10 14:57:59,001][root][INFO] - Iteration 8: Running Code 7
+[2023-12-10 14:57:59,206][root][INFO] - Iteration 8: Code Run 7 successful!
+[2023-12-10 14:57:59,207][root][INFO] - Iteration 8: Running Code 8
+[2023-12-10 14:57:59,380][root][INFO] - Iteration 8: Code Run 8 successful!
+[2023-12-10 14:57:59,380][root][INFO] - Iteration 8: Running Code 9
+[2023-12-10 14:57:59,652][root][INFO] - Iteration 8: Code Run 9 successful!
+[2023-12-10 14:57:59,653][root][INFO] - Iteration 8, response_id 0: Objective value: 23.397219140560217
+[2023-12-10 14:57:59,653][root][INFO] - Iteration 8, response_id 1: Objective value: 31.34703567449669
+[2023-12-10 14:57:59,653][root][INFO] - Iteration 8, response_id 2: Objective value: inf
+[2023-12-10 14:57:59,653][root][INFO] - Iteration 8, response_id 3: Objective value: 35.83388363690708
+[2023-12-10 14:57:59,653][root][INFO] - Iteration 8, response_id 4: Objective value: 37.21633137805326
+[2023-12-10 14:57:59,653][root][INFO] - Iteration 8, response_id 5: Objective value: 34.489474249745385
+[2023-12-10 14:57:59,653][root][INFO] - Iteration 8, response_id 6: Objective value: inf
+[2023-12-10 14:57:59,653][root][INFO] - Iteration 8, response_id 7: Objective value: inf
+[2023-12-10 14:57:59,653][root][INFO] - Iteration 8, response_id 8: Objective value: 17.891626460066647
+[2023-12-10 14:57:59,692][root][INFO] - Iteration 8, response_id 9: Objective value: 33.84429472036173
+[2023-12-10 14:57:59,692][root][INFO] - Iteration 8: Min obj: 6.926479847917209, Best Code Path: problem_iter0_code7.py
+[2023-12-10 14:57:59,692][root][INFO] - Iteration 8: Function Evals: 69
+[2023-12-10 14:57:59,692][root][INFO] - Eliminated 3 greedy or invalid algorithms.
+[2023-12-10 14:58:15,538][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:58:15,540][root][INFO] - Iteration 9, response_id 2: Extract None; invalid response!
+[2023-12-10 14:58:15,540][root][INFO] - Iteration 9: Running Code 0
+[2023-12-10 14:58:15,719][root][INFO] - Iteration 9: Code Run 0 execution error!
+[2023-12-10 14:58:15,725][root][INFO] - Iteration 9: Running Code 1
+[2023-12-10 14:58:15,927][root][INFO] - Iteration 9: Code Run 1 successful!
+[2023-12-10 14:58:15,928][root][INFO] - Iteration 9: Running Code 2
+[2023-12-10 14:58:15,928][root][INFO] - Error for response_id 2: unsupported operand type(s) for +: 'NoneType' and 'str'
+[2023-12-10 14:58:15,928][root][INFO] - Iteration 9, response_id 0: Objective value: inf
+[2023-12-10 14:58:15,981][root][INFO] - Iteration 9, response_id 1: Objective value: inf
+[2023-12-10 14:58:15,982][root][INFO] - Iteration 9: Min obj: 6.926479847917209, Best Code Path: problem_iter0_code7.py
+[2023-12-10 14:58:15,982][root][INFO] - Iteration 9: Function Evals: 72
+[2023-12-10 14:58:16,567][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+[2023-12-10 14:58:32,642][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:58:48,615][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:59:11,450][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:59:38,459][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 14:59:59,171][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:00:14,223][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:00:33,724][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:00:54,876][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:01:16,830][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:01:34,000][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:01:51,098][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:02:09,940][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:02:38,404][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:02:56,223][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:03:16,191][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:03:16,192][root][INFO] - Iteration 10: Running Code 0
+[2023-12-10 15:03:16,349][root][INFO] - Iteration 10: Code Run 0 successful!
+[2023-12-10 15:03:16,349][root][INFO] - Iteration 10: Running Code 1
+[2023-12-10 15:03:16,566][root][INFO] - Iteration 10: Code Run 1 successful!
+[2023-12-10 15:03:16,566][root][INFO] - Iteration 10: Running Code 2
+[2023-12-10 15:03:16,767][root][INFO] - Iteration 10: Code Run 2 successful!
+[2023-12-10 15:03:16,767][root][INFO] - Iteration 10: Running Code 3
+[2023-12-10 15:03:16,951][root][INFO] - Iteration 10: Code Run 3 successful!
+[2023-12-10 15:03:16,952][root][INFO] - Iteration 10: Running Code 4
+[2023-12-10 15:03:17,375][root][INFO] - Iteration 10: Code Run 4 successful!
+[2023-12-10 15:03:17,375][root][INFO] - Iteration 10: Running Code 5
+[2023-12-10 15:03:17,521][root][INFO] - Iteration 10: Code Run 5 successful!
+[2023-12-10 15:03:17,521][root][INFO] - Iteration 10: Running Code 6
+[2023-12-10 15:03:18,026][root][INFO] - Iteration 10: Code Run 6 successful!
+[2023-12-10 15:03:18,026][root][INFO] - Iteration 10: Running Code 7
+[2023-12-10 15:03:18,253][root][INFO] - Iteration 10: Code Run 7 execution error!
+[2023-12-10 15:03:18,253][root][INFO] - Iteration 10: Running Code 8
+[2023-12-10 15:03:18,537][root][INFO] - Iteration 10: Code Run 8 successful!
+[2023-12-10 15:03:18,537][root][INFO] - Iteration 10: Running Code 9
+[2023-12-10 15:03:18,753][root][INFO] - Iteration 10: Code Run 9 execution error!
+[2023-12-10 15:03:18,759][root][INFO] - Iteration 10, response_id 0: Objective value: 26.998422195486132
+[2023-12-10 15:03:18,759][root][INFO] - Iteration 10, response_id 1: Objective value: inf
+[2023-12-10 15:03:18,759][root][INFO] - Iteration 10, response_id 2: Objective value: inf
+[2023-12-10 15:03:18,759][root][INFO] - Iteration 10, response_id 3: Objective value: 30.829060321189296
+[2023-12-10 15:03:18,760][root][INFO] - Iteration 10, response_id 4: Objective value: 36.60554225592113
+[2023-12-10 15:03:18,760][root][INFO] - Iteration 10, response_id 5: Objective value: 16.722197519296902
+[2023-12-10 15:03:18,760][root][INFO] - Iteration 10, response_id 6: Objective value: 26.998422195486132
+[2023-12-10 15:03:18,760][root][INFO] - Iteration 10, response_id 7: Objective value: inf
+[2023-12-10 15:03:18,760][root][INFO] - Iteration 10, response_id 8: Objective value: 18.15560144380906
+[2023-12-10 15:03:18,779][root][INFO] - Iteration 10, response_id 9: Objective value: inf
+[2023-12-10 15:03:18,779][root][INFO] - Iteration 10: Min obj: 6.926479847917209, Best Code Path: problem_iter0_code7.py
+[2023-12-10 15:03:18,780][root][INFO] - Iteration 10: Function Evals: 82
+[2023-12-10 15:03:18,780][root][INFO] - Eliminated 4 greedy or invalid algorithms.
+[2023-12-10 15:03:40,373][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:03:40,374][root][INFO] - Iteration 11: Running Code 0
+[2023-12-10 15:03:40,533][root][INFO] - Iteration 11: Code Run 0 successful!
+[2023-12-10 15:03:40,533][root][INFO] - Iteration 11: Running Code 1
+[2023-12-10 15:03:40,732][root][INFO] - Iteration 11: Code Run 1 successful!
+[2023-12-10 15:03:40,732][root][INFO] - Iteration 11: Running Code 2
+[2023-12-10 15:03:40,921][root][INFO] - Iteration 11: Code Run 2 successful!
+[2023-12-10 15:03:40,921][root][INFO] - Iteration 11: Running Code 3
+[2023-12-10 15:03:41,094][root][INFO] - Iteration 11: Code Run 3 successful!
+[2023-12-10 15:03:41,095][root][INFO] - Iteration 11, response_id 0: Objective value: inf
+[2023-12-10 15:03:41,095][root][INFO] - Iteration 11, response_id 1: Objective value: 37.21633137805326
+[2023-12-10 15:03:41,095][root][INFO] - Iteration 11, response_id 2: Objective value: 6.926479847917209
+[2023-12-10 15:03:41,124][root][INFO] - Iteration 11, response_id 3: Objective value: 6.926479847917209
+[2023-12-10 15:03:41,124][root][INFO] - Iteration 11: Min obj: 6.926479847917209, Best Code Path: problem_iter0_code7.py
+[2023-12-10 15:03:41,124][root][INFO] - Iteration 11: Function Evals: 86
+[2023-12-10 15:03:41,691][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+[2023-12-10 15:04:04,933][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:04:12,495][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:04:12,495][root][INFO] - Iteration 12, response_id 1: Extract None; invalid response!
+[2023-12-10 15:04:25,308][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:04:43,024][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:05:04,332][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:05:38,833][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:05:52,369][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:06:06,078][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:06:22,558][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:06:44,472][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:07:23,181][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:07:39,359][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:08:06,073][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:08:06,074][root][INFO] - Iteration 12: Running Code 0
+[2023-12-10 15:08:06,237][root][INFO] - Iteration 12: Code Run 0 successful!
+[2023-12-10 15:08:06,237][root][INFO] - Iteration 12: Running Code 1
+[2023-12-10 15:08:06,237][root][INFO] - Error for response_id 1: unsupported operand type(s) for +: 'NoneType' and 'str'
+[2023-12-10 15:08:06,237][root][INFO] - Iteration 12: Running Code 2
+[2023-12-10 15:08:06,419][root][INFO] - Iteration 12: Code Run 2 successful!
+[2023-12-10 15:08:06,420][root][INFO] - Iteration 12: Running Code 3
+[2023-12-10 15:08:06,631][root][INFO] - Iteration 12: Code Run 3 successful!
+[2023-12-10 15:08:06,631][root][INFO] - Iteration 12: Running Code 4
+[2023-12-10 15:08:07,069][root][INFO] - Iteration 12: Code Run 4 successful!
+[2023-12-10 15:08:07,069][root][INFO] - Iteration 12: Running Code 5
+[2023-12-10 15:08:07,260][root][INFO] - Iteration 12: Code Run 5 successful!
+[2023-12-10 15:08:07,260][root][INFO] - Iteration 12: Running Code 6
+[2023-12-10 15:08:07,415][root][INFO] - Iteration 12: Code Run 6 successful!
+[2023-12-10 15:08:07,416][root][INFO] - Iteration 12: Running Code 7
+[2023-12-10 15:08:07,627][root][INFO] - Iteration 12: Code Run 7 successful!
+[2023-12-10 15:08:07,628][root][INFO] - Iteration 12: Running Code 8
+[2023-12-10 15:08:07,838][root][INFO] - Iteration 12: Code Run 8 successful!
+[2023-12-10 15:08:07,838][root][INFO] - Iteration 12: Running Code 9
+[2023-12-10 15:08:08,032][root][INFO] - Iteration 12: Code Run 9 successful!
+[2023-12-10 15:08:08,033][root][INFO] - Iteration 12, response_id 0: Objective value: inf
+[2023-12-10 15:08:08,033][root][INFO] - Iteration 12, response_id 2: Objective value: 37.53726681045228
+[2023-12-10 15:08:08,033][root][INFO] - Iteration 12, response_id 3: Objective value: 17.223059176905814
+[2023-12-10 15:08:08,033][root][INFO] - Iteration 12, response_id 4: Objective value: 26.998422195486132
+[2023-12-10 15:08:08,033][root][INFO] - Iteration 12, response_id 5: Objective value: 26.998422195486132
+[2023-12-10 15:08:08,033][root][INFO] - Iteration 12, response_id 6: Objective value: 37.21633137805326
+[2023-12-10 15:08:08,033][root][INFO] - Iteration 12, response_id 7: Objective value: inf
+[2023-12-10 15:08:08,033][root][INFO] - Iteration 12, response_id 8: Objective value: 21.019577796135465
+[2023-12-10 15:08:08,167][root][INFO] - Iteration 12, response_id 9: Objective value: 37.21633137805326
+[2023-12-10 15:08:08,167][root][INFO] - Iteration 12: Min obj: 6.926479847917209, Best Code Path: problem_iter0_code7.py
+[2023-12-10 15:08:08,167][root][INFO] - Iteration 12: Function Evals: 96
+[2023-12-10 15:08:08,167][root][INFO] - Eliminated 3 greedy or invalid algorithms.
+[2023-12-10 15:08:29,024][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:08:29,025][root][INFO] - Iteration 13, response_id 1: Extract None; invalid response!
+[2023-12-10 15:08:29,025][root][INFO] - Iteration 13: Running Code 0
+[2023-12-10 15:08:29,204][root][INFO] - Iteration 13: Code Run 0 successful!
+[2023-12-10 15:08:29,204][root][INFO] - Iteration 13: Running Code 1
+[2023-12-10 15:08:29,381][root][INFO] - Iteration 13: Code Run 1 successful!
+[2023-12-10 15:08:29,382][root][INFO] - Iteration 13: Running Code 2
+[2023-12-10 15:08:29,572][root][INFO] - Iteration 13: Code Run 2 execution error!
+[2023-12-10 15:08:29,572][root][INFO] - Iteration 13, response_id 0: Objective value: inf
+[2023-12-10 15:08:29,572][root][INFO] - Iteration 13, response_id 1: Objective value: 26.845976029334462
+[2023-12-10 15:08:29,592][root][INFO] - Iteration 13, response_id 2: Objective value: inf
+[2023-12-10 15:08:29,592][root][INFO] - Iteration 13: Min obj: 6.926479847917209, Best Code Path: problem_iter0_code7.py
+[2023-12-10 15:08:29,592][root][INFO] - Iteration 13: Function Evals: 99
+[2023-12-10 15:08:30,355][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+[2023-12-10 15:08:52,400][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:09:10,913][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:09:32,615][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:09:55,411][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:10:18,183][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:10:41,020][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:10:56,997][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:11:19,626][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:11:35,294][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:11:57,210][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:12:12,392][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:12:28,132][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:12:49,330][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:13:08,479][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:13:38,174][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:13:45,965][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:13:45,966][root][INFO] - Iteration 14, response_id 6: Extract None; invalid response!
+[2023-12-10 15:14:07,973][httpx][INFO] - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+[2023-12-10 15:14:07,974][root][INFO] - Iteration 14: Running Code 0
+[2023-12-10 15:14:08,141][root][INFO] - Iteration 14: Code Run 0 successful!
+[2023-12-10 15:14:08,141][root][INFO] - Iteration 14: Running Code 1
+[2023-12-10 15:14:08,343][root][INFO] - Iteration 14: Code Run 1 successful!
+[2023-12-10 15:14:08,343][root][INFO] - Iteration 14: Running Code 2
+[2023-12-10 15:14:08,530][root][INFO] - Iteration 14: Code Run 2 successful!
+[2023-12-10 15:14:08,530][root][INFO] - Iteration 14: Running Code 3
+[2023-12-10 15:14:08,756][root][INFO] - Iteration 14: Code Run 3 execution error!
+[2023-12-10 15:14:08,757][root][INFO] - Iteration 14: Running Code 4
+[2023-12-10 15:14:08,917][root][INFO] - Iteration 14: Code Run 4 successful!
+[2023-12-10 15:14:08,917][root][INFO] - Iteration 14: Running Code 5
+[2023-12-10 15:14:09,110][root][INFO] - Iteration 14: Code Run 5 successful!
+[2023-12-10 15:14:09,111][root][INFO] - Iteration 14: Running Code 6
+[2023-12-10 15:14:09,111][root][INFO] - Error for response_id 6: unsupported operand type(s) for +: 'NoneType' and 'str'
+[2023-12-10 15:14:09,111][root][INFO] - Iteration 14: Running Code 7
+[2023-12-10 15:14:09,316][root][INFO] - Iteration 14: Code Run 7 successful!
+[2023-12-10 15:14:09,316][root][INFO] - Iteration 14: Running Code 8
+[2023-12-10 15:14:09,484][root][INFO] - Iteration 14: Code Run 8 successful!
+[2023-12-10 15:14:09,484][root][INFO] - Iteration 14: Running Code 9
+[2023-12-10 15:14:09,675][root][INFO] - Iteration 14: Code Run 9 successful!
+[2023-12-10 15:14:09,675][root][INFO] - Iteration 14, response_id 0: Objective value: 18.773672704789103
+[2023-12-10 15:14:09,675][root][INFO] - Iteration 14, response_id 1: Objective value: 32.27872990368807
+[2023-12-10 15:14:09,675][root][INFO] - Iteration 14, response_id 2: Objective value: inf
+[2023-12-10 15:14:09,676][root][INFO] - Iteration 14, response_id 3: Objective value: inf
+[2023-12-10 15:14:09,676][root][INFO] - Iteration 14, response_id 4: Objective value: inf
+[2023-12-10 15:14:09,676][root][INFO] - Iteration 14, response_id 5: Objective value: inf
+[2023-12-10 15:14:09,676][root][INFO] - Iteration 14, response_id 7: Objective value: inf
+[2023-12-10 15:14:09,676][root][INFO] - Iteration 14, response_id 8: Objective value: 6.460382582017968
+[2023-12-10 15:14:09,751][root][INFO] - Iteration 14, response_id 9: Objective value: 31.950073598195814
+[2023-12-10 15:14:09,751][root][INFO] - Iteration 14: Elitist: 6.460382582017968
+[2023-12-10 15:14:09,751][root][INFO] - Iteration 14: Min obj: 6.460382582017968, Best Code Path: problem_iter14_code8.py
+[2023-12-10 15:14:09,751][root][INFO] - Iteration 14: Function Evals: 109
+[2023-12-10 15:14:09,751][root][INFO] - Best Code Overall: import numpy as np
+
+def select_next_node(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    """
+    For TSP, select the next node to visit from the unvisited nodes.
+    
+    Parameters
+    ----------
+    current_node : int
+        The current node.
+    destination_node : int
+        The destination node to return to.
+    unvisited_nodes : set
+        The set of unvisited nodes.
+    distance_matrix : np.ndarray
+        The distance matrix of shape (n_nodes, n_nodes).
+    
+    Returns
+    -------
+    nxt_node : int
+        The next node to visit.
+    """
+    
+    # Set the weights for distance and diversity
+    distance_weight = 0.8
+    diversity_weight = 0.2
+    
+    # Calculate distances from current node to unvisited nodes
+    distances_to_current = distance_matrix[current_node, list(unvisited_nodes)]
+    
+    # Calculate the diversity score for each unvisited node
+    unvisited_distances = distance_matrix[list(unvisited_nodes)][:, list(unvisited_nodes)]
+    diversity_scores = np.sum(unvisited_distances, axis=1)
+    
+    # Normalize the distances and diversity scores
+    normalized_distances = 1 - (distances_to_current - np.min(distances_to_current)) / (
+        np.max(distances_to_current) - np.min(distances_to_current)
+    )
+    normalized_diversity_scores = (diversity_scores - np.min(diversity_scores)) / (
+        np.max(diversity_scores) - np.min(diversity_scores)
+    )
+    
+    # Calculate the rank score for each unvisited node
+    rank_scores = distance_weight * normalized_distances + diversity_weight * normalized_diversity_scores
+    
+    # Select unvisited node with the highest rank score
+    nxt_node = list(unvisited_nodes)[np.argmax(rank_scores)]
+    
+    return nxt_node
+[2023-12-10 15:14:09,751][root][INFO] - Best Description Overall: Ranking Based Selection
+
+In this ranking based node selection algorithm, each unvisited node is assigned a rank based on its distance to the current node and its diversity score. The distance to the current node will be given higher importance by assigning a higher weight. The rank score of each unvisited node is calculated by taking a massaging of the distance to the current node and diversity score. Finally, the algorithm selects the unvisited node with the highest rank score as the next node to visit.
+[2023-12-10 15:14:09,751][root][INFO] - Best Code Path Overall: problem_iter14_code8.py
+[2023-12-10 15:14:09,752][root][INFO] - Running test script...: /Users/yhr/Desktop/llm-workspace/llm-as-meta-optimizer/problems/tsp_constructive/test.py
+[2023-12-10 15:15:09,976][root][INFO] - 
+[*] Average for 20: 4.312690484938301
+[*] Average for 50: 6.55158664401189
+[*] Average for 100: 8.937470240781678
+[*] Average for 200: 12.368891450414292
+[*] Average for 500: 19.249793175128506
+[*] Average for 1000: 27.122252069209374
+
