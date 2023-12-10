@@ -25,7 +25,11 @@ class GA_LLM:
             assert cfg.diversify == False, "Diversification is not supported for problem types other than constructive."
         
         if cfg.diversify:
-            self.greedy_obj = self.evaluate_greedy_alg()
+            while True:
+                self.greedy_obj = self.evaluate_greedy_alg()
+                if self.greedy_obj != float("inf"):
+                    break
+
             logging.info(f"Greedy Algorithm Objective Value: {self.greedy_obj}")
         
         self.ga_crossover_prompt = file_to_string(f'{root_dir}/utils/prompts_ga/crossover.txt')
@@ -284,6 +288,7 @@ class GA_LLM:
             # If diversification is enabled, only update elitist if the best individual is better than the greedy algorithm
             if not self.cfg.diversify or population[best_sample_idx]["obj"] < self.greedy_obj:
                 self.elitist = population[best_sample_idx]
+                logging.info(f"Iteration {self.iteration}: Elitist: {self.elitist['obj']}")
         
         logging.info(f"Iteration {self.iteration}: Min obj: {self.best_obj_overall}, Best Code Path: {self.best_code_path_overall}")
         logging.info(f"Iteration {self.iteration}: Function Evals: {self.function_evals}")
@@ -423,7 +428,9 @@ class GA_LLM:
     def evolve(self):
         while self.function_evals < self.cfg.max_fe:
             # Diversify
-            self.population = self.diversify(self.population) if self.cfg.diversify else self.population
+            if self.diversify:
+                self.population = self.diversify(self.population)
+                self.update_iter()
             # Select
             population_to_select = self.population if self.elitist is None else [self.elitist] + self.population # add elitist to population for selection
             selected_population = self.select(population_to_select)
@@ -467,10 +474,11 @@ class GA_LLM:
 
 
 
-    def diversify(self, population: list[dict]) -> list[dict]:
+    def diversify(self, population) -> list[dict]:
         """
         Diversify the population by eliminating the greedy algorithms (obj == self.greedy_obj) and adding new ones.
         """
+        population = self.population
         # Eliminate greedy algorithms or those with execution errors
         population = [individual for individual in population if individual["obj"] != self.greedy_obj and individual["exec_success"]]
         n = self.cfg.pop_size - len(population)
@@ -492,7 +500,5 @@ class GA_LLM:
         
         # Add new population to population
         population.extend(new_population)
-        
-        # Update best overall
-        self.update_iter()
+
         return population
