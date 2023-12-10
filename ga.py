@@ -9,7 +9,7 @@ import numpy as np
 from utils.utils import file_to_string, block_until_running, filter_traceback
 
 
-class GA_LLM:
+class G2A:
     def __init__(self, cfg, root_dir) -> None:
         self.client = OpenAI()
         self.cfg = cfg
