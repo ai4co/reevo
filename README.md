@@ -3,6 +3,9 @@
 
 ### Usage
 
+Please generate datasets before running. Refer to `problems/*/dataset/readme.md` for details.
+
+
 ```bash
 # for tsp_constructive
 python main.py problem=tsp_constructive problem_type=constructive model=gpt-3.5-turbo
@@ -13,9 +16,9 @@ python main.py problem=tsp_aco problem_type=aco model=gpt-3.5-turbo diversify=Fa
 
 # for cvrp_aco
 python main.py problem=cvrp_aco problem_type=aco model=gpt-3.5-turbo diversify=False
-
-
 ```
+
+
 ### Dependency
 
 - Python >= 3.9
