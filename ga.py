@@ -387,11 +387,13 @@ class G2A:
         fitness_sum = sum(fitness)
         fitness_prob = [f / fitness_sum for f in fitness]
         selected_population = []
-        for _ in range(self.cfg.pop_size):
+        while len(selected_population) < 2*self.cfg.pop_size:
             parents = np.random.choice(population, size=2, p=fitness_prob, replace=False) # 2x population size for crossover
+            # Skip if parents have the same objective value
+            if parents[0]["obj"] == parents[1]["obj"]:
+                continue
             selected_population.extend(parents)
         
-        assert len(selected_population) == 2*self.cfg.pop_size
         return selected_population
 
 
