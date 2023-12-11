@@ -1,6 +1,7 @@
 from aco import ACO
 import sys
 import numpy as np
+import logging
 from scipy.spatial import distance_matrix
 
 from gpt import scoring_function
@@ -21,7 +22,7 @@ if __name__ == "__main__":
         demands, node_positions = dataset[:, :, 0], dataset[:, :, 1:]
         
         n_instances = node_positions.shape[0]
-        print(f"[*] Dataset loaded: {dataset_path} with {n_instances} instances.")
+        logging.info(f"[*] Evaluating {dataset_path}")
         
         objs = []
         for i, (node_pos, demand) in enumerate(zip(node_positions, demands)):

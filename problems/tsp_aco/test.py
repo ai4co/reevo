@@ -1,6 +1,7 @@
 from aco import ACO
 import sys
 import numpy as np
+import logging
 from scipy.spatial import distance_matrix
 
 from gpt import scoring_function
@@ -16,7 +17,7 @@ if __name__ == "__main__":
     for problem_size in [20, 50, 100]:
         dataset_path = f"{root_dir}/problems/tsp_aco/dataset/test{problem_size}_dataset.npy"
         node_positions = np.load(dataset_path)
-        
+        logging.info(f"[*] Evaluating {dataset_path}")
         n_instances = node_positions.shape[0]
         objs = []
         for i, node_pos in enumerate(node_positions):
