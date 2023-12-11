@@ -26,17 +26,13 @@ def main(cfg):
     
     with open(f"{ROOT_DIR}/problems/{cfg.problem.problem_name}/{cfg.suffix.lower()}.py", 'w') as file:
         file.writelines(best_code_overall + '\n')
+
     # run test script and redirect stdout to a file "best_code_overall_stdout.txt"
     test_script = f"{ROOT_DIR}/problems/{cfg.problem.problem_name}/test.py"
     test_script_stdout = "best_code_overall_stdout.txt"
     logging.info(f"Running test script...: {test_script}")
     with open(test_script_stdout, 'w') as stdout:
         subprocess.run(["python", test_script, ROOT_DIR], stdout=stdout)
-    # read the stdout file
-    with open(test_script_stdout, 'r') as file:
-        stdout = file.read()
-    logging.info("\n" + stdout)
-        
     
 
 if __name__ == "__main__":
