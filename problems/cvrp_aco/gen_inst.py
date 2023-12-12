@@ -15,8 +15,8 @@ def gen_instance(n):
 
 if __name__ == "__main__":
     np.random.seed(1234)
-    for problem_size in [50]:
-        n_instances = 5
+    for problem_size in [20]:
+        n_instances = 10
         dataset = []
         for i in range(n_instances):
             inst = gen_instance(problem_size)

@@ -3,5 +3,6 @@ You begin by giving a concise and clear description of your code, followed by th
 Some helpful tips:
 - Strictly adhere to the function signature.
 - Import necessary packages. Except for importing packages, you should write everything inside the function.
-- You may sparsify the heuristic matrix by assigning a value of zero to unpromising solution components.
+- You may sparsify the heuristic matrix by setting heuristic measures of unpromising solution components to zero.
+- You should write novel algorithms better than the classic and manually designed ones.
 - Your scoring function outputs heuristic measures before solution construction. Therefore, NO information about partial solutions can be utilized.
