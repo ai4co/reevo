@@ -30,13 +30,12 @@ class G2A:
                 self.greedy_obj = self.evaluate_greedy_alg()
                 if self.greedy_obj != float("inf"):
                     break
+            logging.info(f"Greedy Algorithm Objective Value: {self.greedy_obj}")
 
         self.init_population()
 
         if cfg.problem_type != "constructive":
             assert cfg.diversify == False, "Diversification is not supported for problem types other than constructive."
-
-            logging.info(f"Greedy Algorithm Objective Value: {self.greedy_obj}")
         
         self.ga_crossover_prompt = file_to_string(f'{root_dir}/utils/prompts_ga/crossover.txt')
         self.ga_mutate_prompt = file_to_string(f'{root_dir}/utils/prompts_ga/mutate.txt')
