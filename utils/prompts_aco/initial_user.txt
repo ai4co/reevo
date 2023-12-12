@@ -1,5 +1,5 @@
-Write a scoring function for {problem_description}. 
-Your function outputs heuristic measures indicating how promising is each edge before actually solving a problem instance.
-More specifically, your scoring function maps inputs into a heuristic matrix. We will randomly sample solutions based on your output heuristic matrix, where the matrix elements represent unnormalized probabilities.
+Write a scoring function for {problem_description}.
+The function should output heuristic measures, which are non-negative real values. A higher value indicates that including the solution component during solution construction is more promising.
+The scoring function should map inputs to a heuristic matrix. This matrix will be used to randomly sample solutions, where the elements of the matrix represent unnormalized probabilities.
 The function signature is as follows:
 {func_signature}

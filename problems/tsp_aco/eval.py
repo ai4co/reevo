@@ -25,7 +25,7 @@ if __name__ == "__main__":
     for i, node_pos in enumerate(node_positions):
         dist_mat = distance_matrix(node_pos, node_pos)
         dist_mat[np.diag_indices_from(dist_mat)] = np.inf # Note: Set diagonal to inf
-        heuristics = scoring_function(dist_mat)
+        heuristics = scoring_function(dist_mat) + 1e-9
         aco = ACO(dist_mat, heuristics, n_ants=N_ANTS)
         obj = aco.run(N_ITERATIONS)
         print(f"[*] Instance {i}: {obj}")

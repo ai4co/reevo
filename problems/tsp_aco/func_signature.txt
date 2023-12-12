@@ -10,7 +10,7 @@ def scoring_function(distance_matrix: np.ndarray) -> np.ndarray:
     Returns
     -------
     heuristics: np.ndarray
-        The heuristic measures of shape (n_nodes, n_nodes) for all edges. 
+        The heuristic measures of shape (n_nodes, n_nodes) for all edges.
     """
     ...
     return heuristics

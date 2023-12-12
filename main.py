@@ -33,7 +33,7 @@ def main(cfg):
     logging.info(f"Running test script...: {test_script}")
     with open(test_script_stdout, 'w') as stdout:
         subprocess.run(["python", test_script, ROOT_DIR], stdout=stdout)
-    
+    logging.info(f"Test script finished. See {workspace_dir}/{test_script_stdout} for stdout.")
 
 if __name__ == "__main__":
     main()
