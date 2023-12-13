@@ -8,14 +8,14 @@ Please generate datasets before running. Refer to `problems/*/dataset/readme.md`
 
 ```bash
 # for tsp_constructive
-python main.py problem=tsp_constructive problem_type=constructive model=gpt-3.5-turbo diversify=True
+python main.py problem=tsp_constructive problem_type=constructive diversify=True
 python main.py problem=tsp_constructive problem_type=constructive model=gpt-4-1106-preview diversify=False # using GPT-4-turbo
 
 # for tsp_aco
-python main.py problem=tsp_aco problem_type=aco model=gpt-3.5-turbo
+python main.py problem=tsp_aco problem_type=aco
 
 # for cvrp_aco
-python main.py problem=cvrp_aco problem_type=aco model=gpt-3.5-turbo
+python main.py problem=cvrp_aco problem_type=aco
 ```
 
 
