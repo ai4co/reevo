@@ -2,6 +2,9 @@ import subprocess
 import os
 import json
 import logging
+from openai import OpenAI
+import multiprocessing
+import time
 
 
 def file_to_string(filename):
@@ -30,3 +33,94 @@ def block_until_running(stdout_filepath, log_status=False, iter_num=-1, response
             else:
                 logging.info(f"Iteration {iter_num}: Code Run {response_id} successful!")
             break
+
+def get_chat_completion(client, message, model="gpt-3.5-turbo-1106", temperature=0.):
+    """
+    Deprecated. Use chat_completion instead.
+    """
+    raise NotImplementedError
+    client = OpenAI()
+    completion = client.chat.completions.create(
+        model=model,
+        messages=message,
+        temperature=temperature,
+    )
+    return completion.choices[0].message.content
+
+
+def multi_chat_completion(messages_list: list[list[dict]], n=1, model: str="gpt-3.5-turbo-1106", temperature: float=0.):
+    """
+    An example of messages_list:
+    
+    messages_list = [
+        [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Hello!"},
+        ],
+        [
+            {"role": "system", "content": "You are a knowledgeable guide."},
+            {"role": "user", "content": "How are you?"},
+        ],
+        [
+            {"role": "system", "content": "You are a witty comedian."},
+            {"role": "user", "content": "Tell me a joke."},
+        ]
+    ]
+    param: n: number of responses to generate for each message in messages_list
+    """
+    with multiprocessing.Pool() as executor:
+        # Create a list of arguments to pass to get_chat_completion
+        args = [(n, messages, model, temperature) for messages in messages_list]
+        # Use executor.starmap to pass the list of arguments
+        contents = executor.starmap(chat_completion, args)
+    return list(contents)
+
+
+def chat_completion(n: int, messages: list[dict], model: str, temperature: float) -> list[dict]:
+    """
+    Generate n responses using OpenAI Chat Completions API
+    """
+    client = OpenAI()
+    total_samples = 0
+    responses = []
+    chunk_size = n if "gpt-3.5" in model else min(4, n)
+    while True:
+        if total_samples >= n:
+            break
+        for attempt in range(1000):
+            try:
+                response_cur = client.chat.completions.create(model=model, messages=messages, temperature=temperature, n=chunk_size)
+                total_samples += chunk_size
+                break
+            except Exception as e:
+                if attempt >= 10:
+                    chunk_size = max(int(chunk_size / 2), 1)
+                    print("Current Chunk Size", chunk_size)
+                logging.info(f"Attempt {attempt+1} failed with error: {e}")
+                time.sleep(1)
+        if response_cur is None:
+            logging.info("Code terminated due to too many failed attempts!")
+            exit()
+            
+        responses.extend(response_cur.choices)
+    return responses
+
+
+if __name__ == "__main__":
+    # Test multi_chat_completion
+    messages_list = [
+        [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Hello!"},
+        ],
+        [
+            {"role": "system", "content": "You are a knowledgeable guide."},
+            {"role": "user", "content": "How are you?"},
+        ],
+        [
+            {"role": "system", "content": "You are a witty comedian."},
+            {"role": "user", "content": "Tell me a joke."},
+        ]
+    ]
+    responses = multi_chat_completion(messages_list, n=1, model="gpt-3.5-turbo-1106", temperature=0.)
+    print(responses)

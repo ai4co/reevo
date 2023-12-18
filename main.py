@@ -8,7 +8,7 @@ import subprocess
 from ga import G2A
 
 ROOT_DIR = os.getcwd()
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 @hydra.main(version_base=None, config_path="cfg", config_name="config")
 def main(cfg):

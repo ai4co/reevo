@@ -6,7 +6,7 @@ import re
 import subprocess
 import numpy as np
 
-from utils.utils import file_to_string, block_until_running, filter_traceback
+from utils.utils import *
 
 
 class G2A:
@@ -73,7 +73,7 @@ class G2A:
         # Generate responses
         messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": self.initial_user + self.code_output_tip}]
         logging.info("Initial prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + self.initial_user + self.code_output_tip)
-        responses = self.chat_completion(self.cfg.pop_size, self.cfg, messages)
+        responses = chat_completion(self.cfg.pop_size, messages, self.cfg.model, self.cfg.temperature)
         
         # Responses to population
         population = self.responses_to_population(responses)
@@ -103,7 +103,7 @@ class G2A:
         logging.info("Greedy Algorithm Prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + self.initial_user + greedy_alg_tip)
         
         # Generate responses
-        responses = self.chat_completion(1, self.cfg, messages)
+        responses = chat_completion(1, messages, self.cfg.model, self.cfg.temperature)
         
         # Response to individual
         individual = self.response_to_individual(responses[0], 0, file_name="greedy_alg")
@@ -258,42 +258,6 @@ class G2A:
         block_until_running(individual["stdout_filepath"], log_status=True, iter_num=self.iteration, response_id=response_id)
         return process
 
-
-    def chat_completion(self, n: int, cfg, messages: list[dict]) -> list[dict]:
-        """
-        Generate n responses using OpenAI Chat Completions API
-        """
-        responses = []
-        total_samples = 0
-        total_token = 0
-        total_completion_token = 0
-        chunk_size = n if "gpt-3.5" in cfg.model else min(4, n)
-        while True:
-            if total_samples >= n:
-                break
-            for attempt in range(1000):
-                try:
-                    response_cur = self.client.chat.completions.create(model=cfg.model, messages=messages, temperature=cfg.temperature, n=chunk_size)
-                    total_samples += chunk_size
-                    break
-                except Exception as e:
-                    if attempt >= 10:
-                        chunk_size = max(int(chunk_size / 2), 1)
-                        print("Current Chunk Size", chunk_size)
-                    logging.info(f"Attempt {attempt+1} failed with error: {e}")
-                    time.sleep(1)
-            if response_cur is None:
-                logging.info("Code terminated due to too many failed attempts!")
-                exit()
-                
-            responses.extend(response_cur.choices)
-            prompt_tokens = response_cur.usage.prompt_tokens
-            total_completion_token += response_cur.usage.completion_tokens
-            total_token += response_cur.usage.total_tokens
-        
-        logging.debug(f"Iteration {self.iteration}: Prompt Tokens: {prompt_tokens}, Completion Tokens: {total_completion_token}, Total Tokens: {total_token}")
-        return responses
-
     
     def update_iter(self) -> None:
         """
@@ -399,7 +363,8 @@ class G2A:
     def crossover(self, population: list[dict]) -> list[dict]:
         crossed_population = []
         assert len(population) == self.cfg.pop_size * 2
-        response_id = 0
+        
+        messages_lst = []
         for i in range(0, len(population), 2):
             # Select two individuals
             parent_1 = population[i]
@@ -414,15 +379,18 @@ class G2A:
                 description2=parent_2["description"],
                 )
             messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": crossover_prompt_user + self.code_output_tip}]
+            messages_lst.append(messages)
             
             # Print crossover prompt for the first iteration
             if self.print_cross_prompt:
                 logging.info("Crossover Prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + crossover_prompt_user + self.code_output_tip)
                 self.print_cross_prompt = False
-            
-            # Generate response and convert response to individual
-            responses = self.chat_completion(1, self.cfg, messages)
-            individual = self.response_to_individual(responses[0], response_id)
+        
+        # Multi-processed chat completion
+        responses_lst = multi_chat_completion(messages_lst, 1, self.cfg.model, self.cfg.temperature)
+        response_id = 0
+        for i in range(len(responses_lst)):
+            individual = self.response_to_individual(responses_lst[i][0], response_id)
             crossed_population.append(individual)
             response_id += 1
 
@@ -431,6 +399,8 @@ class G2A:
 
 
     def mutate(self, population: list[dict]) -> list[dict]:
+        messages_lst = []
+        response_id_lst = []
         for i in range(len(population)):
             individual = population[i]
             
@@ -442,16 +412,20 @@ class G2A:
                     description=individual["description"]
                     )
                 messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": mutate_prompt + self.code_output_tip}]
-                
+                messages_lst.append(messages)
+                response_id_lst.append(i)
                 # Print mutate prompt for the first iteration
                 if self.print_mutate_prompt:
                     logging.info("Mutate Prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + mutate_prompt + self.code_output_tip)
                     self.print_mutate_prompt = False
-                
-                # Generate response and convert response to individual
-                responses = self.chat_completion(1, self.cfg, messages)
-                mutated_individual = self.response_to_individual(responses[0], individual["response_id"])
-                population[i] = mutated_individual
+            
+        # Multi-processed chat completion
+        responses_lst = multi_chat_completion(messages_lst, 1, self.cfg.model, self.cfg.temperature)
+        for i in range(len(responses_lst)):
+            response_id = response_id_lst[i]
+            mutated_individual = self.response_to_individual(responses_lst[i][0], response_id)
+            population[response_id] = mutated_individual
+
         assert len(population) == self.cfg.pop_size
         return population
 
@@ -519,7 +493,7 @@ class G2A:
         
         # Generate new responses
         messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": self.initial_user + self.code_output_tip}]
-        responses = self.chat_completion(n_eliminated, self.cfg, messages)
+        responses = chat_completion(n_eliminated, messages, self.cfg.model, self.cfg.temperature)
         
         # Responses to population
         new_population = self.responses_to_population(responses)
