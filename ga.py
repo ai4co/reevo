@@ -1,8 +1,6 @@
 from openai import OpenAI
 from sklearn.metrics.pairwise import cosine_similarity
 import logging
-import time
-import re
 import subprocess
 import numpy as np
 
@@ -126,7 +124,7 @@ class G2A:
             file.writelines(content + '\n')
 
         # Extract code and description from response
-        code_string, desc_string = self.extract_code_description(content)
+        code_string, desc_string = extract_code_description(content)
         std_out_filepath = f"problem_iter{self.iteration}_stdout{response_id}.txt" if file_name is None else file_name + "_stdout.txt"
 
         if code_string is None:
@@ -229,18 +227,6 @@ class G2A:
         return population
 
 
-    def extract_code_description(self, response: str) -> tuple[str, str]:
-        # Regex patterns to extract python code enclosed in GPT response
-        pattern_code = r'```python(.*?)```'
-        code_string = re.search(pattern_code, response, re.DOTALL)
-        code_string = code_string.group(1).strip() if code_string is not None else None
-        # Regex patterns to extract code description enclosed in GPT response
-        pattern_desc = r'(.*?)```python'
-        desc_string = re.search(pattern_desc, response, re.DOTALL)
-        desc_string = desc_string.group(1).strip() if desc_string is not None else None
-        return code_string, desc_string
-
-
     def run_code(self, individual: dict, response_id) -> subprocess.Popen:
         """
         Write code into a file and run eval script.
@@ -320,7 +306,7 @@ class G2A:
     
     def random_select(self, population: list[dict]) -> list[dict]:
         """
-        Random selection, select individuals with equal probability. Deprecated.
+        Random selection, select individuals with equal probability. Used for comparison.
         """
         selected_population = []
         for _ in range(self.cfg.pop_size):

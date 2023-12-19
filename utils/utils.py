@@ -5,6 +5,7 @@ import logging
 from openai import OpenAI
 import multiprocessing
 import time
+import re
 
 
 def file_to_string(filename):
@@ -33,6 +34,19 @@ def block_until_running(stdout_filepath, log_status=False, iter_num=-1, response
             else:
                 logging.info(f"Iteration {iter_num}: Code Run {response_id} successful!")
             break
+
+
+def extract_code_description(response: str) -> tuple[str, str]:
+    # Regex patterns to extract python code enclosed in GPT response
+    pattern_code = r'```python(.*?)```'
+    code_string = re.search(pattern_code, response, re.DOTALL)
+    code_string = code_string.group(1).strip() if code_string is not None else None
+    # Regex patterns to extract code description enclosed in GPT response
+    pattern_desc = r'(.*?)```python'
+    desc_string = re.search(pattern_desc, response, re.DOTALL)
+    desc_string = desc_string.group(1).strip() if desc_string is not None else None
+    return code_string, desc_string
+
 
 def get_chat_completion(client, message, model="gpt-3.5-turbo-1106", temperature=0.):
     """
@@ -89,13 +103,12 @@ def chat_completion(n: int, messages: list[dict], model: str, temperature: float
             break
         for attempt in range(1000):
             try:
-                response_cur = client.chat.completions.create(model=model, messages=messages, temperature=temperature, n=chunk_size)
+                response_cur = client.chat.completions.create(model=model, messages=messages, temperature=temperature, n=min(chunk_size, n-total_samples))
                 total_samples += chunk_size
                 break
             except Exception as e:
-                if attempt >= 10:
-                    chunk_size = max(int(chunk_size / 2), 1)
-                    print("Current Chunk Size", chunk_size)
+                chunk_size = max(int(chunk_size / 2), 1)
+                logging.info(f"Current Chunk Size: {chunk_size}")
                 logging.info(f"Attempt {attempt+1} failed with error: {e}")
                 time.sleep(1)
         if response_cur is None:
