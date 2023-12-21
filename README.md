@@ -8,14 +8,17 @@ Please generate datasets before running. Refer to `problems/*/dataset/readme.md`
 
 ```bash
 # for tsp_constructive
-python main.py problem=tsp_constructive problem_type=constructive diversify=True
-python main.py problem=tsp_constructive problem_type=constructive model=gpt-4-1106-preview diversify=False # using GPT-4-turbo
+python main.py problem=tsp_constructive
+python main.py problem=tsp_constructive model=gpt-4-1106-preview # using GPT-4 Turbo
 
 # for tsp_aco
-python main.py problem=tsp_aco problem_type=aco
+python main.py problem=tsp_aco
 
 # for cvrp_aco
-python main.py problem=cvrp_aco problem_type=aco
+python main.py problem=cvrp_aco
+
+# for online BPP
+python main.py problem=bpp_online
 ```
 
 
@@ -26,5 +29,6 @@ python main.py problem=cvrp_aco problem_type=aco
 - hydra-core
 
 ### Acknowledgments
-
-[Eureka: Human-Level Reward Design via Coding Large Language Models](https://github.com/eureka-research/Eureka)
+- [DeepACO: Neural-enhanced Ant Systems for Combinatorial Optimization](https://github.com/henry-yeh/DeepACO)
+- [Mathematical discoveries from program search with large language models](https://github.com/google-deepmind/funsearch)
+- [Eureka: Human-Level Reward Design via Coding Large Language Models](https://github.com/eureka-research/Eureka)

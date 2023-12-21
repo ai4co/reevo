@@ -18,33 +18,17 @@ class G2A:
         self.elitist = None
         self.best_obj_overall = float("inf")
         
-        self.invalid_responses = 0 # Number of invalid responses
-        self.total_responses = 0 # Number of total responses
-        
         self.init_prompt()
-        
-        if cfg.diversify:
-            while True:
-                self.greedy_obj = self.evaluate_greedy_alg()
-                if self.greedy_obj != float("inf"):
-                    break
-            logging.info(f"Greedy Algorithm Objective Value: {self.greedy_obj}")
 
         self.init_population()
-
-        if cfg.problem_type != "constructive":
-            assert cfg.diversify == False, "Diversification is not supported for problem types other than constructive."
         
         self.ga_crossover_prompt = file_to_string(f'{root_dir}/utils/prompts_ga/crossover.txt')
         self.ga_mutate_prompt = file_to_string(f'{root_dir}/utils/prompts_ga/mutate.txt')
         
         self.print_cross_prompt = True # Print crossover prompt for the first iteration
         self.print_mutate_prompt = True # Print mutate prompt for the first iteration
-        
-        if cfg.diversify:
-            greedy_count = len([individual for individual in self.population if individual["obj"] == self.greedy_obj])
-            logging.info(f"Greedy Algorithm Count: {greedy_count} out of {len(self.population)}")
-        
+
+
     def init_prompt(self) -> None:
         self.problem = self.cfg.problem.problem_name
         self.problem_description = self.cfg.problem.description
@@ -53,24 +37,29 @@ class G2A:
         logging.info("Problem: " + self.problem)
         logging.info("Problem description: " + self.problem_description)
         
-        prompt_dir = f'{self.root_dir}/utils/prompts_{self.cfg.problem_type}'
+        prompt_dir = f'{self.root_dir}/utils/prompts_{self.cfg.problem.problem_type}'
         problem_dir = f"{self.root_dir}/problems/{self.problem}"
         self.output_file = f"{self.root_dir}/problems/{self.problem}/{self.cfg.suffix.lower()}.py"
         
         # Loading all text prompts
-        func_signature = file_to_string(f'{problem_dir}/func_signature.txt')
-        self.code_output_tip = file_to_string(f'{prompt_dir}/code_output_tip.txt')
-        self.system_prompt = file_to_string(f'{self.root_dir}/utils/prompts_general/system.txt')
-        self.initial_user = file_to_string(f'{prompt_dir}/initial_user.txt').format(
-            problem_description=self.problem_description,
-            func_signature=func_signature
-            )
+        self.seed_function = file_to_string(f'{problem_dir}/seed.txt')
+        self.generator_system_prompt = file_to_string(f'{self.root_dir}/utils/prompts_general/system_generator.txt')
+        self.initial_user = file_to_string(f'{prompt_dir}/initial_user.txt').format(problem_description=self.problem_description)
 
         
     def init_population(self) -> None:
         # Generate responses
-        messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": self.initial_user + self.code_output_tip}]
-        logging.info("Initial prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + self.initial_user + self.code_output_tip)
+        messages = [
+            {"role": "system", "content": self.generator_system_prompt},
+            {"role": "user", "content": self.initial_user},
+            {"role": "assistant", "content": self.seed_function},
+            {"role": "user", "content": "Improve over the above code. \n[code]:\n"}
+        ]
+        logging.info(
+            "Initial Population Prompt: \nSystem Prompt: \n" + self.generator_system_prompt +
+            "\nUser Prompt: \n" + self.initial_user +
+            "\nAssistant Prompt: \n" + self.seed_function
+        )
         responses = chat_completion(self.cfg.pop_size, messages, self.cfg.model, self.cfg.temperature)
         
         # Responses to population
@@ -83,7 +72,6 @@ class G2A:
         # Bookkeeping
         self.best_obj_overall, best_sample_idx = min(objs), np.argmin(np.array(objs))
         self.best_code_overall = population[best_sample_idx]["code"]
-        self.best_desc_overall = population[best_sample_idx]["description"]
         self.best_code_path_overall = population[best_sample_idx]["code_path"]
 
         # Update iteration
@@ -115,31 +103,19 @@ class G2A:
         """
         Convert response to individual
         """
-        self.total_responses += 1
-        content = response.message.content
-        
+        code = process_code(response.message.content)
         # Write response to file
         file_name = f"problem_iter{self.iteration}_response{response_id}.txt" if file_name is None else file_name + ".txt"
         with open(file_name, 'w') as file:
-            file.writelines(content + '\n')
+            file.writelines(code + '\n')
 
         # Extract code and description from response
-        code_string, desc_string = extract_code_description(content)
         std_out_filepath = f"problem_iter{self.iteration}_stdout{response_id}.txt" if file_name is None else file_name + "_stdout.txt"
-
-        if code_string is None:
-            logging.info(f"Iteration {self.iteration}, response_id {response_id}: Extract None; invalid response!")
-            self.invalid_responses += 1
-        elif desc_string is None:
-            desc_string = "This is an algorithm that solves the problem." # Default description
-            logging.info(f"Iteration {self.iteration}, response_id {response_id}: Extract no description; use default description.")
         
         individual = {
             "stdout_filepath": std_out_filepath,
             "code_path": f"problem_iter{self.iteration}_code{response_id}.py",
-            "description": desc_string,
-            "code": code_string,
-            "response": content,
+            "code": code,
             "response_id": response_id,
         }
 
@@ -213,11 +189,11 @@ class G2A:
             individual = population[response_id]
             # Store objective value and fitness for each individual
             if traceback_msg == '': # If execution has no error
-                individual["exec_success"] = True
                 try:
                     individual["obj"] = float(stdout_str.split('\n')[-2])
                     assert individual["obj"] > 0, "Objective value <= 0 is not supported."
                     individual["fitness"] = 1 / individual["obj"]
+                    individual["exec_success"] = True
                 except:
                     population[response_id] = self.mark_invalid_individual(population[response_id], "Invalid std out / objective value!")
             else: # Otherwise, also provide execution traceback error feedback
@@ -262,46 +238,13 @@ class G2A:
         
         # update elitist
         if self.elitist is None or best_obj < self.elitist["obj"]:
-            # If diversification is enabled, only update elitist if the best individual is better than the greedy algorithm
-            if not self.cfg.diversify or population[best_sample_idx]["obj"] < self.greedy_obj:
-                self.elitist = population[best_sample_idx]
-                logging.info(f"Iteration {self.iteration}: Elitist: {self.elitist['obj']}")
+            self.elitist = population[best_sample_idx]
+            logging.info(f"Iteration {self.iteration}: Elitist: {self.elitist['obj']}")
         
         logging.info(f"Iteration {self.iteration} finished...")
         logging.info(f"Min obj: {self.best_obj_overall}, Best Code Path: {self.best_code_path_overall}")
         logging.info(f"Function Evals: {self.function_evals}")
-        logging.info(f"Invalid Responses: {self.invalid_responses}, Total Responses: {self.total_responses}")
         self.iteration += 1
-
-
-    @staticmethod
-    def fitness_sharing(similarity_matrix: np.ndarray, fitness: list[float], sigma_share: float=0.9) -> list[float]:
-        """
-        Fitness sharing based on cosine similarity matrix to encourage diversity in the population.
-        
-        :param similarity_matrix: An n x n matrix representing the cosine similarity between each pair of individuals.
-        :param fitness: A list of original fitness values for each individual.
-        :param sigma_share: The sharing threshold, defining the niche size.
-        :param alpha: A constant that determines the shape of the sharing function.
-        :return: A list of adjusted fitness values.
-        """
-
-        n = len(fitness)
-        adjusted_fitness = np.zeros(n)
-
-        # Define the sharing function adjusted for cosine similarity
-        def sharing_function(similarity: float) -> float:
-            if similarity > sigma_share: 
-                return (similarity - sigma_share) / (1 - sigma_share)
-            else:
-                return 0
-        
-        # Calculate the niche count for each individual
-        for i in range(n):
-            m_i = sum(sharing_function(similarity_matrix[i][j]) for j in range(n))
-            adjusted_fitness[i] = fitness[i] / m_i if m_i != 0 else fitness[i]
-
-        return adjusted_fitness.tolist()
     
     
     def random_select(self, population: list[dict]) -> list[dict]:
@@ -309,40 +252,12 @@ class G2A:
         Random selection, select individuals with equal probability. Used for comparison.
         """
         selected_population = []
+        # Eliminate invalid individuals
+        population = [individual for individual in population if individual["exec_success"]]
         for _ in range(self.cfg.pop_size):
             parents = np.random.choice(population, size=2, replace=False)
             selected_population.extend(parents)
         assert len(selected_population) == 2*self.cfg.pop_size
-        return selected_population
-
-
-    def select(self, population: list[dict]) -> list[dict]:
-        """
-        Roulette selection, select individuals with probability proportional to their adjusted fitness
-        """
-        # Eliminate those without description (description is None or "")
-        population = [individual for individual in population if individual["description"] is not None and individual["description"] != ""]
-        
-        similarity_matrix = self.compute_similarity([individual["description"] for individual in population], self.client)
-        similarity_matrix = self.adjust_similarity_matrix(similarity_matrix, population)
-        # logging.info("Similarity Matrix: \n" + str(similarity_matrix))
-        
-        fitness = [individual["fitness"] for individual in population]
-        # logging.info("Fitness before sharing: \n" + str(fitness))
-        
-        fitness = self.fitness_sharing(similarity_matrix, fitness)
-        logging.info("Fitness after sharing: \n" + str(fitness))
-        
-        fitness_sum = sum(fitness)
-        fitness_prob = [f / fitness_sum for f in fitness]
-        selected_population = []
-        while len(selected_population) < 2*self.cfg.pop_size:
-            parents = np.random.choice(population, size=2, p=fitness_prob, replace=False) # 2x population size for crossover
-            # Skip if parents have the same objective value
-            if parents[0]["obj"] == parents[1]["obj"]:
-                continue
-            selected_population.extend(parents)
-        
         return selected_population
 
 
@@ -364,12 +279,12 @@ class G2A:
                 description1=parent_1["description"],
                 description2=parent_2["description"],
                 )
-            messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": crossover_prompt_user + self.code_output_tip}]
+            messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": crossover_prompt_user }]
             messages_lst.append(messages)
             
             # Print crossover prompt for the first iteration
             if self.print_cross_prompt:
-                logging.info("Crossover Prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + crossover_prompt_user + self.code_output_tip)
+                logging.info("Crossover Prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + crossover_prompt_user )
                 self.print_cross_prompt = False
         
         # Multi-processed chat completion
@@ -397,12 +312,12 @@ class G2A:
                     code=individual["code"],
                     description=individual["description"]
                     )
-                messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": mutate_prompt + self.code_output_tip}]
+                messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": mutate_prompt}]
                 messages_lst.append(messages)
                 response_id_lst.append(i)
                 # Print mutate prompt for the first iteration
                 if self.print_mutate_prompt:
-                    logging.info("Mutate Prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + mutate_prompt + self.code_output_tip)
+                    logging.info("Mutate Prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + mutate_prompt)
                     self.print_mutate_prompt = False
             
         # Multi-processed chat completion
@@ -422,7 +337,7 @@ class G2A:
             if self.cfg.diversify: self.diversify()
             # Select
             population_to_select = self.population if self.elitist is None else [self.elitist] + self.population # add elitist to population for selection
-            selected_population = self.select(population_to_select)
+            selected_population = self.random_select(population_to_select)
             # Crossover
             crossed_population = self.crossover(selected_population)
             # Mutate
@@ -460,33 +375,3 @@ class G2A:
                     similarity_matrix[i][j] = 1
                     similarity_matrix[j][i] = 1
         return similarity_matrix
-
-
-
-    def diversify(self):
-        """
-        Diversify the population by eliminating the greedy algorithms (obj == self.greedy_obj) and adding new ones.
-        """
-        # Eliminate greedy algorithms or those with execution errors
-        preserved_population = [individual for individual in self.population if individual["obj"] != self.greedy_obj and individual["exec_success"]]
-        n_eliminated = self.cfg.pop_size - len(preserved_population)
-        logging.info(f"Eliminated {n_eliminated} greedy or invalid algorithms.")
-        
-        # Return if no new individuals are needed
-        if n_eliminated == 0:
-            self.update_iter()
-            return
-        
-        # Generate new responses
-        messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": self.initial_user + self.code_output_tip}]
-        responses = chat_completion(n_eliminated, messages, self.cfg.model, self.cfg.temperature)
-        
-        # Responses to population
-        new_population = self.responses_to_population(responses)
-        
-        # Run code and evaluate population
-        new_population = self.evaluate_population(new_population)
-        
-        # Add new population to population
-        self.population = preserved_population + new_population
-        self.update_iter()
