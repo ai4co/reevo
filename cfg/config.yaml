@@ -3,8 +3,6 @@ defaults:
   - problem: tsp_constructive
   - override hydra/output: local
 
-problem_type: constructive
-
 hydra:
   job:
     chdir: True
@@ -12,11 +10,10 @@ hydra:
 # LLM parameters
 model: gpt-3.5-turbo-0613  # LLM model (other options include gpt-4-1106-preview)
 # model: gpt-4-1106-preview
-temperature: 1.1  # temperature for chat completion
+temperature: 1  # temperature for chat completion
 suffix: GPT  # suffix for generated files (indicates LLM model)
 
 # Main GA loop parameters
 max_fe: 100 # maximum number of function evaluations
 pop_size: 10 # population size for GA
-mutation_rate: 0.3 # mutation rate for GA
-diversify: False # whether to diversify population
+mutation_rate: 0.2 # mutation rate for GA

@@ -83,7 +83,7 @@ if __name__ == "__main__":
     
     # Saving datasets as pickle files
     pickle.dump(weibull_5k_train, open('dataset/weibull_5k_train.pickle', 'wb'))
-    pickle.dump(weibull_5k_val, open('dataset/weibull_5k_val.pickle', 'wb'))
+    # pickle.dump(weibull_5k_val, open('dataset/weibull_5k_val.pickle', 'wb')) # Not used
     pickle.dump(weibull_10k_test, open('dataset/weibull_10k_test.pickle', 'wb'))
     pickle.dump(weibull_100k_test, open('dataset/weibull_100k_test.pickle', 'wb'))
     

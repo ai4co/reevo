@@ -6,6 +6,8 @@ import numpy as np
 import pickle
 import sys
 
+from gpt import priority
+
 
 def get_valid_bin_indices(item: float, bins: np.ndarray) -> np.ndarray:
     """Returns indices of bins in which item can fit."""
@@ -49,26 +51,13 @@ def evaluate(instances: dict) -> float:
         bins = np.array([capacity for _ in range(instance['num_items'])])
         # Pack items into bins and return remaining capacity in bins_packed, which
         # has shape (num_items,).
-        _, bins_packed = online_binpack(items, bins)
+        _, bins_packed = online_binpack(items.astype(float), bins)
         # If remaining capacity in a bin is equal to initial capacity, then it is
         # unused. Count number of used bins.
         num_bins.append((bins_packed != capacity).sum())
     # Score of heuristic function is negative of average number of bins used
     # across instances (as we want to minimize number of bins).
     return -np.mean(num_bins)
-
-
-def priority(item: float, bins: np.ndarray) -> np.ndarray:
-    """Returns priority with which we want to add item to each bin.
-
-    Args:
-        item: Size of item to be added to the bin.
-        bins: Array of capacities for each bin.
-
-    Return:
-        Array of same size as bins with priority score of each bin.
-    """
-    return -(bins - item)
 
 
 def is_valid_packing(
@@ -122,4 +111,4 @@ if __name__ == "__main__":
     print(f'\t Excess: {100 * excess:.2f}%')
     
     print("[*] Average:")
-    print(excess)
+    print(excess * 100)

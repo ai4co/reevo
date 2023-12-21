@@ -37,6 +37,7 @@ def block_until_running(stdout_filepath, log_status=False, iter_num=-1, response
 
 
 def extract_code_description(response: str) -> tuple[str, str]:
+    """Deprecated."""
     # Regex patterns to extract python code enclosed in GPT response
     pattern_code = r'```python(.*?)```'
     code_string = re.search(pattern_code, response, re.DOTALL)
@@ -117,6 +118,12 @@ def chat_completion(n: int, messages: list[dict], model: str, temperature: float
             
         responses.extend(response_cur.choices)
     return responses
+
+def process_code(code):
+    if code.startswith('def') and "np" in code:        
+        code = 'import numpy as np\n' + code
+    return code
+        
 
 
 if __name__ == "__main__":

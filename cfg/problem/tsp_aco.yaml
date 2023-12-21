@@ -1,3 +1,4 @@
 problem_name: tsp_aco
+problem_type: aco
 problem_size: 20 # problem size for validation
 description: Solving Traveling Salesman Problem (TSP) via stochastic solution sampling. TSP requires finding the shortest path that visits all given nodes and returns to the starting node.

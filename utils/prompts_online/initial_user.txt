@@ -1,0 +1,4 @@
+Write a priority function for {problem_description}.
+The priority function takes as input an item and an array of bins (containing the remaining capacity of each bin) and returns a priority score for each bin.
+The priority score will be used to determine which bin the item should be placed in.
+[code]:

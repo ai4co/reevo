@@ -1,1 +1,0 @@
-You are going to write a vanilla "greedy" algorithm for this problem. Your code should be formatted as a Python code string: "```python ... ```". Output your formatted code and nothing else. Remember to import the necessary packages.
