@@ -9,7 +9,6 @@ Please generate datasets before running. Refer to `problems/*/dataset/readme.md`
 ```bash
 # for tsp_constructive
 python main.py problem=tsp_constructive
-python main.py problem=tsp_constructive model=gpt-4-1106-preview # using GPT-4 Turbo
 
 # for tsp_aco
 python main.py problem=tsp_aco
@@ -19,6 +18,9 @@ python main.py problem=cvrp_aco
 
 # for online BPP
 python main.py problem=bpp_online
+
+# when using GPT-4 Turbo, add:
+model=gpt-4-1106-preview
 ```
 
 

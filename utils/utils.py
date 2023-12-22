@@ -119,28 +119,43 @@ def chat_completion(n: int, messages: list[dict], model: str, temperature: float
         responses.extend(response_cur.choices)
     return responses
 
-def process_code(code):
-    if code.startswith('def') and "np" in code:        
-        code = 'import numpy as np\n' + code
-    return code
-        
+
+def extract_code_from_generator(content):
+    pattern_code = r'```python(.*?)```'
+    code_string = re.search(pattern_code, content, re.DOTALL)
+    code_string = code_string.group(1).strip() if code_string is not None else None
+    if code_string is None:
+        # Find the line that starts with "def" and the line that starts with "return", and extract the code in between
+        lines = content.split('\n')
+        start = None
+        end = None
+        for i, line in enumerate(lines):
+            if line.startswith('def'):
+                start = i
+            if line.startswith('return'):
+                end = i
+                break
+        if start is not None and end is not None:
+            code_string = '\n'.join(lines[start:end])
+    
+    if code_string is None:
+        return None
+    # Add import statements if not present
+    if "import" not in code_string:
+        code_string = "import numpy as np\n" + code_string
+    return code_string
 
 
-if __name__ == "__main__":
-    # Test multi_chat_completion
-    messages_list = [
-        [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": "Hello!"},
-        ],
-        [
-            {"role": "system", "content": "You are a knowledgeable guide."},
-            {"role": "user", "content": "How are you?"},
-        ],
-        [
-            {"role": "system", "content": "You are a witty comedian."},
-            {"role": "user", "content": "Tell me a joke."},
-        ]
-    ]
-    responses = multi_chat_completion(messages_list, n=1, model="gpt-3.5-turbo-1106", temperature=0.)
-    print(responses)
+def filter_code(code_string):
+    """Remove lines containing signature and import statements."""
+    lines = code_string.split('\n')
+    filtered_lines = []
+    for line in lines:
+        if line.startswith('def'):
+            continue
+        elif line.startswith('import'):
+            continue
+        else:
+            filtered_lines.append(line)
+    code_string = '\n'.join(filtered_lines)
+    return code_string

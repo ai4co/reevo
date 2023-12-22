@@ -6,7 +6,7 @@ import numpy as np
 import pickle
 import sys
 
-from gpt import priority
+from gpt import priority_v2 as priority
 
 
 def get_valid_bin_indices(item: float, bins: np.ndarray) -> np.ndarray:
@@ -46,6 +46,7 @@ def evaluate(instances: dict) -> float:
         instance = instances[name]
         capacity = instance['capacity']
         items = instance['items']
+        items = np.array(items) if isinstance(items, list) else items
         # Create num_items bins so there will always be space for all items,
         # regardless of packing order. Array has shape (num_items,).
         bins = np.array([capacity for _ in range(instance['num_items'])])
@@ -85,8 +86,6 @@ def is_valid_packing(
             return False
 
     return True
-
-
 
 
 if __name__ == "__main__":
