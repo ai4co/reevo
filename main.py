@@ -19,9 +19,8 @@ def main(cfg):
     logging.info(f"Using LLM: {cfg.model}")
     
     ga = G2A(cfg, ROOT_DIR)
-    best_code_overall, best_desc_overall, best_code_path_overall = ga.evolve()
+    best_code_overall, best_code_path_overall = ga.evolve()
     logging.info(f"Best Code Overall: {best_code_overall}")
-    logging.info(f"Best Description Overall: {best_desc_overall}")
     logging.info(f"Best Code Path Overall: {best_code_path_overall}")
     
     with open(f"{ROOT_DIR}/problems/{cfg.problem.problem_name}/{cfg.suffix.lower()}.py", 'w') as file:

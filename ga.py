@@ -19,14 +19,7 @@ class G2A:
         self.best_obj_overall = float("inf")
         
         self.init_prompt()
-
         self.init_population()
-        
-        self.ga_crossover_prompt = file_to_string(f'{root_dir}/utils/prompts_ga/crossover.txt')
-        self.ga_mutate_prompt = file_to_string(f'{root_dir}/utils/prompts_ga/mutate.txt')
-        
-        self.print_cross_prompt = True # Print crossover prompt for the first iteration
-        self.print_mutate_prompt = True # Print mutate prompt for the first iteration
 
 
     def init_prompt(self) -> None:
@@ -37,29 +30,28 @@ class G2A:
         logging.info("Problem: " + self.problem)
         logging.info("Problem description: " + self.problem_description)
         
-        prompt_dir = f'{self.root_dir}/utils/prompts_{self.cfg.problem.problem_type}'
-        problem_dir = f"{self.root_dir}/problems/{self.problem}"
+        self.prompt_dir = f"{self.root_dir}/prompts"
         self.output_file = f"{self.root_dir}/problems/{self.problem}/{self.cfg.suffix.lower()}.py"
         
         # Loading all text prompts
-        self.seed_function = file_to_string(f'{problem_dir}/seed.txt')
-        self.generator_system_prompt = file_to_string(f'{self.root_dir}/utils/prompts_general/system_generator.txt')
-        self.initial_user = file_to_string(f'{prompt_dir}/initial_user.txt').format(problem_description=self.problem_description)
-
+        self.generator_system_prompt = file_to_string(f'{self.prompt_dir}/common/system_generator.txt')
+        self.reflector_system_prompt = file_to_string(f'{self.prompt_dir}/common/system_reflector.txt')
+        self.task_desc = file_to_string(f'{self.prompt_dir}/{self.problem}/task_desc.txt')
+        self.seed_prompt = file_to_string(f'{self.prompt_dir}/{self.problem}/seed.txt')
+        self.user_reflector_prompt = file_to_string(f'{self.prompt_dir}/{self.problem}/user_reflector.txt')
+        self.crossover_prompt = file_to_string(f'{self.prompt_dir}/{self.problem}/crossover.txt')
         
+        self.print_cross_prompt = True # Print crossover prompt for the first iteration
+        self.print_mutate_prompt = True # Print mutate prompt for the first iteration
+        self.print_short_term_reflection_prompt = True # Print short-term reflection prompt for the first iteration
+
+
     def init_population(self) -> None:
         # Generate responses
-        messages = [
-            {"role": "system", "content": self.generator_system_prompt},
-            {"role": "user", "content": self.initial_user},
-            {"role": "assistant", "content": self.seed_function},
-            {"role": "user", "content": "Improve over the above code. \n[code]:\n"}
-        ]
-        logging.info(
-            "Initial Population Prompt: \nSystem Prompt: \n" + self.generator_system_prompt +
-            "\nUser Prompt: \n" + self.initial_user +
-            "\nAssistant Prompt: \n" + self.seed_function
-        )
+        system = self.generator_system_prompt
+        user = self.task_desc + self.seed_prompt
+        messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
+        logging.info("Initial Population Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
         responses = chat_completion(self.cfg.pop_size, messages, self.cfg.model, self.cfg.temperature)
         
         # Responses to population
@@ -79,35 +71,17 @@ class G2A:
         self.update_iter()
 
     
-    def evaluate_greedy_alg(self) -> float:
-        """
-        Generate and evaluate the greedy algorithm for the problem, e.g. Nearest Neighbor for TSP.
-        """
-        # Loading all text prompts
-        greedy_alg_tip = file_to_string(f'{self.root_dir}/utils/prompts_general/gen_greedy_tip.txt')
-        messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": self.initial_user + greedy_alg_tip}]
-        logging.info("Greedy Algorithm Prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + self.initial_user + greedy_alg_tip)
-        
-        # Generate responses
-        responses = chat_completion(1, messages, self.cfg.model, self.cfg.temperature)
-        
-        # Response to individual
-        individual = self.response_to_individual(responses[0], 0, file_name="greedy_alg")
-        
-        # Run code and evaluate population
-        population = self.evaluate_population([individual])
-        return population[0]["obj"]
-
-    
     def response_to_individual(self, response, response_id, file_name=None) -> dict:
         """
         Convert response to individual
         """
-        code = process_code(response.message.content)
+        content = response.message.content
         # Write response to file
         file_name = f"problem_iter{self.iteration}_response{response_id}.txt" if file_name is None else file_name + ".txt"
         with open(file_name, 'w') as file:
-            file.writelines(code + '\n')
+            file.writelines(content + '\n')
+
+        code = extract_code_from_generator(content)
 
         # Extract code and description from response
         std_out_filepath = f"problem_iter{self.iteration}_stdout{response_id}.txt" if file_name is None else file_name + "_stdout.txt"
@@ -118,7 +92,6 @@ class G2A:
             "code": code,
             "response_id": response_id,
         }
-
         return individual
 
         
@@ -132,6 +105,7 @@ class G2A:
             population.append(individual)
         return population
 
+
     @staticmethod
     def mark_invalid_individual(individual: dict, traceback_msg: str) -> dict:
         """
@@ -142,6 +116,7 @@ class G2A:
         individual["fitness"] = 0
         individual["traceback_msg"] = traceback_msg
         return individual
+
 
     def evaluate_population(self, population: list[dict]) -> list[float]:
         """
@@ -233,7 +208,6 @@ class G2A:
         if best_obj < self.best_obj_overall:
             self.best_obj_overall = best_obj
             self.best_code_overall = population[best_sample_idx]["code"]
-            self.best_desc_overall = population[best_sample_idx]["description"]
             self.best_code_path_overall = population[best_sample_idx]["code_path"]
         
         # update elitist
@@ -249,43 +223,97 @@ class G2A:
     
     def random_select(self, population: list[dict]) -> list[dict]:
         """
-        Random selection, select individuals with equal probability. Used for comparison.
+        Random selection, select individuals with equal probability.
         """
         selected_population = []
         # Eliminate invalid individuals
         population = [individual for individual in population if individual["exec_success"]]
-        for _ in range(self.cfg.pop_size):
+        while len(selected_population) < 2 * self.cfg.pop_size:
             parents = np.random.choice(population, size=2, replace=False)
-            selected_population.extend(parents)
-        assert len(selected_population) == 2*self.cfg.pop_size
+            # If two parents have the same objective value, consider them as identical; otherwise, add them to the selected population
+            if parents[0]["obj"] != parents[1]["obj"]:
+                selected_population.extend(parents)
         return selected_population
+
+    def gen_short_term_reflection_prompt(self, ind1: dict, ind2: dict):
+        """
+        Short-term reflection before crossovering two individuals.
+        """
+        # Determine which individual is better or worse
+        if ind1["obj"] < ind2["obj"]:
+            better_ind, worse_ind = ind1, ind2
+        elif ind1["obj"] > ind2["obj"]:
+            better_ind, worse_ind = ind2, ind1
+        else:
+            raise ValueError("Two individuals to crossover have the same objective value!")
+        worse_code = filter_code(worse_ind["code"])
+        better_code = filter_code(better_ind["code"])
+        message = [{"role": "system", "content": self.reflector_system_prompt},
+                   {"role": "user", "content": self.user_reflector_prompt.format(worse_code=worse_code, better_code=better_code)}]
+        return message, worse_code, better_code
+    
+    
+    def short_term_reflection(self, population: list[dict]):
+        """
+        Short-term reflection before crossovering two individuals.
+        """
+        messages_lst = []
+        worse_code_lst = []
+        better_code_lst = []
+        for i in range(0, len(population), 2):
+            # Select two individuals
+            parent_1 = population[i]
+            parent_2 = population[i+1]
+            
+            # Short-term reflection
+            messages, worse_code, better_code = self.gen_short_term_reflection_prompt(parent_1, parent_2)
+            messages_lst.append(messages)
+            worse_code_lst.append(worse_code)
+            better_code_lst.append(better_code)
+            
+            # Print reflection prompt for the first iteration
+            if self.print_short_term_reflection_prompt:
+                logging.info("Short-term Reflection Prompt: \nSystem Prompt: \n" + self.reflector_system_prompt + "\nUser Prompt: \n" + self.user_reflector_prompt.format(worse_code=parent_2["code"], better_code=parent_1["code"]))
+                self.print_short_term_reflection_prompt = False
+        
+        # Multi-processed chat completion
+        responses_lst = multi_chat_completion(messages_lst, 1, self.cfg.model, self.cfg.temperature)
+        return responses_lst, worse_code_lst, better_code_lst
 
 
     def crossover(self, population: list[dict]) -> list[dict]:
         crossed_population = []
         assert len(population) == self.cfg.pop_size * 2
         
+        # Short-term reflection
+        responses_lst, worse_code_lst, better_code_lst = self.short_term_reflection(population)
+        
         messages_lst = []
-        for i in range(0, len(population), 2):
-            # Select two individuals
-            parent_1 = population[i]
-            parent_2 = population[i+1]
+        
+        idx = 0
+        for response, worse_code, better_code in zip(responses_lst, worse_code_lst, better_code_lst):
+            reflection = response[0].message.content
             
             # Crossover
-            crossover_prompt_user = self.ga_crossover_prompt.format(
-                problem_description=self.problem_description,
-                code1=parent_1["code"],
-                code2=parent_2["code"],
-                description1=parent_1["description"],
-                description2=parent_2["description"],
-                )
-            messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": crossover_prompt_user }]
+            crossover_prompt_user = self.crossover_prompt.format(
+                task_desc = self.task_desc,
+                worse_code = worse_code,
+                better_code = better_code,
+                reflection = reflection,
+            )
+            messages = [{"role": "system", "content": self.generator_system_prompt}, {"role": "user", "content": crossover_prompt_user}]
             messages_lst.append(messages)
             
             # Print crossover prompt for the first iteration
             if self.print_cross_prompt:
-                logging.info("Crossover Prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + crossover_prompt_user )
+                logging.info("Crossover Prompt: \nSystem Prompt: \n" + self.generator_system_prompt + "\nUser Prompt: \n" + crossover_prompt_user)
                 self.print_cross_prompt = False
+            
+            # Save crossover prompt to file
+            file_name = f"problem_iter{self.iteration}_crossover{idx}.txt"
+            with open(file_name, 'w') as file:
+                file.writelines(crossover_prompt_user + '\n')
+            idx += 1
         
         # Multi-processed chat completion
         responses_lst = multi_chat_completion(messages_lst, 1, self.cfg.model, self.cfg.temperature)
@@ -333,45 +361,20 @@ class G2A:
 
     def evolve(self):
         while self.function_evals < self.cfg.max_fe:
-            # Diversify
-            if self.cfg.diversify: self.diversify()
             # Select
             population_to_select = self.population if self.elitist is None else [self.elitist] + self.population # add elitist to population for selection
             selected_population = self.random_select(population_to_select)
             # Crossover
             crossed_population = self.crossover(selected_population)
-            # Mutate
-            mutated_population = self.mutate(crossed_population)
             # Evaluate
-            population = self.evaluate_population(mutated_population)
+            self.population = self.evaluate_population(crossed_population)
             # Update
-            self.population = population
             self.update_iter()
-        return self.best_code_overall, self.best_desc_overall, self.best_code_path_overall
+            # Mutate
+            # mutated_population = self.mutate(crossed_population)
+            # # Evaluate
+            # self.population = self.evaluate_population(mutated_population)
+            # # Update
+            # self.update_iter()
 
-
-    @staticmethod
-    def compute_similarity(descriptions: list[str], client: OpenAI, model: str="text-embedding-ada-002") -> np.ndarray:
-        """
-        Embed code descriptions using OpenAI's embedding API and compute the cosine similarity matrix.
-        """
-        response = client.embeddings.create(
-            input=descriptions,
-            model=model,
-        )
-        embeddings = [_data.embedding for _data in response.data]
-        similarity_matrix = cosine_similarity(embeddings)
-        return similarity_matrix
-
-
-    @staticmethod
-    def adjust_similarity_matrix(similarity_matrix: np.ndarray, population: list[dict]) -> np.ndarray:
-        """
-        For those with identical objective values, set their similarity to 1.
-        """
-        for i in range(len(population)):
-            for j in range(i+1, len(population)):
-                if population[i]["obj"] == population[j]["obj"]:
-                    similarity_matrix[i][j] = 1
-                    similarity_matrix[j][i] = 1
-        return similarity_matrix
+        return self.best_code_overall, self.best_code_path_overall
