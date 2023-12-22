@@ -16,6 +16,7 @@ class G2A:
         self.iteration = 0
         self.function_evals = 0
         self.elitist = None
+        self.long_term_reflection_str = "Nothing yet."
         self.best_obj_overall = float("inf")
         
         self.init_prompt()
@@ -36,20 +37,23 @@ class G2A:
         # Loading all text prompts
         self.generator_system_prompt = file_to_string(f'{self.prompt_dir}/common/system_generator.txt')
         self.reflector_system_prompt = file_to_string(f'{self.prompt_dir}/common/system_reflector.txt')
-        self.task_desc = file_to_string(f'{self.prompt_dir}/{self.problem}/task_desc.txt')
+        self.user_generator_prompt = file_to_string(f'{self.prompt_dir}/{self.problem}/user_generator.txt')
+        self.user_reflector_st_prompt = file_to_string(f'{self.prompt_dir}/{self.problem}/user_reflector_st.txt') # short-term reflection
+        self.user_reflector_lt_prompt = file_to_string(f'{self.prompt_dir}/common/user_reflector_lt.txt') # long-term reflection
         self.seed_prompt = file_to_string(f'{self.prompt_dir}/{self.problem}/seed.txt')
-        self.user_reflector_prompt = file_to_string(f'{self.prompt_dir}/{self.problem}/user_reflector.txt')
         self.crossover_prompt = file_to_string(f'{self.prompt_dir}/{self.problem}/crossover.txt')
-        
-        self.print_cross_prompt = True # Print crossover prompt for the first iteration
+        self.mutataion_prompt = file_to_string(f'{self.prompt_dir}/{self.problem}/mutation.txt')
+
+        self.print_crossover_prompt = True # Print crossover prompt for the first iteration
         self.print_mutate_prompt = True # Print mutate prompt for the first iteration
         self.print_short_term_reflection_prompt = True # Print short-term reflection prompt for the first iteration
+        self.print_long_term_reflection_prompt = True # Print long-term reflection prompt for the first iteration
 
 
     def init_population(self) -> None:
         # Generate responses
         system = self.generator_system_prompt
-        user = self.task_desc + self.seed_prompt
+        user = self.user_generator_prompt + self.seed_prompt # Task description + function description + seed code
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
         logging.info("Initial Population Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
         responses = chat_completion(self.cfg.pop_size, messages, self.cfg.model, self.cfg.temperature)
@@ -235,7 +239,8 @@ class G2A:
                 selected_population.extend(parents)
         return selected_population
 
-    def gen_short_term_reflection_prompt(self, ind1: dict, ind2: dict):
+
+    def gen_short_term_reflection_prompt(self, ind1: dict, ind2: dict) -> tuple[list[dict], str, str]:
         """
         Short-term reflection before crossovering two individuals.
         """
@@ -248,12 +253,19 @@ class G2A:
             raise ValueError("Two individuals to crossover have the same objective value!")
         worse_code = filter_code(worse_ind["code"])
         better_code = filter_code(better_ind["code"])
-        message = [{"role": "system", "content": self.reflector_system_prompt},
-                   {"role": "user", "content": self.user_reflector_prompt.format(worse_code=worse_code, better_code=better_code)}]
+        
+        system = self.reflector_system_prompt
+        user = self.user_reflector_st_prompt.format(worse_code=worse_code, better_code=better_code)
+        message = [{"role": "system", "content": system}, {"role": "user", "content": user}]
+        
+        # Print reflection prompt for the first iteration
+        if self.print_short_term_reflection_prompt:
+                logging.info("Short-term Reflection Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
+                self.print_short_term_reflection_prompt = False
         return message, worse_code, better_code
-    
-    
-    def short_term_reflection(self, population: list[dict]):
+
+
+    def short_term_reflection(self, population: list[dict]) -> tuple[list[list[dict]], list[str], list[str]]:
         """
         Short-term reflection before crossovering two individuals.
         """
@@ -270,33 +282,43 @@ class G2A:
             messages_lst.append(messages)
             worse_code_lst.append(worse_code)
             better_code_lst.append(better_code)
-            
-            # Print reflection prompt for the first iteration
-            if self.print_short_term_reflection_prompt:
-                logging.info("Short-term Reflection Prompt: \nSystem Prompt: \n" + self.reflector_system_prompt + "\nUser Prompt: \n" + self.user_reflector_prompt.format(worse_code=parent_2["code"], better_code=parent_1["code"]))
-                self.print_short_term_reflection_prompt = False
         
         # Multi-processed chat completion
         responses_lst = multi_chat_completion(messages_lst, 1, self.cfg.model, self.cfg.temperature)
         return responses_lst, worse_code_lst, better_code_lst
+    
+    def long_term_reflection(self, short_term_reflections: list[str]) -> None:
+        """
+        Long-term reflection before mutation.
+        """
+        system = self.reflector_system_prompt
+        user = self.user_reflector_lt_prompt.format(
+            problem_description = self.problem_description,
+            prior_reflection = self.long_term_reflection_str,
+            new_reflection = "\n".join(short_term_reflections),
+            )
+        messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
+        
+        if self.print_long_term_reflection_prompt:
+            logging.info("Long-term Reflection Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
+            self.print_long_term_reflection_prompt = False
+        
+        response = chat_completion(1, messages, self.cfg.model, self.cfg.temperature)
+        self.long_term_reflection_str = response[0].message.content
+        return
 
 
-    def crossover(self, population: list[dict]) -> list[dict]:
+    def crossover(self, short_term_reflection_tuple: tuple[list[list[dict]], list[str], list[str]]) -> list[dict]:
+        reflection_responses_lst, worse_code_lst, better_code_lst = short_term_reflection_tuple
         crossed_population = []
-        assert len(population) == self.cfg.pop_size * 2
-        
-        # Short-term reflection
-        responses_lst, worse_code_lst, better_code_lst = self.short_term_reflection(population)
-        
         messages_lst = []
-        
         idx = 0
-        for response, worse_code, better_code in zip(responses_lst, worse_code_lst, better_code_lst):
+        for response, worse_code, better_code in zip(reflection_responses_lst, worse_code_lst, better_code_lst):
             reflection = response[0].message.content
             
             # Crossover
             crossover_prompt_user = self.crossover_prompt.format(
-                task_desc = self.task_desc,
+                task_desc = self.user_generator_prompt,
                 worse_code = worse_code,
                 better_code = better_code,
                 reflection = reflection,
@@ -305,9 +327,9 @@ class G2A:
             messages_lst.append(messages)
             
             # Print crossover prompt for the first iteration
-            if self.print_cross_prompt:
+            if self.print_crossover_prompt:
                 logging.info("Crossover Prompt: \nSystem Prompt: \n" + self.generator_system_prompt + "\nUser Prompt: \n" + crossover_prompt_user)
-                self.print_cross_prompt = False
+                self.print_crossover_prompt = False
             
             # Save crossover prompt to file
             file_name = f"problem_iter{self.iteration}_crossover{idx}.txt"
@@ -327,35 +349,21 @@ class G2A:
         return crossed_population
 
 
-    def mutate(self, population: list[dict]) -> list[dict]:
-        messages_lst = []
-        response_id_lst = []
-        for i in range(len(population)):
-            individual = population[i]
+    def mutate(self) -> list[dict]:
+        """Elitist-based mutation. We only mutate the best individual to generate n_pop new individuals."""
+        system = self.generator_system_prompt
+        user = self.mutataion_prompt.format(
+            task_desc = self.user_generator_prompt,
+            reflection = self.long_term_reflection_str,
+            elitist_code = filter_code(self.elitist["code"]),
+        )
+        messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
+        if self.print_mutate_prompt:
+            logging.info("Mutation Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
+            self.print_mutate_prompt = False
             
-            # Mutate
-            if np.random.uniform() < self.cfg.mutation_rate:
-                mutate_prompt = self.ga_mutate_prompt.format(
-                    problem_description=self.problem_description,
-                    code=individual["code"],
-                    description=individual["description"]
-                    )
-                messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": mutate_prompt}]
-                messages_lst.append(messages)
-                response_id_lst.append(i)
-                # Print mutate prompt for the first iteration
-                if self.print_mutate_prompt:
-                    logging.info("Mutate Prompt: \nSystem Prompt: \n" + self.system_prompt + "\nUser Prompt: \n" + mutate_prompt)
-                    self.print_mutate_prompt = False
-            
-        # Multi-processed chat completion
-        responses_lst = multi_chat_completion(messages_lst, 1, self.cfg.model, self.cfg.temperature)
-        for i in range(len(responses_lst)):
-            response_id = response_id_lst[i]
-            mutated_individual = self.response_to_individual(responses_lst[i][0], response_id)
-            population[response_id] = mutated_individual
-
-        assert len(population) == self.cfg.pop_size
+        responses = chat_completion(self.cfg.pop_size, messages, self.cfg.model, self.cfg.temperature)
+        population = self.responses_to_population(responses)
         return population
 
 
@@ -364,17 +372,21 @@ class G2A:
             # Select
             population_to_select = self.population if self.elitist is None else [self.elitist] + self.population # add elitist to population for selection
             selected_population = self.random_select(population_to_select)
+            # Short-term reflection
+            short_term_reflection_tuple = self.short_term_reflection(selected_population) # (responses_lst, worse_code_lst, better_code_lst)
             # Crossover
-            crossed_population = self.crossover(selected_population)
+            crossed_population = self.crossover(short_term_reflection_tuple)
             # Evaluate
             self.population = self.evaluate_population(crossed_population)
             # Update
             self.update_iter()
+            # Long-term reflection
+            self.long_term_reflection([response[0].message.content for response in short_term_reflection_tuple[0]])
             # Mutate
-            # mutated_population = self.mutate(crossed_population)
-            # # Evaluate
-            # self.population = self.evaluate_population(mutated_population)
-            # # Update
-            # self.update_iter()
+            mutated_population = self.mutate()
+            # Evaluate
+            self.population.extend(self.evaluate_population(mutated_population))
+            # Update
+            self.update_iter()
 
         return self.best_code_overall, self.best_code_path_overall

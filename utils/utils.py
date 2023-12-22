@@ -121,6 +121,7 @@ def chat_completion(n: int, messages: list[dict], model: str, temperature: float
 
 
 def extract_code_from_generator(content):
+    """Extract code from the response of the code generator."""
     pattern_code = r'```python(.*?)```'
     code_string = re.search(pattern_code, content, re.DOTALL)
     code_string = code_string.group(1).strip() if code_string is not None else None
