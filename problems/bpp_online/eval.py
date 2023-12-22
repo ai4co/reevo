@@ -89,13 +89,15 @@ def is_valid_packing(
 
 
 if __name__ == "__main__":
-    file_name = "weibull_5k_train.pickle"
-    
     print("[*] Running ...")
 
     problem_size = int(sys.argv[1])
-    assert problem_size == 5000
     root_dir = sys.argv[2]
+    mood = sys.argv[3]
+    assert mood in ['train', 'val']
+    assert problem_size in [5000, -1]
+    
+    file_name = f"weibull_5k_{mood}.pickle"
     
     dataset_path = f"{root_dir}/problems/bpp_online/dataset/" + file_name
     dataset = pickle.load(open(dataset_path, 'rb'))
