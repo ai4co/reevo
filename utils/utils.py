@@ -38,6 +38,7 @@ def block_until_running(stdout_filepath, log_status=False, iter_num=-1, response
 
 def extract_code_description(response: str) -> tuple[str, str]:
     """Deprecated."""
+    raise NotImplementedError
     # Regex patterns to extract python code enclosed in GPT response
     pattern_code = r'```python(.*?)```'
     code_string = re.search(pattern_code, response, re.DOTALL)
@@ -133,11 +134,11 @@ def extract_code_from_generator(content):
         for i, line in enumerate(lines):
             if line.startswith('def'):
                 start = i
-            if line.startswith('return'):
+            if 'return' in line:
                 end = i
                 break
         if start is not None and end is not None:
-            code_string = '\n'.join(lines[start:end])
+            code_string = '\n'.join(lines[start:end+1])
     
     if code_string is None:
         return None
@@ -155,6 +156,8 @@ def filter_code(code_string):
         if line.startswith('def'):
             continue
         elif line.startswith('import'):
+            continue
+        elif line.startswith('from'):
             continue
         else:
             filtered_lines.append(line)
