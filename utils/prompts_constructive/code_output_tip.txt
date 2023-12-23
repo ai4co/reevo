@@ -1,7 +1,0 @@
-You begin by giving a concise description of your code, followed by the code itself. **NOTE**: Your code should be formatted as a Python code string: "```python ... ```"
-
-Some helpful tips:
-- Do NOT modify the function signature.
-- Import necessary packages. Except for importing packages, you should write everything inside the function.
-- You can try designs like node clustering, look-ahead mechanisms, and local search.
-- You can try combining various factors to determine how promising it is to select a node. **Do NOT use Nearest Neighbor heuristic**.
