@@ -1,0 +1,1 @@
+def select_next_node_v{version}(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:

@@ -9,4 +9,4 @@ You are provided with two code versions below, where the second version performs
 [Better code]
 {better_code}
 
-You respond with some hints for designing better heuristics, based on the two code versions and using less than 50 words.
+You respond with some hints for designing better heuristics, based on the two code versions and using less than 20 words.

@@ -13,11 +13,15 @@ class G2A:
         self.cfg = cfg
         self.root_dir = root_dir
         
+        self.mutation_rate = cfg.mutation_rate
         self.iteration = 0
         self.function_evals = 0
         self.elitist = None
-        self.long_term_reflection_str = "Nothing yet."
         self.best_obj_overall = float("inf")
+        self.long_term_reflection_str = "Nothing yet"
+        self.best_obj_overall = None
+        self.best_code_overall = None
+        self.best_code_path_overall = None
         
         self.init_prompt()
         self.init_population()
@@ -41,6 +45,11 @@ class G2A:
         self.seed_func = file_to_string(f'{self.prompt_dir}/{self.problem}/seed_func.txt')
         self.func_signature = file_to_string(f'{self.prompt_dir}/{self.problem}/func_signature.txt')
         self.func_desc = file_to_string(f'{self.prompt_dir}/{self.problem}/func_desc.txt')
+        if os.path.exists(f'{self.prompt_dir}/{self.problem}/external_knowledge.txt'):
+            self.external_knowledge = file_to_string(f'{self.prompt_dir}/{self.problem}/external_knowledge.txt')
+        else:
+            self.external_knowledge = ""
+        
         
         # Common prompts
         self.system_generator_prompt = file_to_string(f'{self.prompt_dir}/common/system_generator.txt')
@@ -67,9 +76,22 @@ class G2A:
 
 
     def init_population(self) -> None:
+        # Evaluate the seed function, and set it as Elite
+        logging.info("Evaluating seed function...")
+        code = extract_code_from_generator(self.seed_func).replace("v1", "v2")
+        logging.info("Seed function code: \n" + code)
+        seed_ind = {
+            "stdout_filepath": f"problem_iter{self.iteration}_stdout0.txt",
+            "code_path": f"problem_iter{self.iteration}_code0.py",
+            "code": code,
+            "response_id": 0,
+        }
+        self.population = self.evaluate_population([seed_ind])
+        self.update_iter()
+        
         # Generate responses
         system = self.system_generator_prompt
-        user = self.user_generator_prompt + "\n" + self.seed_prompt
+        user = self.user_generator_prompt + "\n" + self.seed_prompt + "\n" + self.external_knowledge
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
         logging.info("Initial Population Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
         responses = chat_completion(self.cfg.pop_size, messages, self.cfg.model, self.cfg.temperature)
@@ -80,11 +102,6 @@ class G2A:
         # Run code and evaluate population
         population = self.evaluate_population(population)
         objs = [individual["obj"] for individual in population]
-        
-        # Bookkeeping
-        self.best_obj_overall, best_sample_idx = min(objs), np.argmin(np.array(objs))
-        self.best_code_overall = population[best_sample_idx]["code"]
-        self.best_code_path_overall = population[best_sample_idx]["code_path"]
 
         # Update iteration
         self.population = population
@@ -156,7 +173,7 @@ class G2A:
             self.function_evals += 1
             
             try:
-                process = self.run_code(population[response_id], response_id)
+                process = self._run_code(population[response_id], response_id)
                 inner_runs.append(process)
             except Exception as e: # If code execution fails
                 logging.info(f"Error for response_id {response_id}: {e}")
@@ -198,7 +215,7 @@ class G2A:
         return population
 
 
-    def run_code(self, individual: dict, response_id) -> subprocess.Popen:
+    def _run_code(self, individual: dict, response_id) -> subprocess.Popen:
         """
         Write code into a file and run eval script.
         """
@@ -225,7 +242,7 @@ class G2A:
         best_obj, best_sample_idx = min(objs), np.argmin(np.array(objs))
         
         # update best overall
-        if best_obj < self.best_obj_overall:
+        if self.best_obj_overall is None or best_obj < self.best_obj_overall:
             self.best_obj_overall = best_obj
             self.best_code_overall = population[best_sample_idx]["code"]
             self.best_code_path_overall = population[best_sample_idx]["code_path"]
@@ -327,7 +344,6 @@ class G2A:
         
         response = chat_completion(1, messages, self.cfg.model, self.cfg.temperature)
         self.long_term_reflection_str = response[0].message.content
-        return
 
 
     def crossover(self, short_term_reflection_tuple: tuple[list[list[dict]], list[str], list[str]]) -> list[dict]:
@@ -376,7 +392,7 @@ class G2A:
         func_signature1 = self.func_signature.format(version=1) 
         user = self.mutataion_prompt.format(
             user_generator = self.user_generator_prompt,
-            reflection = self.long_term_reflection_str,
+            reflection = self.long_term_reflection_str + "\n" + self.external_knowledge,
             func_signature1 = func_signature1,
             elitist_code = filter_code(self.elitist["code"]),
             func_name = self.func_name,
@@ -386,7 +402,7 @@ class G2A:
             logging.info("Mutation Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
             self.print_mutate_prompt = False
             
-        responses = chat_completion(self.cfg.pop_size, messages, self.cfg.model, self.cfg.temperature)
+        responses = chat_completion(self.cfg.pop_size * self.mutation_rate, messages, self.cfg.model, self.cfg.temperature)
         population = self.responses_to_population(responses)
         return population
 

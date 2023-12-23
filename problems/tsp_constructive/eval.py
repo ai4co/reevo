@@ -3,8 +3,9 @@ import numpy as np
 import sys
 import argparse
 from scipy.spatial import distance_matrix
+import logging
 
-from gpt import select_next_node
+from gpt import select_next_node_v2 as select_next_node
 
 # TSP evaluation
 def eval_heuristic(node_positions: np.ndarray) -> float:
@@ -59,20 +60,32 @@ if __name__ == '__main__':
 
     problem_size = int(sys.argv[1])
     root_dir = sys.argv[2]
+    mood = sys.argv[3]
+    assert mood in ['train', 'val']
     
-    dataset_path = f"{root_dir}/problems/tsp_constructive/dataset/val{problem_size}_dataset.npy"
-    node_positions = np.load(dataset_path)
-    n_instances = node_positions.shape[0]
-    print(f"[*] Dataset loaded: {dataset_path} with {n_instances} instances.")
+    if mood == 'train':
+        dataset_path = f"{root_dir}/problems/tsp_constructive/dataset/val{problem_size}_dataset.npy"
+        node_positions = np.load(dataset_path)
+        n_instances = node_positions.shape[0]
+        print(f"[*] Dataset loaded: {dataset_path} with {n_instances} instances.")
+        
+        objs = []
+        for i in range(n_instances):
+            obj = eval_heuristic(node_positions[i])
+            print(f"[*] Instance {i}: {obj}")
+            objs.append(obj)
+        
+        print("[*] Average:")
+        print(np.mean(objs))
     
-    objs = []
-    for i in range(n_instances):
-        obj = eval_heuristic(node_positions[i])
-        print(f"[*] Instance {i}: {obj}")
-        objs.append(obj)
-    
-    print("[*] Average:")
-    print(np.mean(objs))
-   
-   
-   
+    else:
+        for problem_size in [20, 50, 100, 200, 500, 1000]:
+            dataset_path = f"{root_dir}/problems/tsp_constructive/dataset/test{problem_size}_dataset.npy"
+            logging.info(f"[*] Evaluating {dataset_path}")
+            node_positions = np.load(dataset_path)
+            n_instances = node_positions.shape[0]
+            objs = []
+            for i in range(n_instances):
+                obj = eval_heuristic(node_positions[i])
+                objs.append(obj)
+            print(f"[*] Average for {problem_size}: {np.mean(objs)}")
