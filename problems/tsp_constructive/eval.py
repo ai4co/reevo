@@ -64,7 +64,7 @@ if __name__ == '__main__':
     assert mood in ['train', 'val']
     
     if mood == 'train':
-        dataset_path = f"{root_dir}/problems/tsp_constructive/dataset/val{problem_size}_dataset.npy"
+        dataset_path = f"{root_dir}/problems/tsp_constructive/dataset/train{problem_size}_dataset.npy"
         node_positions = np.load(dataset_path)
         n_instances = node_positions.shape[0]
         print(f"[*] Dataset loaded: {dataset_path} with {n_instances} instances.")
@@ -79,8 +79,8 @@ if __name__ == '__main__':
         print(np.mean(objs))
     
     else:
-        for problem_size in [20, 50, 100, 200, 500, 1000]:
-            dataset_path = f"{root_dir}/problems/tsp_constructive/dataset/test{problem_size}_dataset.npy"
+        for problem_size in [50]:
+            dataset_path = f"{root_dir}/problems/tsp_constructive/dataset/val{problem_size}_dataset.npy"
             logging.info(f"[*] Evaluating {dataset_path}")
             node_positions = np.load(dataset_path)
             n_instances = node_positions.shape[0]
