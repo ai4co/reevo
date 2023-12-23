@@ -1,0 +1,11 @@
+{user_generator}
+
+[Prior reflection]
+{reflection}
+
+[Code]
+{func_signature1}
+{elitist_code}
+
+[Improved code]
+Please write a mutated function `{func_name}_v2`, according to the reflection. Output code only and enclose your code with Python code block: ```python ... ```.

@@ -25,25 +25,41 @@ class G2A:
 
     def init_prompt(self) -> None:
         self.problem = self.cfg.problem.problem_name
-        self.problem_description = self.cfg.problem.description
+        self.problem_desc = self.cfg.problem.description
         self.problem_size = self.cfg.problem.problem_size
+        self.func_name = self.cfg.problem.func_name
         
         logging.info("Problem: " + self.problem)
-        logging.info("Problem description: " + self.problem_description)
+        logging.info("Problem description: " + self.problem_desc)
+        logging.info("Function name: " + self.func_name)
         
         self.prompt_dir = f"{self.root_dir}/prompts"
         self.output_file = f"{self.root_dir}/problems/{self.problem}/{self.cfg.suffix.lower()}.py"
         
         # Loading all text prompts
-        self.generator_system_prompt = file_to_string(f'{self.prompt_dir}/common/system_generator.txt')
-        self.reflector_system_prompt = file_to_string(f'{self.prompt_dir}/common/system_reflector.txt')
-        self.user_generator_prompt = file_to_string(f'{self.prompt_dir}/{self.problem}/user_generator.txt')
-        self.user_reflector_st_prompt = file_to_string(f'{self.prompt_dir}/{self.problem}/user_reflector_st.txt') # short-term reflection
+        # Problem-specific prompt components
+        self.seed_func = file_to_string(f'{self.prompt_dir}/{self.problem}/seed_func.txt')
+        self.func_signature = file_to_string(f'{self.prompt_dir}/{self.problem}/func_signature.txt')
+        self.func_desc = file_to_string(f'{self.prompt_dir}/{self.problem}/func_desc.txt')
+        
+        # Common prompts
+        self.system_generator_prompt = file_to_string(f'{self.prompt_dir}/common/system_generator.txt')
+        self.system_reflector_prompt = file_to_string(f'{self.prompt_dir}/common/system_reflector.txt')
+        self.user_reflector_st_prompt = file_to_string(f'{self.prompt_dir}/common/user_reflector_st.txt') # shrot-term reflection
         self.user_reflector_lt_prompt = file_to_string(f'{self.prompt_dir}/common/user_reflector_lt.txt') # long-term reflection
-        self.seed_prompt = file_to_string(f'{self.prompt_dir}/{self.problem}/seed.txt')
-        self.crossover_prompt = file_to_string(f'{self.prompt_dir}/{self.problem}/crossover.txt')
-        self.mutataion_prompt = file_to_string(f'{self.prompt_dir}/{self.problem}/mutation.txt')
+        self.crossover_prompt = file_to_string(f'{self.prompt_dir}/common/crossover.txt')
+        self.mutataion_prompt = file_to_string(f'{self.prompt_dir}/common/mutation.txt')
+        self.user_generator_prompt = file_to_string(f'{self.prompt_dir}/common/user_generator.txt').format(
+            func_name=self.func_name, 
+            problem_desc=self.problem_desc,
+            func_desc=self.func_desc,
+            )
+        self.seed_prompt = file_to_string(f'{self.prompt_dir}/common/seed.txt').format(
+            seed_func=self.seed_func,
+            func_name=self.func_name,
+        )
 
+        # Flag to print prompts
         self.print_crossover_prompt = True # Print crossover prompt for the first iteration
         self.print_mutate_prompt = True # Print mutate prompt for the first iteration
         self.print_short_term_reflection_prompt = True # Print short-term reflection prompt for the first iteration
@@ -52,8 +68,8 @@ class G2A:
 
     def init_population(self) -> None:
         # Generate responses
-        system = self.generator_system_prompt
-        user = self.user_generator_prompt + self.seed_prompt # Task description + function description + seed code
+        system = self.system_generator_prompt
+        user = self.user_generator_prompt + "\n" + self.seed_prompt
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
         logging.info("Initial Population Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
         responses = chat_completion(self.cfg.pop_size, messages, self.cfg.model, self.cfg.temperature)
@@ -254,8 +270,14 @@ class G2A:
         worse_code = filter_code(worse_ind["code"])
         better_code = filter_code(better_ind["code"])
         
-        system = self.reflector_system_prompt
-        user = self.user_reflector_st_prompt.format(worse_code=worse_code, better_code=better_code)
+        system = self.system_reflector_prompt
+        user = self.user_reflector_st_prompt.format(
+            func_name = self.func_name,
+            func_desc = self.func_desc,
+            problem_desc = self.problem_desc,
+            worse_code=worse_code,
+            better_code=better_code
+            )
         message = [{"role": "system", "content": system}, {"role": "user", "content": user}]
         
         # Print reflection prompt for the first iteration
@@ -291,9 +313,9 @@ class G2A:
         """
         Long-term reflection before mutation.
         """
-        system = self.reflector_system_prompt
+        system = self.system_reflector_prompt
         user = self.user_reflector_lt_prompt.format(
-            problem_description = self.problem_description,
+            problem_desc = self.problem_desc,
             prior_reflection = self.long_term_reflection_str,
             new_reflection = "\n".join(short_term_reflections),
             )
@@ -312,30 +334,29 @@ class G2A:
         reflection_responses_lst, worse_code_lst, better_code_lst = short_term_reflection_tuple
         crossed_population = []
         messages_lst = []
-        idx = 0
         for response, worse_code, better_code in zip(reflection_responses_lst, worse_code_lst, better_code_lst):
             reflection = response[0].message.content
             
             # Crossover
-            crossover_prompt_user = self.crossover_prompt.format(
-                task_desc = self.user_generator_prompt,
+            system = self.system_generator_prompt
+            func_signature0 = self.func_signature.format(version=0)
+            func_signature1 = self.func_signature.format(version=1)
+            user = self.crossover_prompt.format(
+                user_generator = self.user_generator_prompt,
+                func_signature0 = func_signature0,
+                func_signature1 = func_signature1,
                 worse_code = worse_code,
                 better_code = better_code,
                 reflection = reflection,
+                func_name = self.func_name,
             )
-            messages = [{"role": "system", "content": self.generator_system_prompt}, {"role": "user", "content": crossover_prompt_user}]
+            messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
             messages_lst.append(messages)
             
             # Print crossover prompt for the first iteration
             if self.print_crossover_prompt:
-                logging.info("Crossover Prompt: \nSystem Prompt: \n" + self.generator_system_prompt + "\nUser Prompt: \n" + crossover_prompt_user)
+                logging.info("Crossover Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
                 self.print_crossover_prompt = False
-            
-            # Save crossover prompt to file
-            file_name = f"problem_iter{self.iteration}_crossover{idx}.txt"
-            with open(file_name, 'w') as file:
-                file.writelines(crossover_prompt_user + '\n')
-            idx += 1
         
         # Multi-processed chat completion
         responses_lst = multi_chat_completion(messages_lst, 1, self.cfg.model, self.cfg.temperature)
@@ -351,11 +372,14 @@ class G2A:
 
     def mutate(self) -> list[dict]:
         """Elitist-based mutation. We only mutate the best individual to generate n_pop new individuals."""
-        system = self.generator_system_prompt
+        system = self.system_generator_prompt
+        func_signature1 = self.func_signature.format(version=1) 
         user = self.mutataion_prompt.format(
-            task_desc = self.user_generator_prompt,
+            user_generator = self.user_generator_prompt,
             reflection = self.long_term_reflection_str,
+            func_signature1 = func_signature1,
             elitist_code = filter_code(self.elitist["code"]),
+            func_name = self.func_name,
         )
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
         if self.print_mutate_prompt:

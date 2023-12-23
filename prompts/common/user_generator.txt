@@ -1,0 +1,2 @@
+Write a {func_name} function for {problem_desc}
+{func_desc}

@@ -1,0 +1,3 @@
+{seed_func}
+
+Improve `{func_name}_v1` to give `{func_name}_v2`. Output code only and enclose your code with Python code block: ```python ... ```.
