@@ -7,7 +7,7 @@ import numpy as np
 from utils.utils import *
 
 
-class G2A:
+class ReEvo:
     def __init__(self, cfg, root_dir) -> None:
         self.client = OpenAI()
         self.cfg = cfg

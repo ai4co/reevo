@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 import subprocess
 
-from ga import G2A
+from reevo import ReEvo
 
 ROOT_DIR = os.getcwd()
 logging.basicConfig(level=logging.INFO)
@@ -19,8 +19,8 @@ def main(cfg):
     logging.info(f"Using LLM: {cfg.model}")
     
     # Main algorithm
-    ga = G2A(cfg, ROOT_DIR)
-    best_code_overall, best_code_path_overall = ga.evolve()
+    reevo = ReEvo(cfg, ROOT_DIR)
+    best_code_overall, best_code_path_overall = reevo.evolve()
     logging.info(f"Best Code Overall: {best_code_overall}")
     logging.info(f"Best Code Path Overall: {best_code_path_overall}")
     
