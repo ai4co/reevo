@@ -402,7 +402,7 @@ class G2A:
             logging.info("Mutation Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
             self.print_mutate_prompt = False
             
-        responses = chat_completion(self.cfg.pop_size * self.mutation_rate, messages, self.cfg.model, self.cfg.temperature)
+        responses = chat_completion(int(self.cfg.pop_size * self.mutation_rate), messages, self.cfg.model, self.cfg.temperature)
         population = self.responses_to_population(responses)
         return population
 
