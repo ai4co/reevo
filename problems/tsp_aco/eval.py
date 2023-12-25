@@ -11,6 +11,15 @@ N_ITERATIONS = 100
 N_ANTS = 30
 
 
+def solve(node_pos):
+    dist_mat = distance_matrix(node_pos, node_pos)
+    dist_mat[np.diag_indices_from(dist_mat)] = 1 # set diagonal to a large number
+    heu = heuristics(dist_mat.copy()) + 1e-9
+    heu[heu < 1e-9] = 1e-9
+    aco = ACO(dist_mat, heu, n_ants=N_ANTS)
+    obj = aco.run(N_ITERATIONS)
+    return obj
+
 if __name__ == "__main__":
     print("[*] Running ...")
 
@@ -27,12 +36,7 @@ if __name__ == "__main__":
         
         objs = []
         for i, node_pos in enumerate(node_positions):
-            dist_mat = distance_matrix(node_pos, node_pos)
-            dist_mat[np.diag_indices_from(dist_mat)] = 1 # Note: Set diagonal to a large value
-            heu = heuristics(dist_mat) + 1e-9
-            heu[heu < 1e-9] = 1e-9
-            aco = ACO(dist_mat, heu, n_ants=N_ANTS)
-            obj = aco.run(N_ITERATIONS)
+            obj = solve(node_pos)
             print(f"[*] Instance {i}: {obj}")
             objs.append(obj)
         
@@ -47,11 +51,6 @@ if __name__ == "__main__":
             n_instances = node_positions.shape[0]
             objs = []
             for i, node_pos in enumerate(node_positions):
-                dist_mat = distance_matrix(node_pos, node_pos)
-                dist_mat[np.diag_indices_from(dist_mat)] = 1 # Note: Set diagonal to a large value
-                heu = heuristics(dist_mat) + 1e-9
-                heu[heu < 1e-9] = 1e-9
-                aco = ACO(dist_mat, heu, n_ants=N_ANTS)
-                obj = aco.run(N_ITERATIONS)
+                obj = solve(node_pos)
                 objs.append(obj.item())
             print(f"[*] Average for {problem_size}: {np.mean(objs)}")

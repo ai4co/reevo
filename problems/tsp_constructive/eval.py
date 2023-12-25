@@ -4,10 +4,11 @@ import sys
 import argparse
 from scipy.spatial import distance_matrix
 import logging
+from copy import copy
 
 from gpt import select_next_node_v2 as select_next_node
 
-# TSP evaluation
+
 def eval_heuristic(node_positions: np.ndarray) -> float:
     '''
     Generate solution for TSP problem using the GPT-generated heuristic algorithm.
@@ -37,14 +38,12 @@ def eval_heuristic(node_positions: np.ndarray) -> float:
         next_node = select_next_node(
             current_node=solution[-1],
             destination_node=start_node,
-            unvisited_nodes=unvisited,
-            distance_matrix=dist_mat,
+            unvisited_nodes=copy(unvisited),
+            distance_matrix=dist_mat.copy(),
         )
         solution.append(next_node)
         if next_node in unvisited:
             unvisited.remove(next_node)
-        elif len(unvisited) + len(solution) ==  problem_size:
-            pass
         else:
             raise KeyError(f"Node {next_node} is already visited.")
     

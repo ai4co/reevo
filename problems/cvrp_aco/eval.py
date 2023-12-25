@@ -11,6 +11,15 @@ N_ITERATIONS = 100
 N_ANTS = 30
 CAPACITY = 50
 
+def solve(node_pos, demand):
+    dist_mat = distance_matrix(node_pos, node_pos)
+    dist_mat[np.diag_indices_from(dist_mat)] = 1 # set diagonal to a large number
+    heu = heuristics(dist_mat.copy(), node_pos.copy(), demand.copy(), CAPACITY) + 1e-9
+    heu[heu < 1e-9] = 1e-9
+    aco = ACO(dist_mat, demand, heu, CAPACITY, n_ants=N_ANTS)
+    obj = aco.run(N_ITERATIONS)
+    return obj
+
 
 if __name__ == "__main__":
     print("[*] Running ...")
@@ -31,14 +40,9 @@ if __name__ == "__main__":
         
         objs = []
         for i, (node_pos, demand) in enumerate(zip(node_positions, demands)):
-            dist_mat = distance_matrix(node_pos, node_pos)
-            dist_mat[np.diag_indices_from(dist_mat)] = 1 # set diagonal to a large number
-            heu = heuristics(dist_mat, node_pos, demand, CAPACITY) + 1e-9
-            heu[heu < 1e-9] = 1e-9
-            aco = ACO(dist_mat, demand, heu, CAPACITY, n_ants=N_ANTS)
-            obj = aco.run(N_ITERATIONS)
+            obj = solve(node_pos, demand)
             print(f"[*] Instance {i}: {obj}")
-            objs.append(obj)
+            objs.append(obj.item())
         
         print("[*] Average:")
         print(np.mean(objs))
@@ -55,12 +59,7 @@ if __name__ == "__main__":
             
             objs = []
             for i, (node_pos, demand) in enumerate(zip(node_positions, demands)):
-                dist_mat = distance_matrix(node_pos, node_pos)
-                dist_mat[np.diag_indices_from(dist_mat)] = 1 # set diagonal to a large number
-                heu = heuristics(dist_mat, node_pos, demand, CAPACITY) + 1e-9
-                heu[heu < 1e-9] = 1e-9
-                aco = ACO(dist_mat, demand, heu, CAPACITY, n_ants=N_ANTS)
-                obj = aco.run(N_ITERATIONS)
+                obj = solve(node_pos, demand)
                 objs.append(obj.item())
             
             print(f"[*] Average for {problem_size}: {np.mean(objs)}")
