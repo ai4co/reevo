@@ -1,0 +1,2 @@
+- Try combining various factors to determine how promising it is to select an edge.
+- Try sparsifying the matrix by setting unpromising elements to zero.
