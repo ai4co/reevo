@@ -15,8 +15,18 @@ def gen_instance(n):
 
 if __name__ == "__main__":
     np.random.seed(1234)
-    for problem_size in [20]:
+    
+    for problem_size in [50]:
         n_instances = 10
+        dataset = []
+        for i in range(n_instances):
+            inst = gen_instance(problem_size)
+            dataset.append(inst)
+        dataset = np.array(dataset)
+        np.save(f'./dataset/train{problem_size}_dataset.npy', dataset)
+
+    for problem_size in [20, 50, 100]:
+        n_instances = 64
         dataset = []
         for i in range(n_instances):
             inst = gen_instance(problem_size)

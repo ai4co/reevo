@@ -1,4 +1,5 @@
 problem_name: cvrp_aco
 problem_type: aco
-problem_size: 20 # problem size for validation
+problem_size: 50 # problem size for validation
+func_name: heuristics
 description: Solving Capacitated Vehicle Routing Problem (CVRP) via stochastic solution sampling. CVRP requires finding the shortest path that visits all given nodes and returns to the starting node. Each node has a demand and each vehicle has a capacity. The total demand of the nodes visited by a vehicle cannot exceed the vehicle capacity. When the total demand exceeds the vehicle capacity, the vehicle must return to the starting node.

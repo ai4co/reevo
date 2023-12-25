@@ -1,0 +1,3 @@
+def heuristics_v1(distance_matrix: np.ndarray, coordinates: np.ndarray, demands: np.ndarray, capacity: int) -> np.ndarray:
+    """A trivial indicator of how promising is each edge."""
+    return 1 / distance_matrix

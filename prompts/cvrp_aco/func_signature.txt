@@ -1,0 +1,1 @@
+def heuristics_v{version}(distance_matrix: np.ndarray, coordinates: np.ndarray, demands: np.ndarray, capacity: int) -> np.ndarray:
