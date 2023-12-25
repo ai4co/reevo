@@ -18,9 +18,6 @@ python main.py problem=cvrp_aco
 
 # for online BPP
 python main.py problem=bpp_online
-
-# when using GPT-4 Turbo, add:
-model=gpt-4-1106-preview
 ```
 
 

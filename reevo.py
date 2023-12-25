@@ -101,7 +101,6 @@ class ReEvo:
         
         # Run code and evaluate population
         population = self.evaluate_population(population)
-        objs = [individual["obj"] for individual in population]
 
         # Update iteration
         self.population = population
