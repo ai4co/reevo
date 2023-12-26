@@ -1,5 +1,0 @@
-Write a scoring function for {problem_description}.
-The function should output heuristic measures, which are non-negative real values. Solution components (e.g., edges connecting node pairs) with higher values are more likely to be chosen during subsequent solution construction.
-So, your output heuristic measures should indicate how promising it is to include each solution component in a solution.
-The function signature is as follows:
-{func_signature}
