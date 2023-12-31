@@ -5,13 +5,14 @@ from tqdm import tqdm
 
 # Datasets and baseline results are drawn from Duflo et al. (2019). A GP Hyper-Heuristic Approach for Generating TSP Heuristics.
 
-names = ["ts225", "rat99", "rl1889", "u1817", "bier127", "lin318", "eil51", "d493", "kroB100", "kroC100", "ch130", "pr299", "fl417", "d657", "kroA150", "fl1577", "u724", "pr264", "pr226", "pr439"]
+names = ["ts225", "rat99", "rl1889", "u1817", "d1655", "bier127", "lin318", "eil51", "d493", "kroB100", "kroC100", "ch130", "pr299", "fl417", "d657", "kroA150", "fl1577", "u724", "pr264", "pr226", "pr439"]
 
 opt = {
     'ts225': 126643,
     'rat99': 1211,
     'rl1889': 316536,
     'u1817': 57201,
+    'd1655': 62128,
     'bier127': 118282,
     'lin318': 42029,
     'eil51': 426,
