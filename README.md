@@ -26,6 +26,14 @@ python main.py problem=bpp_online
 - Python >= 3.9
 - openai >= 1.0.0
 - hydra-core
+- scikit-learn
+- scipy
+
+You may install the dependencies via pip:
+```bash
+$ pip install -r ./requirements.txt
+```
+
 
 ### Acknowledgments
 - [DeepACO: Neural-enhanced Ant Systems for Combinatorial Optimization](https://github.com/henry-yeh/DeepACO)
