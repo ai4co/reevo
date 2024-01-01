@@ -33,9 +33,9 @@ def generate_datasets(basepath = None):
 
     m = 5
     for mood, seed, problem_sizes in [
-        ('train', 1234, (50,)),
-        ('val',   3456, (20, 50, 100,)),
-        ('test',  4567, (20, 50, 100, 200,)),
+        ('train', 1234, (100,)),
+        ('val',   3456, (100, 300, 500)),
+        ('test',  4567, (100, 300, 500)),
     ]:
         np.random.seed(seed)
         for n in problem_sizes:

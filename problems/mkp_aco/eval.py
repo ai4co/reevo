@@ -5,8 +5,8 @@ import logging
 
 from gpt import heuristics_v2 as heuristics
 
-N_ITERATIONS = 100
-N_ANTS = 30
+N_ITERATIONS = 50
+N_ANTS = 10
 
 def solve(prize: np.ndarray, weight: np.ndarray):
     n, m = weight.shape

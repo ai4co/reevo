@@ -1,0 +1,2 @@
+- Try combining various factors to determine how promising it is to select an item.
+- Try sparsifying the heuristics by setting unpromising elements to zero.
