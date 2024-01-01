@@ -35,12 +35,13 @@ def generate_datasets(basepath = None):
     for mood, seed, problem_sizes in [
         ('train', 1234, (100,)),
         ('val',   3456, (100, 300, 500)),
-        ('test',  4567, (100, 300, 500)),
+        ('test',  4567, (100, 200, 300, 500, 1000)),
     ]:
         np.random.seed(seed)
+        batch_size = 5 if mood == 'train' or mood == 'val' else 64
         for n in problem_sizes:
             filepath = os.path.join(basepath, f"{mood}{n}_dataset.npz")
-            generate_dataset(filepath, n, m, batch_size=5)
+            generate_dataset(filepath, n, m, batch_size=batch_size)
 
 if __name__ == '__main__':
     generate_datasets()

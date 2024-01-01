@@ -6,7 +6,7 @@ import logging
 from gpt import heuristics_v2 as heuristics
 
 N_ITERATIONS = 50
-N_ANTS = 10
+N_ANTS = 20
 
 def solve(prize: np.ndarray, weight: np.ndarray):
     n, m = weight.shape
@@ -53,7 +53,7 @@ if __name__ == "__main__":
         print(np.mean(objs))
 
     else: # mood == 'val'
-        for problem_size in [20, 50]:
+        for problem_size in [100, 300, 500]:
             dataset_path = os.path.join(basepath, f"dataset/{mood}{problem_size}_dataset.npz")
             dataset = np.load(dataset_path)
             prizes, weights = dataset['prizes'], dataset['weights']
