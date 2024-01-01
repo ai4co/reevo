@@ -1,6 +1,6 @@
 To generate eval dataset:
 
 ```
-cd problems/cvrp_aco
+cd problems/bpp_online
 python gen_inst.py
 ```
