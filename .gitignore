@@ -1,4 +1,3 @@
-venv
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -165,3 +164,6 @@ outputs/
 gpt.py
 *.npy
 test.ipynb
+venv
+*.npz
+.vscode

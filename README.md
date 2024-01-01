@@ -29,11 +29,9 @@ python main.py problem=bpp_online
 - scikit-learn
 - scipy
 
-You may install the dependencies via pip:
-```bash
-$ pip install -r ./requirements.txt
-```
+You may install the dependencies via `pip install -r ./requirements.txt`.
 
+*In our implementation, solving some of the problems requires [pytorch](https://pytorch.org/), which is not included in `requirements.txt`.*
 
 ### Acknowledgments
 - [DeepACO: Neural-enhanced Ant Systems for Combinatorial Optimization](https://github.com/henry-yeh/DeepACO)

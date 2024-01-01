@@ -1,0 +1,1 @@
+def heuristics_v{version}(prize: np.ndarray, weight: np.ndarray) -> np.ndarray:
