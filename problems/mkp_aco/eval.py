@@ -11,7 +11,7 @@ N_ANTS = 30
 def solve(prize: np.ndarray, weight: np.ndarray):
     n, m = weight.shape
     heu = heuristics(prize.copy(), weight.copy()) + 1e-9
-    assert heu.shape[0] == heu.shape[1] == n
+    assert heu.shape == (n,)
     heu[heu < 1e-9] = 1e-9
     aco = ACO(torch.from_numpy(prize), torch.from_numpy(weight), torch.from_numpy(heu), N_ANTS)
     obj, _ = aco.run(N_ITERATIONS)
