@@ -17,7 +17,7 @@ class ReEvo:
         self.iteration = 0
         self.function_evals = 0
         self.elitist = None
-        self.best_obj_overall = float("inf")
+        self.best_obj_overall = float("inf") if cfg.problem.obj_type == "min" else -float("inf")
         self.long_term_reflection_str = "Nothing yet"
         self.best_obj_overall = None
         self.best_code_overall = None
@@ -32,6 +32,7 @@ class ReEvo:
         self.problem_desc = self.cfg.problem.description
         self.problem_size = self.cfg.problem.problem_size
         self.func_name = self.cfg.problem.func_name
+        self.obj_type = self.cfg.problem.obj_type
         
         logging.info("Problem: " + self.problem)
         logging.info("Problem description: " + self.problem_desc)
@@ -142,13 +143,12 @@ class ReEvo:
         return population
 
 
-    @staticmethod
-    def mark_invalid_individual(individual: dict, traceback_msg: str) -> dict:
+    def mark_invalid_individual(self, individual: dict, traceback_msg: str) -> dict:
         """
         Mark an individual as invalid.
         """
         individual["exec_success"] = False
-        individual["obj"] = float("inf")
+        individual["obj"] = float("inf") if self.obj_type == "min" else -float("inf")
         individual["fitness"] = 0
         individual["traceback_msg"] = traceback_msg
         return individual
@@ -203,7 +203,7 @@ class ReEvo:
                 try:
                     individual["obj"] = float(stdout_str.split('\n')[-2])
                     assert individual["obj"] > 0, "Objective value <= 0 is not supported."
-                    individual["fitness"] = 1 / individual["obj"]
+                    individual["fitness"] = 1 / individual["obj"] if self.obj_type == "min" else individual["obj"]
                     individual["exec_success"] = True
                 except:
                     population[response_id] = self.mark_invalid_individual(population[response_id], "Invalid std out / objective value!")
@@ -238,21 +238,24 @@ class ReEvo:
         """
         population = self.population
         objs = [individual["obj"] for individual in population]
-        best_obj, best_sample_idx = min(objs), np.argmin(np.array(objs))
+        if self.obj_type == "min":
+            best_obj, best_sample_idx = min(objs), np.argmin(np.array(objs))
+        else:
+            best_obj, best_sample_idx = max(objs), np.argmax(np.array(objs))
         
         # update best overall
-        if self.best_obj_overall is None or best_obj < self.best_obj_overall:
+        if self.best_obj_overall is None or (self.obj_type == "min" and best_obj < self.best_obj_overall) or (self.obj_type == "max" and best_obj > self.best_obj_overall):
             self.best_obj_overall = best_obj
             self.best_code_overall = population[best_sample_idx]["code"]
             self.best_code_path_overall = population[best_sample_idx]["code_path"]
         
         # update elitist
-        if self.elitist is None or best_obj < self.elitist["obj"]:
+        if self.elitist is None or (self.obj_type == "min" and best_obj < self.elitist["obj"]) or (self.obj_type == "max" and best_obj > self.elitist["obj"]):
             self.elitist = population[best_sample_idx]
             logging.info(f"Iteration {self.iteration}: Elitist: {self.elitist['obj']}")
         
         logging.info(f"Iteration {self.iteration} finished...")
-        logging.info(f"Min obj: {self.best_obj_overall}, Best Code Path: {self.best_code_path_overall}")
+        logging.info(f"Best obj: {self.best_obj_overall}, Best Code Path: {self.best_code_path_overall}")
         logging.info(f"Function Evals: {self.function_evals}")
         self.iteration += 1
     
@@ -280,13 +283,20 @@ class ReEvo:
         """
         Short-term reflection before crossovering two individuals.
         """
-        # Determine which individual is better or worse
-        if ind1["obj"] < ind2["obj"]:
-            better_ind, worse_ind = ind1, ind2
-        elif ind1["obj"] > ind2["obj"]:
-            better_ind, worse_ind = ind2, ind1
-        else:
+        if ind1["obj"] == ind2["obj"]:
             raise ValueError("Two individuals to crossover have the same objective value!")
+        # Determine which individual is better or worse
+        if self.obj_type == "min":
+            if ind1["obj"] < ind2["obj"]:
+                better_ind, worse_ind = ind1, ind2
+            elif ind1["obj"] > ind2["obj"]:
+                better_ind, worse_ind = ind2, ind1
+        elif self.obj_type == "max":
+            if ind1["obj"] > ind2["obj"]:
+                better_ind, worse_ind = ind1, ind2
+            elif ind1["obj"] < ind2["obj"]:
+                better_ind, worse_ind = ind2, ind1
+
         worse_code = filter_code(worse_ind["code"])
         better_code = filter_code(better_ind["code"])
         
