@@ -33,6 +33,7 @@ class ReEvo:
         self.problem_size = self.cfg.problem.problem_size
         self.func_name = self.cfg.problem.func_name
         self.obj_type = self.cfg.problem.obj_type
+        self.problem_type = self.cfg.problem.problem_type
         
         logging.info("Problem: " + self.problem)
         logging.info("Problem description: " + self.problem_desc)
@@ -43,10 +44,12 @@ class ReEvo:
         
         # Loading all text prompts
         # Problem-specific prompt components
-        self.seed_func = file_to_string(f'{self.prompt_dir}/{self.problem}/seed_func.txt')
-        self.func_signature = file_to_string(f'{self.prompt_dir}/{self.problem}/func_signature.txt')
-        self.func_desc = file_to_string(f'{self.prompt_dir}/{self.problem}/func_desc.txt')
-        if os.path.exists(f'{self.prompt_dir}/{self.problem}/external_knowledge.txt'):
+        prompt_path_suffix = "_black_box" if self.problem_type == "black_box" else ""
+        problem_prompt_path = f'{self.prompt_dir}/{self.problem}{prompt_path_suffix}'
+        self.seed_func = file_to_string(f'{problem_prompt_path}/seed_func.txt')
+        self.func_signature = file_to_string(f'{problem_prompt_path}/func_signature.txt')
+        self.func_desc = file_to_string(f'{problem_prompt_path}/func_desc.txt')
+        if os.path.exists(f'{problem_prompt_path}/external_knowledge.txt'):
             self.external_knowledge = file_to_string(f'{self.prompt_dir}/{self.problem}/external_knowledge.txt')
         else:
             self.external_knowledge = ""
@@ -68,6 +71,11 @@ class ReEvo:
             seed_func=self.seed_func,
             func_name=self.func_name,
         )
+        
+        # Extra prompts for black-box problems
+        if self.problem_type == "black_box":
+            self.user_reflector_st_prompt += " Please give hints by inferring the problem settings."
+            self.user_reflector_lt_prompt += " Please give hints by inferring the problem settings."
 
         # Flag to print prompts
         self.print_crossover_prompt = True # Print crossover prompt for the first iteration
@@ -184,7 +192,7 @@ class ReEvo:
             if inner_run is None: # If code execution fails, skip
                 continue
             try:
-                inner_run.communicate(timeout=20) # Wait for code execution to finish
+                inner_run.communicate(timeout=60) # Wait for code execution to finish
             except subprocess.TimeoutExpired as e:
                 logging.info(f"Error for response_id {response_id}: {e}")
                 population[response_id] = self.mark_invalid_individual(population[response_id], str(e))
@@ -357,6 +365,15 @@ class ReEvo:
         
         response = chat_completion(1, messages, self.cfg.model, self.cfg.temperature)
         self.long_term_reflection_str = response[0].message.content
+        
+        # Write reflections to file
+        file_name = f"problem_iter{self.iteration}_short_term_reflections.txt"
+        with open(file_name, 'w') as file:
+            file.writelines("\n".join(short_term_reflections) + '\n')
+        
+        file_name = f"problem_iter{self.iteration}_long_term_reflection.txt"
+        with open(file_name, 'w') as file:
+            file.writelines(self.long_term_reflection_str + '\n')
 
 
     def crossover(self, short_term_reflection_tuple: tuple[list[list[dict]], list[str], list[str]]) -> list[dict]:
