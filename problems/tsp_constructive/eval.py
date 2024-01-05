@@ -78,7 +78,7 @@ if __name__ == '__main__':
         print(np.mean(objs))
     
     else:
-        for problem_size in [50]:
+        for problem_size in [20, 50, 100, 200]:
             dataset_path = f"{root_dir}/problems/tsp_constructive/dataset/val{problem_size}_dataset.npy"
             logging.info(f"[*] Evaluating {dataset_path}")
             node_positions = np.load(dataset_path)
