@@ -50,9 +50,7 @@ class ReEvo:
         self.func_signature = file_to_string(f'{problem_prompt_path}/func_signature.txt')
         self.func_desc = file_to_string(f'{problem_prompt_path}/func_desc.txt')
         if os.path.exists(f'{problem_prompt_path}/external_knowledge.txt'):
-            self.external_knowledge = file_to_string(f'{self.prompt_dir}/{self.problem}/external_knowledge.txt')
-        else:
-            self.external_knowledge = ""
+            self.long_term_reflection_str = file_to_string(f'{self.prompt_dir}/{self.problem}/external_knowledge.txt')
         
         
         # Common prompts
@@ -95,7 +93,7 @@ class ReEvo:
         
         # Generate responses
         system = self.system_generator_prompt
-        user = self.user_generator_prompt + "\n" + self.seed_prompt + "\n" + self.external_knowledge
+        user = self.user_generator_prompt + "\n" + self.seed_prompt + "\n" + self.long_term_reflection_str
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
         logging.info("Initial Population Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
         responses = chat_completion(self.cfg.pop_size, messages, self.cfg.model, self.cfg.temperature)
@@ -416,7 +414,7 @@ class ReEvo:
         func_signature1 = self.func_signature.format(version=1) 
         user = self.mutataion_prompt.format(
             user_generator = self.user_generator_prompt,
-            reflection = self.long_term_reflection_str + "\n" + self.external_knowledge,
+            reflection = self.long_term_reflection_str,
             func_signature1 = func_signature1,
             elitist_code = filter_code(self.elitist["code"]),
             func_name = self.func_name,
