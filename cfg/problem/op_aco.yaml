@@ -1,0 +1,6 @@
+problem_name: op_aco
+problem_type: aco
+obj_type: max
+problem_size: 50 # problem size for validation
+func_name: heuristics
+description: Solving Orienteering Problem (OP) via stochastic solution sampling following "heuristics". OP is an optimization problem where the goal is to find the most rewarding route, starting from a depot, visiting a subset of nodes with associated prizes, and returning to the depot within a specified travel distance.
