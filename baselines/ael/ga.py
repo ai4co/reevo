@@ -234,6 +234,8 @@ class AEL:
         Random selection, select individuals with equal probability.
         """
         selected_population = []
+        # Eliminate invalid individuals
+        population = [individual for individual in population if individual["exec_success"]]
         for _ in range(self.cfg.pop_size):
             parents = np.random.choice(population, size=2, replace=False)
             selected_population.extend(parents)

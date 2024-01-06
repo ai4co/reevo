@@ -3,7 +3,10 @@ import numpy as np
 import torch
 import logging
 
-from gpt import heuristics_v2 as heuristics
+try:
+    from gpt import heuristics_v2 as heuristics
+except:
+    from gpt import heuristics
 
 N_ITERATIONS = 50
 N_ANTS = 10
