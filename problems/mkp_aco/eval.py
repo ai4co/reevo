@@ -3,15 +3,18 @@ import numpy as np
 import torch
 import logging
 
-from gpt import heuristics_v2 as heuristics
+try:
+    from gpt import heuristics_v2 as heuristics
+except:
+    from gpt import heuristics
 
-N_ITERATIONS = 100
-N_ANTS = 30
+N_ITERATIONS = 50
+N_ANTS = 10
 
 def solve(prize: np.ndarray, weight: np.ndarray):
     n, m = weight.shape
     heu = heuristics(prize.copy(), weight.copy()) + 1e-9
-    assert heu.shape[0] == heu.shape[1] == n
+    assert heu.shape == (n,)
     heu[heu < 1e-9] = 1e-9
     aco = ACO(torch.from_numpy(prize), torch.from_numpy(weight), torch.from_numpy(heu), N_ANTS)
     obj, _ = aco.run(N_ITERATIONS)
@@ -53,7 +56,7 @@ if __name__ == "__main__":
         print(np.mean(objs))
 
     else: # mood == 'val'
-        for problem_size in [20, 50]:
+        for problem_size in [100, 300, 500]:
             dataset_path = os.path.join(basepath, f"dataset/{mood}{problem_size}_dataset.npz")
             dataset = np.load(dataset_path)
             prizes, weights = dataset['prizes'], dataset['weights']

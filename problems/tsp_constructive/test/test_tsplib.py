@@ -32,72 +32,27 @@ opt = {
  }
 
 
-def select_next_node_reevo(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
-
-        """Select the next node to visit from the unvisited nodes.
-
-        Args:
-            current_node: The current node.
-            destination_node: The destination node.
-            unvisited_nodes: A set of unvisited nodes.
-            distance_matrix: A matrix representing the distances between nodes.
-
-        Returns:
-            The next node to visit.
-        """
-        threshold = 0.6
-        
-        # Define weights for the scoring factors
-        weights = {
-            'current_distance': 0.25,
-            'average_distance_to_unvisited': 0.15,
-            'std_dev_distance_to_unvisited': 0.15,
-            'destination_distance': 0.1,
-            'nearest_neighbor_distance': 0.12,
-            'second_nearest_neighbor_distance': 0.08,
-            'furthest_neighbor_distance': 0.1,
-            'second_furthest_neighbor_distance': 0.07,
-        }
-
-        # Normalize the weights
-        total_weight = sum(weights.values())
-        normalized_weights = {factor: weight / total_weight for factor, weight in weights.items()}
-
-        scores = {}
-
-        for node in unvisited_nodes:
-            # Calculate average and standard deviation of distances to unvisited nodes
-            distances_to_unvisited = [distance_matrix[node][i] for i in unvisited_nodes if i != node]
-            n = len(distances_to_unvisited)
-            if n > 0:
-                average_distance_to_unvisited = sum(distances_to_unvisited) / (n + 1) # Consider the current node
-                std_dev_distance_to_unvisited = np.std(distances_to_unvisited + [distance_matrix[node][current_node]])
-            else:
-                average_distance_to_unvisited = 0
-                std_dev_distance_to_unvisited = 0
-
-            # Calculate the score for the current node
-            score = (
-                normalized_weights['current_distance'] * distance_matrix[current_node][node]
-                - normalized_weights['average_distance_to_unvisited'] * average_distance_to_unvisited
-                + normalized_weights['std_dev_distance_to_unvisited'] * std_dev_distance_to_unvisited
-                - normalized_weights['destination_distance'] * distance_matrix[destination_node][node]
-                - normalized_weights['nearest_neighbor_distance'] * min(distance_matrix[current_node])
-                - normalized_weights['second_nearest_neighbor_distance'] * sorted(distance_matrix[current_node])[1]
-                - normalized_weights['furthest_neighbor_distance'] * max(distance_matrix[current_node])
-                - normalized_weights['second_furthest_neighbor_distance'] * sorted(distance_matrix[current_node])[-2]
-            )
-
-            scores[node] = score
-
-        if all(score > threshold for score in scores.values()):
-            # Use a greedy strategy to select the node if all scores are above the threshold
-            next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
+def select_next_node_ReEvo(current_node: int, destination_node: int, unvisited_nodes: set, distance_matrix: np.ndarray) -> int:
+    """Select the next node to visit from the unvisited nodes."""
+    weights = {'distance_to_current': 0.4, 
+               'average_distance_to_unvisited': 0.25, 
+               'std_dev_distance_to_unvisited': 0.25, 
+               'distance_to_destination': 0.1}
+    scores = {}
+    for node in unvisited_nodes:
+        future_distances = [distance_matrix[node, i] for i in unvisited_nodes if i != node]
+        if future_distances:
+            average_distance_to_unvisited = sum(future_distances) / len(future_distances)
+            std_dev_distance_to_unvisited = (sum((x - average_distance_to_unvisited) ** 2 for x in future_distances) / len(future_distances)) ** 0.5
         else:
-            # Select the node with the minimum score
-            next_node = min(scores, key=scores.get)
-
-        return next_node
+            average_distance_to_unvisited = std_dev_distance_to_unvisited = 0
+        score = (weights['distance_to_current'] * distance_matrix[current_node, node] -
+                 weights['average_distance_to_unvisited'] * average_distance_to_unvisited +
+                 weights['std_dev_distance_to_unvisited'] * std_dev_distance_to_unvisited -
+                 weights['distance_to_destination'] * distance_matrix[destination_node, node])
+        scores[node] = score
+    next_node = min(scores, key=scores.get)
+    return next_node
 
 
 def eval_heuristic(node_positions: np.ndarray, start_node: int) -> float:
@@ -112,7 +67,7 @@ def eval_heuristic(node_positions: np.ndarray, start_node: int) -> float:
     unvisited.remove(start_node)
     # run the heuristic
     for _ in tqdm(range(problem_size - 1)):
-        next_node = select_next_node_reevo(
+        next_node = select_next_node_ReEvo(
             current_node=solution[-1],
             destination_node=start_node,
             unvisited_nodes=copy(unvisited),
@@ -148,7 +103,7 @@ if __name__ == '__main__':
 
         # Evaluate the heuristic
         objs = []
-        for start_node in range(5):
+        for start_node in range(3):
             obj = eval_heuristic(data, start_node) * scale
             objs.append(obj)
         mean, std = np.mean(objs), np.std(objs)

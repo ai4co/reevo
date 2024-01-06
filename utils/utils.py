@@ -37,15 +37,15 @@ def block_until_running(stdout_filepath, log_status=False, iter_num=-1, response
 
 
 def extract_code_description(response: str) -> tuple[str, str]:
-    """Deprecated."""
-    raise NotImplementedError
+    """
+    Extract code and description from GPT response. Used only for AEL."""
     # Regex patterns to extract python code enclosed in GPT response
     pattern_code = r'```python(.*?)```'
     code_string = re.search(pattern_code, response, re.DOTALL)
     code_string = code_string.group(1).strip() if code_string is not None else None
-    # Regex patterns to extract code description enclosed in GPT response
-    pattern_desc = r'(.*?)```python'
-    desc_string = re.search(pattern_desc, response, re.DOTALL)
+    # Regex patterns to extract code description enclosed in GPT response, it starts with ‘<start>’ and ends with ‘<end>’
+    pattern_code = r'<start>(.*?)```python'
+    desc_string = re.search(pattern_code, response, re.DOTALL)
     desc_string = desc_string.group(1).strip() if desc_string is not None else None
     return code_string, desc_string
 

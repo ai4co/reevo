@@ -9,8 +9,5 @@ def select_next_node_v1(current_node: int, destination_node: int, unvisited_node
         std_dev_distance_to_unvisited = np.std(all_distances)
         score = c1 * distance_matrix[current_node][node] - c2 * average_distance_to_unvisited + c3 * std_dev_distance_to_unvisited - c4 * distance_matrix[destination_node][node]
         scores[node] = score
-    if min(scores.values()) > threshold:
-        next_node = min(unvisited_nodes, key=lambda node: distance_matrix[current_node][node])
-    else:
-        next_node = min(scores, key=scores.get)
+    next_node = min(scores, key=scores.get)
     return next_node

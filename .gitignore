@@ -167,3 +167,8 @@ test.ipynb
 venv
 *.npz
 .vscode
+*.pickle
+*.pkl
+*.DS_Store
+exp/*
+ablation/*

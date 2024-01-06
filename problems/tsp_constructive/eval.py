@@ -6,7 +6,10 @@ from scipy.spatial import distance_matrix
 import logging
 from copy import copy
 
-from gpt import select_next_node_v2 as select_next_node
+try:
+    from gpt import select_next_node_v2 as select_next_node
+except:
+    from gpt import select_next_node
 
 
 def eval_heuristic(node_positions: np.ndarray) -> float:
@@ -78,7 +81,7 @@ if __name__ == '__main__':
         print(np.mean(objs))
     
     else:
-        for problem_size in [50]:
+        for problem_size in [20, 50, 100, 200]:
             dataset_path = f"{root_dir}/problems/tsp_constructive/dataset/val{problem_size}_dataset.npy"
             logging.info(f"[*] Evaluating {dataset_path}")
             node_positions = np.load(dataset_path)
