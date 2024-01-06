@@ -58,7 +58,7 @@ class ReEvo:
         # Common prompts
         self.system_generator_prompt = file_to_string(f'{self.prompt_dir}/common/system_generator.txt')
         self.system_reflector_prompt = file_to_string(f'{self.prompt_dir}/common/system_reflector.txt')
-        self.user_reflector_st_prompt = file_to_string(f'{self.prompt_dir}/common/user_reflector_st.txt') # shrot-term reflection
+        self.user_reflector_st_prompt = file_to_string(f'{self.prompt_dir}/common/user_reflector_st.txt') if self.problem_type != "black_box" else file_to_string(f'{self.prompt_dir}/common/user_reflector_st_black_box.txt') # shrot-term reflection
         self.user_reflector_lt_prompt = file_to_string(f'{self.prompt_dir}/common/user_reflector_lt.txt') # long-term reflection
         self.crossover_prompt = file_to_string(f'{self.prompt_dir}/common/crossover.txt')
         self.mutataion_prompt = file_to_string(f'{self.prompt_dir}/common/mutation.txt')
@@ -71,11 +71,6 @@ class ReEvo:
             seed_func=self.seed_func,
             func_name=self.func_name,
         )
-        
-        # Extra prompts for black-box problems
-        if self.problem_type == "black_box":
-            self.user_reflector_st_prompt += " Please give hints by inferring the problem settings."
-            self.user_reflector_lt_prompt += " Please give hints by inferring the problem settings."
 
         # Flag to print prompts
         self.print_crossover_prompt = True # Print crossover prompt for the first iteration
