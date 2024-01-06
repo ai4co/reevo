@@ -132,7 +132,7 @@ class AEL:
         inner_runs = []
         # Run code to evaluate
         for response_id in range(len(population)):
-            
+            self.function_evals += 1
             # Skip if response is invalid
             if population[response_id]["code"] is None:
                 population[response_id] = self.mark_invalid_individual(population[response_id], "Invalid response!")
@@ -140,7 +140,6 @@ class AEL:
                 continue
             
             logging.info(f"Iteration {self.iteration}: Running Code {response_id}")
-            self.function_evals += 1
             
             try:
                 process = self._run_code(population[response_id], response_id)
@@ -155,7 +154,7 @@ class AEL:
             if inner_run is None: # If code execution fails, skip
                 continue
             try:
-                inner_run.communicate(timeout=60) # Wait for code execution to finish
+                inner_run.communicate(timeout=10) # Wait for code execution to finish
             except subprocess.TimeoutExpired as e:
                 logging.info(f"Error for response_id {response_id}: {e}")
                 population[response_id] = self.mark_invalid_individual(population[response_id], str(e))
@@ -245,6 +244,23 @@ class AEL:
         assert len(selected_population) == 2*self.cfg.pop_size
         return selected_population
 
+    def rank_select(self, population: list[dict]) -> list[dict]:
+        """
+        Rank selection, select individuals with probability proportional to the inverse of their rank.
+        """
+        selected_population = []
+        # Eliminate invalid individuals
+        population = [individual for individual in population if individual["exec_success"]]
+        population.sort(key=lambda x: x["fitness"], reverse=True)
+        # Compute rank probabilities
+        rank_probs = [1 / (i+1) for i in range(len(population))]
+        rank_probs = np.array(rank_probs) / np.sum(rank_probs)
+        for _ in range(self.cfg.pop_size):
+            parents = np.random.choice(population, size=2, replace=False, p=rank_probs)
+            selected_population.extend(parents)
+        assert len(selected_population) == 2*self.cfg.pop_size
+        return selected_population
+
     def crossover(self, population: list[dict]) -> list[dict]:
         crossed_population = []
         assert len(population) == self.cfg.pop_size * 2
@@ -317,7 +333,7 @@ class AEL:
     def evolve(self):
         while self.function_evals < self.cfg.max_fe:
             # Select
-            selected_population = self.random_select(self.population)
+            selected_population = self.rank_select(self.population)
             # Crossover
             crossed_population = self.crossover(selected_population)
             # Mutate
