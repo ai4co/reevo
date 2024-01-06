@@ -5,7 +5,6 @@ import os
 from pathlib import Path
 import subprocess
 
-from reevo import ReEvo
 
 ROOT_DIR = os.getcwd()
 logging.basicConfig(level=logging.INFO)
@@ -17,9 +16,17 @@ def main(cfg):
     logging.info(f"Workspace: {workspace_dir}")
     logging.info(f"Project Root: {ROOT_DIR}")
     logging.info(f"Using LLM: {cfg.model}")
+    logging.info(f"Using Algorithm: {cfg.algorithm}")
     
+    if cfg.algorithm == "reevo":
+        from reevo import ReEvo as ga
+    elif cfg.algorithm == "ael":
+        from baselines.ael.ga import AEL as ga
+    else:
+        raise NotImplementedError
+
     # Main algorithm
-    reevo = ReEvo(cfg, ROOT_DIR)
+    reevo = ga(cfg, ROOT_DIR)
     best_code_overall, best_code_path_overall = reevo.evolve()
     logging.info(f"Best Code Overall: {best_code_overall}")
     logging.info(f"Best Code Path Overall: {best_code_path_overall}")

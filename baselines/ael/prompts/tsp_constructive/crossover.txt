@@ -1,0 +1,14 @@
+I have 2 algorithms with their code to select the next node in each step.
+The first algorithm and the corresponding code is:
+<Algorithm description>: {alg_desc1}
+<Code>: {alg_code1}
+The second algorithm and the corresponding code is
+<Algorithm description>: {alg_desc2}
+<Code>: {alg_code2}
+
+Please help me create a new algorithm that motivated by the given algorithms. Please provide a brief description of the new algorithm and its corresponding code. The code function must called 'select_next_node' that takes inputs 'current_node', 'destination_node', 'unvisited_nodes', and 'distance_matrix', and outputs the 'next_node', where 'current_node', 'destination_node', 'next_node', and 'unvisited_nodes' are node id.
+
+Your code description must start with ‘<start>’ and end with ‘<end>’. 
+Your Python code should be formatted as a Python code string: "```python ... ```"
+
+Be creative and do not give additional explanation.

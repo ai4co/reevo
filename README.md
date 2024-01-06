@@ -7,7 +7,7 @@
 - Make sure to generate datasets before running. Refer to `problems/*/dataset/readme.md` for details.
 - Running logs and intermediate results are saved in `./outputs/main/` by default.
 
-
+#### To run ReEvo
 ```bash
 # for tsp_constructive
 python main.py problem=tsp_constructive
@@ -23,6 +23,12 @@ python main.py problem=mkp_aco
 
 # for online BPP
 python main.py problem=bpp_online
+```
+
+#### To run AEL
+```bash
+# for tsp_constructive
+python main.py problem=tsp_constructive algorithm=ael mutation_rate=0.2
 ```
 
 

@@ -6,7 +6,10 @@ from scipy.spatial import distance_matrix
 import logging
 from copy import copy
 
-from gpt import select_next_node_v2 as select_next_node
+try:
+    from gpt import select_next_node_v2 as select_next_node
+except:
+    from gpt import select_next_node
 
 
 def eval_heuristic(node_positions: np.ndarray) -> float:

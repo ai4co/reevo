@@ -7,6 +7,9 @@ hydra:
   job:
     chdir: True
 
+# The chosen algorithm
+algorithm: reevo # another option is "ael"
+
 # LLM parameters
 model: gpt-3.5-turbo-0613  # LLM model (other options include gpt-4-1106-preview)
 temperature: 1  # temperature for chat completion
