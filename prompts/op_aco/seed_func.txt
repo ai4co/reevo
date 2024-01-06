@@ -1,0 +1,2 @@
+def heuristics_v1(prize: np.ndarray, distance: np.ndarray, maxlen: float) -> np.ndarray:
+    return prize[np.newaxis, :] / distance
