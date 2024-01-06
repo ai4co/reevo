@@ -35,14 +35,17 @@ class AEL:
         self.problem_description = self.cfg.problem.description
         self.problem_size = self.cfg.problem.problem_size
         self.obj_type = self.cfg.problem.obj_type
+        self.problem_type = self.cfg.problem.problem_type
         
         logging.info("Problem: " + self.problem)
         logging.info("Problem description: " + self.problem_description)
         
-        prompt_dir = f'{self.root_dir}/baselines/ael/prompts/{self.problem}'
+        prompt_path_suffix = "_black_box" if self.problem_type == "black_box" else ""
+        prompt_dir = f'{self.root_dir}/baselines/ael/prompts/{self.problem}{prompt_path_suffix}'
         self.output_file = f"{self.root_dir}/problems/{self.problem}/{self.cfg.suffix.lower()}.py"
         
         # Loading all text prompts
+        
         task_desc = file_to_string(f'{prompt_dir}/task_desc.txt')
         self.initial_prompt = task_desc + file_to_string(f'{prompt_dir}/init.txt')
         self.crossover_prompt = task_desc + file_to_string(f'{prompt_dir}/crossover.txt')

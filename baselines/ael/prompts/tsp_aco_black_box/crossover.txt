@@ -1,0 +1,14 @@
+I have 2 algorithms for this task.
+The first algorithm and the corresponding code is:
+<Algorithm description>: {alg_desc1}
+<Code>: {alg_code1}
+The second algorithm and the corresponding code is
+<Algorithm description>: {alg_desc2}
+<Code>: {alg_code2}
+
+Please help me create a new algorithm that motivated by the given algorithms. Please provide a brief description of the new algorithm and its corresponding code. The `heuristics` function takes as input a matrix of edge attributes and returns prior indicators of how promising it is to include each edge in a solution. The return is of the same shape as the input matrix.
+
+Your code description must start with ‘<start>’ and end with ‘<end>’. 
+Your Python code should be formatted as a Python code string: "```python ... ```"
+
+Be creative and do not give additional explanation.
