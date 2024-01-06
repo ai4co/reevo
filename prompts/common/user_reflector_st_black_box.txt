@@ -1,0 +1,12 @@
+Below are two {func_name} functions for {problem_desc}
+{func_desc}
+
+You are provided with two code versions below, where the second version performs better than the first one.
+
+[Worse code]
+{worse_code}
+
+[Better code]
+{better_code}
+
+Please infer the problem settings by comparing two code versions and give hints for designing better heuristics, using less than 50 words.
