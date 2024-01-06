@@ -164,7 +164,7 @@ class ReEvo:
         inner_runs = []
         # Run code to evaluate
         for response_id in range(len(population)):
-            
+            self.function_evals += 1
             # Skip if response is invalid
             if population[response_id]["code"] is None:
                 population[response_id] = self.mark_invalid_individual(population[response_id], "Invalid response!")
@@ -172,7 +172,6 @@ class ReEvo:
                 continue
             
             logging.info(f"Iteration {self.iteration}: Running Code {response_id}")
-            self.function_evals += 1
             
             try:
                 process = self._run_code(population[response_id], response_id)
@@ -187,7 +186,7 @@ class ReEvo:
             if inner_run is None: # If code execution fails, skip
                 continue
             try:
-                inner_run.communicate(timeout=60) # Wait for code execution to finish
+                inner_run.communicate(timeout=10) # Wait for code execution to finish
             except subprocess.TimeoutExpired as e:
                 logging.info(f"Error for response_id {response_id}: {e}")
                 population[response_id] = self.mark_invalid_individual(population[response_id], str(e))
