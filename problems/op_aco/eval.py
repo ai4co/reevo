@@ -20,7 +20,7 @@ def solve(inst: OPInstance):
     heu = torch.from_numpy(heu)
     aco = ACO(inst.prize, inst.distance, inst.maxlen, heu, N_ANTS)
     obj, _ = aco.run(N_ITERATIONS)
-    return -obj
+    return obj
 
 
 if __name__ == "__main__":
