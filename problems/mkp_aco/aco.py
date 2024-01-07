@@ -1,3 +1,5 @@
+# Adapted from `mkp_transformer` in [*DeepACO: Neural-enhanced Ant Systems for Combinatorial Optimization*](https://github.com/henry-yeh/DeepACO)
+
 import torch
 from torch.distributions import Categorical
 import numpy as np

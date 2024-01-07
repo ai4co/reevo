@@ -1,4 +1,4 @@
-Adapted from [*DeepACO: Neural-enhanced Ant Systems for Combinatorial Optimization*](https://github.com/henry-yeh/DeepACO)
+ACO implementations are adapted from [*DeepACO: Neural-enhanced Ant Systems for Combinatorial Optimization*](https://github.com/henry-yeh/DeepACO)
 
 
 Reference:
