@@ -27,7 +27,7 @@ python main.py problem=bpp_online
 
 #### To run AEL
 ```bash
-# for tsp_constructive
+# e.g., for tsp_constructive
 python main.py problem=tsp_constructive algorithm=ael mutation_rate=0.2
 ```
 

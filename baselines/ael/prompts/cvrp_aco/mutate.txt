@@ -1,0 +1,12 @@
+Task: Solving Capacitated Vehicle Routing Problem (CVRP) via stochastic solution sampling. CVRP requires finding the shortest path that visits all given nodes and returns to the starting node. Each node has a demand and each vehicle has a capacity. The total demand of the nodes visited by a vehicle cannot exceed the vehicle capacity. When the total demand exceeds the vehicle capacity, the vehicle must return to the starting node.
+
+I have an algorithm for this task. The algorithm and the corresponding code are:
+<Algorithm description>: {alg_desc}
+<Code>: {alg_code}
+
+Please assist me in creating a modified version of the algorithm provided. Please provide a brief description of the new algorithm and its corresponding code. The code function must be named 'heuristics'. The `heuristics` function takes as input a distance matrix (shape: n by n), Euclidean coordinates of nodes (shape: n by 2), a vector of customer demands (shape: n), and the integer capacity of vehicle capacity. It returns prior indicators of how promising it is to include each edge in a solution. The return is of the same shape as the distance_matrix. The depot node is indexed by 0. The function should NOT involve actually visiting each node.
+
+Your code description must start with ‘<start>’ and end with ‘<end>’. 
+Your Python code should be formatted as a Python code string: "```python ... ```"
+
+Be creative and do not give additional explanation.
