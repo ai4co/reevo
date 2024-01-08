@@ -5,8 +5,6 @@ from typing import Tuple, List, Optional, Annotated
 IntArray = npt.NDArray[np.int_]
 FloatArray = npt.NDArray[np.float_]
 
-CAPACITY = 150
-
 def organize_path(path: IntArray) -> Tuple[int, IntArray]:
     order = {}
     result = np.zeros_like(path)
@@ -24,11 +22,11 @@ def calculate_path_cost_fitness(vacancies: IntArray, capacity: int) -> Tuple[int
     return cost, result
 
 class ACO(object):
-    def __init__(self,  # 0: depot
+    def __init__(self,
                  demand: IntArray,   # (n, )
-                 heuristic: FloatArray,
-                 max_bin_count: Optional[int]= None,
-                 capacity=CAPACITY,
+                 heuristic: FloatArray,   # (n, max_bin_count)
+                 capacity: int,
+                 max_bin_count: Optional[int] = None, # default to n
                  n_ants=20, 
                  decay=0.9,
                  alpha=1,
@@ -107,14 +105,15 @@ class ACO(object):
         for index in order:
             demand = self.demand[index]
             mask = demand <= vacancy
-            if np.count_nonzero(mask) == 0:
+            if not np.any(mask):
                 return None, 0, 0.0
+            prob = (prob_matrix[index]+1e-6)*mask
+
             if self.greedy_mode:
-                prob = prob_matrix[index]*mask
                 sampled = prob.argmax()
             else:
-                prob = (prob_matrix[index]+1e-6)*mask
                 sampled = np.random.choice(self.max_bin_count, p=prob/prob.sum())
+
             path[index] = sampled
             vacancy[sampled] -= demand
         cost, fitness = calculate_path_cost_fitness(vacancy, self.capacity)

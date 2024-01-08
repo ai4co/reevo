@@ -2,9 +2,11 @@ from aco import ACO
 import numpy as np
 import logging
 from gen_inst import BPPInstance, load_dataset, dataset_conf
-from typing import Literal
 
-from gpt import heuristics_v2 as heuristics
+try:
+    from gpt import heuristics_v2 as heuristics
+except:
+    from gpt import heuristics
 
 N_ITERATIONS = 50
 N_ANTS = 20
@@ -14,7 +16,7 @@ def solve(inst: BPPInstance, mode = 'sample'):
     heu = heuristics(inst.demands, inst.capacity) + 1e-6
     assert tuple(heu.shape) == (inst.n, inst.n)
     heu[heu < 1e-9] = 1e-9
-    aco = ACO(inst.demands, heu, max_bin_count=inst.n, capacity = inst.capacity, n_ants=N_ANTS)
+    aco = ACO(inst.demands, heu, capacity = inst.capacity, max_bin_count=inst.n, n_ants=N_ANTS)
     if mode == 'sample':
         obj, _ = aco.sample_only(SAMPLE_COUNT)
     else:
