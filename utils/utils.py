@@ -7,6 +7,7 @@ import multiprocessing
 import time
 import re
 
+client = OpenAI()
 
 def file_to_string(filename):
     with open(filename, 'r') as file:
@@ -52,7 +53,6 @@ def get_chat_completion(client, message, model="gpt-3.5-turbo-1106", temperature
     Deprecated. Use chat_completion instead.
     """
     raise NotImplementedError
-    client = OpenAI()
     completion = client.chat.completions.create(
         model=model,
         messages=message,
@@ -93,7 +93,6 @@ def chat_completion(n: int, messages: list[dict], model: str, temperature: float
     """
     Generate n responses using OpenAI Chat Completions API
     """
-    client = OpenAI()
     total_samples = 0
     responses = []
     chunk_size = n if "gpt-3.5" in model else min(4, n)
