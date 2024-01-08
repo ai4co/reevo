@@ -1,0 +1,10 @@
+Task: Solving Multiple Knapsack Problems (MKP) through stochastic solution sampling based on "heuristics". MKP involves selecting a subset of items to maximize the total prize collected, subject to multi-dimensional maximum weight constraints.
+
+You should create a totally new strategy for me. Provide a brief description of the new algorithm and its corresponding code. The code function must be named 'heuristics', take inputs of "prize" and "weight", and return "heuristics".
+Suppose `n` indicates the scale of the problem, and `m` is the dimension of weights each item has. The constraint of each dimension is fixed to 1. The `heuristics` function takes as input a `prize` of shape (n,), a `weight` of shape (n, m), and returns `heuristics` of shape (n,). `heuristics[i]` indicates how promising it is to include item i in the solution.
+
+
+Your code description must start with ‘<start>’ and end with ‘<end>’. 
+Your Python code should be formatted as a Python code string: "```python ... ```"
+
+Be creative and do not give additional explanation.

@@ -1,0 +1,16 @@
+Task: Solving a black-box combinatorial optimization problem via stochastic solution sampling following "heuristics".
+
+I have 2 algorithms for this task.
+The first algorithm and the corresponding code are:
+<Algorithm description>: {alg_desc1}
+<Code>: {alg_code1}
+The second algorithm and the corresponding code are:
+<Algorithm description>: {alg_desc2}
+<Code>: {alg_code2}
+
+Please help me create a new algorithm that is motivated by the given algorithms. Please provide a brief description of the new algorithm and its corresponding code. Suppose `n` indicates the scale of the problem, and `m` is the dimension of some attributes each involved item has. The `heuristics` function takes as input an `item_attr1` of shape (n,), an `item_attr2` of shape (n, m), and returns `heuristics` of shape (n,). `heuristics[i]` indicates how promising it is to include item i in the solution.
+
+Your code description must start with ‘<start>’ and end with ‘<end>’. 
+Your Python code should be formatted as a Python code string: "```python ... ```"
+
+Be creative and do not give additional explanation.

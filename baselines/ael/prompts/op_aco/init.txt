@@ -1,0 +1,9 @@
+Task: Solving Traveling Salesman Problem (TSP) via stochastic solution sampling following "heuristics". TSP requires finding the shortest path that visits all given nodes and returns to the starting node.
+
+You should create a totally new strategy for me. Provide a brief description of the new algorithm and its corresponding code. The code function must be named 'heuristics', take an input 'distance_matrix', and output the 'heuristics'. The `heuristics` function takes as input a distance matrix (np.ndarray), and returns prior indicators (np.ndarray) of how promising it is to include each edge in a solution. The return is of the same shape as the input. The function should NOT involve actually visiting each node.
+
+
+Your code description must start with ‘<start>’ and end with ‘<end>’. 
+Your Python code should be formatted as a Python code string: "```python ... ```"
+
+Be creative and do not give additional explanation.
