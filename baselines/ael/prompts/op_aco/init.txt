@@ -1,6 +1,6 @@
-Task: Solving Traveling Salesman Problem (TSP) via stochastic solution sampling following "heuristics". TSP requires finding the shortest path that visits all given nodes and returns to the starting node.
+Task: Solving Orienteering Problem (OP) via stochastic solution sampling following "heuristics". OP is an optimization problem where the goal is to find the most rewarding route, starting from a depot, visiting a subset of nodes with associated prizes, and returning to the depot within a specified travel distance.
 
-You should create a totally new strategy for me. Provide a brief description of the new algorithm and its corresponding code. The code function must be named 'heuristics', take an input 'distance_matrix', and output the 'heuristics'. The `heuristics` function takes as input a distance matrix (np.ndarray), and returns prior indicators (np.ndarray) of how promising it is to include each edge in a solution. The return is of the same shape as the input. The function should NOT involve actually visiting each node.
+You should create a totally new strategy for me. Provide a brief description of the new function and its corresponding code. The code function must be named 'heuristics'. Suppose `n` represents the number of nodes in the problem, with the depot being the first node. The `heuristics` function takes as input a `prize` array of shape (n,), a `distance` matrix of shape (n,n), and a `max_len` float which is the constraint to total travel distance, and it returns `heuristics` of shape (n, n), where `heuristics[i][j]` indicates the promise of including the edge from node #i to node #j in the solution.
 
 
 Your code description must start with ‘<start>’ and end with ‘<end>’. 
