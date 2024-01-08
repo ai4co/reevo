@@ -45,11 +45,9 @@ class AEL:
         self.output_file = f"{self.root_dir}/problems/{self.problem}/{self.cfg.suffix.lower()}.py"
         
         # Loading all text prompts
-        
-        task_desc = file_to_string(f'{prompt_dir}/task_desc.txt')
-        self.initial_prompt = task_desc + file_to_string(f'{prompt_dir}/init.txt')
-        self.crossover_prompt = task_desc + file_to_string(f'{prompt_dir}/crossover.txt')
-        self.mutate_prompt = task_desc + file_to_string(f'{prompt_dir}/mutate.txt')
+        self.initial_prompt = file_to_string(f'{prompt_dir}/init.txt')
+        self.crossover_prompt = file_to_string(f'{prompt_dir}/crossover.txt')
+        self.mutate_prompt = file_to_string(f'{prompt_dir}/mutate.txt')
         
     def init_population(self) -> None:
         # Generate responses
@@ -81,7 +79,7 @@ class AEL:
             file.writelines(content + '\n')
 
         # Extract code and description from response
-        code_string, desc_string = extract_code_description(content)
+        code_string, desc_string = extract_code_from_generator(content), extract_description(content)
         std_out_filepath = f"problem_iter{self.iteration}_stdout{response_id}.txt" if file_name is None else file_name + "_stdout.txt"
 
         if code_string is None:

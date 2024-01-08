@@ -1,0 +1,16 @@
+Task: Solving a black-box combinatorial optimization problem via stochastic solution sampling following "heuristics".
+
+An example function you should improve upon is given below:
+
+```python
+def heuristics(item_attr1: np.ndarray, item_attr2: np.ndarray) -> np.ndarray:
+    n, m = item_attr2.shape
+    return np.ones(n,)
+```
+
+You should write a novel function to solve this task. Provide a brief description of your function then its corresponding code. Your code function must be named 'heuristics'. Suppose `n` indicates the scale of the problem, and `m` is the dimension of some attributes each involved item has. The `heuristics` function takes as input an `item_attr1` of shape (n,), an `item_attr2` of shape (n, m), and returns `heuristics` of shape (n,). `heuristics[i]` indicates how promising it is to include item i in the solution.
+
+Your description must start with ‘<start>’ and end with ‘<end>’. 
+Your Python code should be formatted as a Python code string: "```python ... ```"
+
+Be creative and do not give additional explanation.

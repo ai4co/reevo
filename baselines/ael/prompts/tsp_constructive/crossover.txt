@@ -1,8 +1,10 @@
+Task: Given a set of nodes with their coordinates, you need to find the shortest route that visits each node once and returns to the starting node. The task can be solved step-by-step by starting from the current node and iteratively choosing the next node. 
+
 I have 2 algorithms with their code to select the next node in each step.
-The first algorithm and the corresponding code is:
+The first algorithm and the corresponding code are:
 <Algorithm description>: {alg_desc1}
 <Code>: {alg_code1}
-The second algorithm and the corresponding code is
+The second algorithm and the corresponding code are:
 <Algorithm description>: {alg_desc2}
 <Code>: {alg_code2}
 

@@ -7,6 +7,7 @@ import multiprocessing
 import time
 import re
 
+client = OpenAI()
 
 def file_to_string(filename):
     with open(filename, 'r') as file:
@@ -36,16 +37,7 @@ def block_until_running(stdout_filepath, log_status=False, iter_num=-1, response
             break
 
 
-def extract_code_description(response: str) -> tuple[str, str]:
-    """
-    Extract code and description from GPT response. Used only for AEL."""
-    # Regex patterns to extract python code enclosed in GPT response
-    pattern_code = [r'```python(.*?)```', r"<Code>:(.*?)<end>", r"<code>:(.*?)<end>"]
-    for pattern in pattern_code:
-        code_string = re.search(pattern, response, re.DOTALL)
-        code_string = code_string.group(1).strip() if code_string is not None else None
-        if code_string is not None:
-            break
+def extract_description(response: str) -> tuple[str, str]:
     # Regex patterns to extract code description enclosed in GPT response, it starts with ‘<start>’ and ends with ‘<end>’
     pattern_desc = [r'<start>(.*?)```python', r'<start>(.*?)<end>']
     for pattern in pattern_desc:
@@ -53,7 +45,7 @@ def extract_code_description(response: str) -> tuple[str, str]:
         desc_string = desc_string.group(1).strip() if desc_string is not None else None
         if desc_string is not None:
             break
-    return code_string, desc_string
+    return desc_string
 
 
 def get_chat_completion(client, message, model="gpt-3.5-turbo-1106", temperature=0.):
@@ -61,7 +53,6 @@ def get_chat_completion(client, message, model="gpt-3.5-turbo-1106", temperature
     Deprecated. Use chat_completion instead.
     """
     raise NotImplementedError
-    client = OpenAI()
     completion = client.chat.completions.create(
         model=model,
         messages=message,
@@ -102,7 +93,6 @@ def chat_completion(n: int, messages: list[dict], model: str, temperature: float
     """
     Generate n responses using OpenAI Chat Completions API
     """
-    client = OpenAI()
     total_samples = 0
     responses = []
     chunk_size = n if "gpt-3.5" in model else min(4, n)

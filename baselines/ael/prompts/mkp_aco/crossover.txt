@@ -1,0 +1,16 @@
+Task: Solving Multiple Knapsack Problems (MKP) through stochastic solution sampling based on "heuristics". MKP involves selecting a subset of items to maximize the total prize collected, subject to multi-dimensional maximum weight constraints.
+
+I have 2 algorithms for this task.
+The first algorithm and the corresponding code are:
+<Algorithm description>: {alg_desc1}
+<Code>: {alg_code1}
+The second algorithm and the corresponding code are:
+<Algorithm description>: {alg_desc2}
+<Code>: {alg_code2}
+
+Please help me create a new algorithm that is motivated by the given algorithms. Please provide a brief description of the new algorithm and its corresponding code. The code function must be named 'heuristics', take inputs of "prize" and "weight", and return "heuristics".
+
+Your code description must start with ‘<start>’ and end with ‘<end>’. 
+Your Python code should be formatted as a Python code string: "```python ... ```"
+
+Be creative and do not give additional explanation.
