@@ -44,8 +44,9 @@ class ACO(object):
         self.max_bin_count = max_bin_count or self.problem_size
         
         self.pheromone: FloatArray = np.ones((self.problem_size, self.max_bin_count))*0.01 # problem_size x bin_count
+        heuristic[heuristic > 1e6] = 1e6
         heuristic = heuristic/heuristic.max() # normalize
-        heuristic[heuristic<1e-5] = 1e-5
+        heuristic[heuristic < 1e-6] = 1e-6
         self.heuristic: FloatArray = heuristic # problem_size x bin_count
 
         self.shortest_path: IntArray = np.array([0])
