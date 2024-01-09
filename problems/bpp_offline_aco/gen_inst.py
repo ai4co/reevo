@@ -11,7 +11,7 @@ class BPPInstance(NamedTuple):
 
 DEMAND_LOW = 20
 DEMAND_HIGH = 100
-CAPACITY = 100
+CAPACITY = 150
 dataset_conf = {
     'train': (500,),
     'val':   (500, 1000, 5000),

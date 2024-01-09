@@ -13,9 +13,9 @@ N_ANTS = 20
 SAMPLE_COUNT = 300
 
 def solve(inst: BPPInstance, mode = 'sample'):
-    heu = heuristics(inst.demands, inst.capacity) + 1e-6
+    heu = heuristics(inst.demands.copy(), inst.capacity) # normalized in ACO
     assert tuple(heu.shape) == (inst.n, inst.n)
-    heu[heu < 1e-9] = 1e-9
+    # assert 0 < heu.max() < np.inf
     aco = ACO(inst.demands, heu, capacity = inst.capacity, max_bin_count=inst.n, n_ants=N_ANTS)
     if mode == 'sample':
         obj, _ = aco.sample_only(SAMPLE_COUNT)
