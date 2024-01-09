@@ -50,7 +50,8 @@ class ReEvo:
         self.func_signature = file_to_string(f'{problem_prompt_path}/func_signature.txt')
         self.func_desc = file_to_string(f'{problem_prompt_path}/func_desc.txt')
         if os.path.exists(f'{problem_prompt_path}/external_knowledge.txt'):
-            self.long_term_reflection_str = file_to_string(f'{self.prompt_dir}/{self.problem}/external_knowledge.txt')
+            self.external_knowledge = file_to_string(f'{problem_prompt_path}/external_knowledge.txt')
+            self.long_term_reflection_str = self.external_knowledge
         
         
         # Common prompts
@@ -414,7 +415,7 @@ class ReEvo:
         func_signature1 = self.func_signature.format(version=1) 
         user = self.mutataion_prompt.format(
             user_generator = self.user_generator_prompt,
-            reflection = self.long_term_reflection_str,
+            reflection = self.long_term_reflection_str + self.external_knowledge,
             func_signature1 = func_signature1,
             elitist_code = filter_code(self.elitist["code"]),
             func_name = self.func_name,
