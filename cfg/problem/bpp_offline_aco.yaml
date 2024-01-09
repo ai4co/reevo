@@ -1,4 +1,4 @@
-problem_name: bpp_offline
+problem_name: bpp_offline_aco
 problem_type: aco
 obj_type: min
 problem_size: 500 # problem size for validation
