@@ -1,3 +1,4 @@
+import os
 from aco import ACO
 import sys
 import numpy as np
@@ -31,10 +32,14 @@ if __name__ == "__main__":
     root_dir = sys.argv[2]
     mood = sys.argv[3]
     assert mood in ['train', 'val']
+
+    basepath = os.path.dirname(__file__)
+    if not os.path.isfile(os.path.join(basepath, "dataset/train50_dataset.npy")):
+        from gen_inst import generate_datasets
+        generate_datasets()
     
     if mood == 'train':
-    
-        dataset_path = f"{root_dir}/problems/cvrp_aco/dataset/{mood}{problem_size}_dataset.npy"
+        dataset_path = os.path.join(basepath, f"dataset/{mood}{problem_size}_dataset.npy")
         dataset = np.load(dataset_path)
         demands, node_positions = dataset[:, :, 0], dataset[:, :, 1:]
         
@@ -52,8 +57,7 @@ if __name__ == "__main__":
         
     else:
         for problem_size in [20, 50, 100]:
-    
-            dataset_path = f"{root_dir}/problems/cvrp_aco/dataset/{mood}{problem_size}_dataset.npy"
+            dataset_path = os.path.join(basepath, f"dataset/{mood}{problem_size}_dataset.npy")
             dataset = np.load(dataset_path)
             demands, node_positions = dataset[:, :, 0], dataset[:, :, 1:]
             

@@ -1,6 +1,0 @@
-To generate eval dataset:
-
-```
-cd problems/cvrp_aco
-python gen_inst.py
-```

@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pickle
 
@@ -50,9 +51,9 @@ def l1_bound_dataset(instances: dict) -> float:
     l1_bounds.append(l1_bound(instance['items'], instance['capacity']))
   return np.mean(l1_bounds)
 
-
-
-if __name__ == "__main__":
+def generate_datasets():
+    basepath = os.path.dirname(__file__)
+    os.makedirs(os.path.join(basepath, "dataset"), exist_ok=True)
     
     # Generating datasets
     training_data = generate_weibull_instances(5, 5000, shape_param, scale_param, max_item_size)
@@ -85,9 +86,11 @@ if __name__ == "__main__":
     
     
     # Saving datasets as pickle files
-    pickle.dump(weibull_5k_train, open('dataset/weibull_5k_train.pickle', 'wb'))
-    pickle.dump(weibull_5k_val, open('dataset/weibull_5k_val.pickle', 'wb'))
-    pickle.dump(weibull_5k_test, open('dataset/weibull_5k_test.pickle', 'wb'))
-    pickle.dump(weibull_10k_test, open('dataset/weibull_10k_test.pickle', 'wb'))
-    pickle.dump(weibull_100k_test, open('dataset/weibull_100k_test.pickle', 'wb'))
-    
+    pickle.dump(weibull_5k_train, open(os.path.join(basepath, 'dataset/weibull_5k_train.pickle'), 'wb'))
+    pickle.dump(weibull_5k_val, open(os.path.join(basepath,'dataset/weibull_5k_val.pickle'), 'wb'))
+    pickle.dump(weibull_5k_test, open(os.path.join(basepath,'dataset/weibull_5k_test.pickle'), 'wb'))
+    pickle.dump(weibull_10k_test, open(os.path.join(basepath,'dataset/weibull_10k_test.pickle'), 'wb'))
+    pickle.dump(weibull_100k_test, open(os.path.join(basepath,'dataset/weibull_100k_test.pickle'), 'wb'))
+
+if __name__ == "__main__":
+    generate_datasets()

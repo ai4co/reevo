@@ -1,3 +1,4 @@
+from os import path
 from aco import ACO
 import sys
 import numpy as np
@@ -30,9 +31,14 @@ if __name__ == "__main__":
     root_dir = sys.argv[2]
     mood = sys.argv[3]
     assert mood in ['train', 'val']
+
+    basepath = path.join(path.dirname(__file__), "dataset")
+    if not path.isfile(path.join(basepath, "train50_dataset.npy")):
+        from gen_inst import generate_datasets
+        generate_datasets()
     
     if mood == 'train':
-        dataset_path = f"{root_dir}/problems/tsp_aco/dataset/{mood}{problem_size}_dataset.npy"
+        dataset_path = path.join(basepath, f"{mood}{problem_size}_dataset.npy")
         node_positions = np.load(dataset_path)
         n_instances = node_positions.shape[0]
         print(f"[*] Dataset loaded: {dataset_path} with {n_instances} instances.")
@@ -48,7 +54,7 @@ if __name__ == "__main__":
     
     else:
         for problem_size in [20, 50, 100]:
-            dataset_path = f"{root_dir}/problems/tsp_aco/dataset/{mood}{problem_size}_dataset.npy"
+            dataset_path = path.join(basepath, f"{mood}{problem_size}_dataset.npy")
             node_positions = np.load(dataset_path)
             logging.info(f"[*] Evaluating {dataset_path}")
             n_instances = node_positions.shape[0]

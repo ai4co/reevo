@@ -89,17 +89,23 @@ def is_valid_packing(
 
 
 if __name__ == "__main__":
+    import os
     print("[*] Running ...")
 
     problem_size = int(sys.argv[1])
-    root_dir = sys.argv[2]
+    root_dir = sys.argv[2] # reserved for compatibility
     mood = sys.argv[3]
     assert mood in ['train', 'val']
     assert problem_size in [5000, -1]
     
     file_name = f"weibull_5k_{mood}.pickle"
+    basepath = os.path.dirname(__file__)
+    dataset_path = os.path.join(basepath, "dataset", file_name)
     
-    dataset_path = f"{root_dir}/problems/bpp_online/dataset/" + file_name
+    if not os.path.isfile(dataset_path):
+        from gen_inst import generate_datasets
+        generate_datasets()
+    
     dataset = pickle.load(open(dataset_path, 'rb'))
     
     # Evaluate heuristic function on dataset
