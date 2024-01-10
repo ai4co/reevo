@@ -14,7 +14,7 @@ N_ANTS = 20
 
 
 def solve(inst: OPInstance):
-    heu = heuristics(inst.prize.numpy(), inst.distance.numpy(), inst.maxlen) + 1e-9
+    heu = heuristics(np.array(inst.prize), np.array(inst.distance), inst.maxlen) + 1e-9
     assert tuple(heu.shape) == (inst.n, inst.n)
     heu[heu < 1e-9] = 1e-9
     heu = torch.from_numpy(heu)

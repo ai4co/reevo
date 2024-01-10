@@ -18,7 +18,7 @@ class ReEvo:
         self.function_evals = 0
         self.elitist = None
         self.best_obj_overall = float("inf") if cfg.problem.obj_type == "min" else -float("inf")
-        self.long_term_reflection_str = "Nothing yet"
+        self.long_term_reflection_str = ""
         self.best_obj_overall = None
         self.best_code_overall = None
         self.best_code_path_overall = None

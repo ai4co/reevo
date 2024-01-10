@@ -1,6 +1,6 @@
 Task: Solving Orienteering Problem (OP) via stochastic solution sampling following "heuristics". OP is an optimization problem where the goal is to find the most rewarding route, starting from a depot, visiting a subset of nodes with associated prizes, and returning to the depot within a specified travel distance.
 
-I have an function for this task. The function and the corresponding code are:
+I have a function for this task. The function and the corresponding code are:
 <function description>: {alg_desc}
 <Code>: {alg_code}
 

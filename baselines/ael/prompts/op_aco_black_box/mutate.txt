@@ -1,0 +1,12 @@
+Task: Solving a black-box graph combinatorial optimization problem via stochastic solution sampling following "heuristics".
+
+I have a function for this task. The function and the corresponding code are:
+<function description>: {alg_desc}
+<Code>: {alg_code}
+
+Please assist me in creating a modified version of the function provided. Please provide a brief description of the new function and its corresponding code. The code function must be named 'heuristics'. The `heuristics` function takes as input a vector of node attributes (shape: n), a matrix of edge attributes (shape: n by n), and a constraint imposed on the sum of edge attributes. A special node is indexed by 0. `heuristics` returns prior indicators of how promising it is to include each edge in a solution. The return is of the same shape as the input matrix of edge attributes.
+
+Your code description must start with ‘<start>’ and end with ‘<end>’. 
+Your Python code should be formatted as a Python code string: "```python ... ```"
+
+Be creative and do not give additional explanation.
