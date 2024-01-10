@@ -1,0 +1,6 @@
+problem_name: cvrp_aco
+problem_type: black_box
+obj_type: min
+problem_size: 50 # problem size for validation
+func_name: heuristics
+description: Solving a black-box graph combinatorial optimization problem via stochastic solution sampling following "heuristics".

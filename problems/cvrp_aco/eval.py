@@ -4,6 +4,7 @@ import sys
 import numpy as np
 from scipy.spatial import distance_matrix
 import logging
+import inspect
 
 try:
     from gpt import heuristics_v2 as heuristics
@@ -18,7 +19,10 @@ CAPACITY = 50
 def solve(node_pos, demand):
     dist_mat = distance_matrix(node_pos, node_pos)
     dist_mat[np.diag_indices_from(dist_mat)] = 1 # set diagonal to a large number
-    heu = heuristics(dist_mat.copy(), node_pos.copy(), demand.copy(), CAPACITY) + 1e-9
+    if len(inspect.getfullargspec(heuristics).args) == 4:
+        heu = heuristics(dist_mat.copy(), node_pos.copy(), demand.copy(), CAPACITY) + 1e-9
+    elif len(inspect.getfullargspec(heuristics).args) == 2:
+        heu = heuristics(dist_mat.copy(), demand / CAPACITY) + 1e-9
     heu[heu < 1e-9] = 1e-9
     aco = ACO(dist_mat, demand, heu, CAPACITY, n_ants=N_ANTS)
     obj = aco.run(N_ITERATIONS)

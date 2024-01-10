@@ -1,0 +1,16 @@
+Task: Solving a black-box graph combinatorial optimization problem via stochastic solution sampling following "heuristics".
+
+I have 2 algorithms for this task.
+The first algorithm and the corresponding code are:
+<Algorithm description>: {alg_desc1}
+<Code>: {alg_code1}
+The second algorithm and the corresponding code are:
+<Algorithm description>: {alg_desc2}
+<Code>: {alg_code2}
+
+Please help me create a new algorithm that is motivated by the given algorithms. Please provide a brief description of the new algorithm and its corresponding code. The `heuristics` function takes as input a matrix of edge attributes (shape: n by n) and a vector of node attributes (shape: n). A special node is indexed by 0. `heuristics` returns prior indicators of how promising it is to include each edge in a solution. The return is of the same shape as the input matrix of edge attributes. 
+
+Your code description must start with ‘<start>’ and end with ‘<end>’. 
+Your Python code should be formatted as a Python code string: "```python ... ```"
+
+Be creative and do not give additional explanation.
