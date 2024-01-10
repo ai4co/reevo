@@ -52,6 +52,8 @@ class ReEvo:
         if os.path.exists(f'{problem_prompt_path}/external_knowledge.txt'):
             self.external_knowledge = file_to_string(f'{problem_prompt_path}/external_knowledge.txt')
             self.long_term_reflection_str = self.external_knowledge
+        else:
+            self.external_knowledge = ""
         
         
         # Common prompts
