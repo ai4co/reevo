@@ -187,7 +187,7 @@ class ReEvo:
             if inner_run is None: # If code execution fails, skip
                 continue
             try:
-                inner_run.communicate(timeout=10) # Wait for code execution to finish
+                inner_run.communicate(timeout=20) # Wait for code execution to finish
             except subprocess.TimeoutExpired as e:
                 logging.info(f"Error for response_id {response_id}: {e}")
                 population[response_id] = self.mark_invalid_individual(population[response_id], str(e))

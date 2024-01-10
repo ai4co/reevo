@@ -4,7 +4,6 @@
 ### Usage
 
 - Set your OpenAI API key as an environment variable `OPENAI_API_KEY`.
-- Make sure to generate datasets before running. Refer to `problems/*/dataset/readme.md` for details.
 - Running logs and intermediate results are saved in `./outputs/main/` by default.
 
 #### To run ReEvo
