@@ -10,13 +10,13 @@ except:
 
 N_ITERATIONS = 50
 N_ANTS = 20
-SAMPLE_COUNT = 300
+SAMPLE_COUNT = 100
 
 def solve(inst: BPPInstance, mode = 'sample'):
     heu = heuristics(inst.demands.copy(), inst.capacity) # normalized in ACO
     assert tuple(heu.shape) == (inst.n, inst.n)
-    # assert 0 < heu.max() < np.inf
-    aco = ACO(inst.demands, heu, capacity = inst.capacity, max_bin_count=inst.n, n_ants=N_ANTS)
+    assert 0 < heu.max() < np.inf
+    aco = ACO(inst.demands, heu.astype(float), capacity = inst.capacity, n_ants=N_ANTS)
     if mode == 'sample':
         obj, _ = aco.sample_only(SAMPLE_COUNT)
     else:
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     if mood == 'train':
         dataset_path = os.path.join(basepath, f"dataset/{mood}{problem_size}_dataset.npz")
         dataset = load_dataset(dataset_path)
-        n_instances = dataset[0].n
+        n_instances = len(dataset)
 
         print(f"[*] Dataset loaded: {dataset_path} with {n_instances} instances.")
         

@@ -43,7 +43,7 @@ if __name__ == "__main__":
     if mood == 'train':
         dataset_path = os.path.join(basepath, f"dataset/{mood}{problem_size}_dataset.npz")
         dataset = load_dataset(dataset_path)
-        n_instances = dataset[0].n
+        n_instances = len(dataset)
 
         print(f"[*] Dataset loaded: {dataset_path} with {n_instances} instances.")
         
@@ -60,7 +60,6 @@ if __name__ == "__main__":
         for problem_size in [50, 100, 200]:
             dataset_path = os.path.join(basepath, f"dataset/{mood}{problem_size}_dataset.npz")
             dataset = load_dataset(dataset_path)
-            n_instances = dataset[0].n
             logging.info(f"[*] Evaluating {dataset_path}")
 
             objs = []
