@@ -59,6 +59,7 @@ class ACO(object):
                  decay=0.95,
                  alpha=1,
                  beta=2,
+                 greedy = False
                  ):
         
         self.problem_size = len(demand)
@@ -82,10 +83,9 @@ class ACO(object):
         self.best_cost = self.problem_size
 
         self._ordinal: IntArray = np.arange(self.problem_size, dtype=int) # for indexing
-        self.greedy_mode = False
+        self.greedy_mode = greedy
     
     def run(self, iterations: int) -> Tuple[int, IntArray]:
-        self.greedy_mode = False
         for _ in range(iterations):
             prob = self.pheromone**self.alpha * self.heuristic**self.beta
             paths, costs, fitnesses = self.gen_paths(self.n_ants, prob)

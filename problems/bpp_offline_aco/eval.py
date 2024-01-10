@@ -8,15 +8,15 @@ try:
 except:
     from gpt import heuristics
 
-N_ITERATIONS = 50
+N_ITERATIONS = 10
 N_ANTS = 20
-SAMPLE_COUNT = 100
+SAMPLE_COUNT = 200
 
 def solve(inst: BPPInstance, mode = 'sample'):
     heu = heuristics(inst.demands.copy(), inst.capacity) # normalized in ACO
     assert tuple(heu.shape) == (inst.n, inst.n)
     assert 0 < heu.max() < np.inf
-    aco = ACO(inst.demands, heu.astype(float), capacity = inst.capacity, n_ants=N_ANTS)
+    aco = ACO(inst.demands, heu.astype(float), capacity = inst.capacity, n_ants=N_ANTS, greedy=True)
     if mode == 'sample':
         obj, _ = aco.sample_only(SAMPLE_COUNT)
     else:
