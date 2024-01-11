@@ -8,7 +8,7 @@ try:
 except:
     from gpt import heuristics
 
-N_ITERATIONS = 10
+N_ITERATIONS = 15
 N_ANTS = 20
 SAMPLE_COUNT = 200
 
@@ -16,7 +16,7 @@ def solve(inst: BPPInstance, mode = 'sample'):
     heu = heuristics(inst.demands.copy(), inst.capacity) # normalized in ACO
     assert tuple(heu.shape) == (inst.n, inst.n)
     assert 0 < heu.max() < np.inf
-    aco = ACO(inst.demands, heu.astype(float), capacity = inst.capacity, n_ants=N_ANTS, greedy=True)
+    aco = ACO(inst.demands, heu.astype(float), capacity = inst.capacity, n_ants=N_ANTS, greedy=False)
     if mode == 'sample':
         obj, _ = aco.sample_only(SAMPLE_COUNT)
     else:
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     problem_size = int(sys.argv[1])
     root_dir = sys.argv[2]
     mood = sys.argv[3]
-    method = sys.argv[4] if len(sys.argv) >= 5 else 'sample'
+    method = sys.argv[4] if len(sys.argv) >= 5 else 'aco'
     assert mood in ['train', 'val']
     assert method in ['sample', 'aco']
 

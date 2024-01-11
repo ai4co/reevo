@@ -36,6 +36,8 @@ def random_sample(prob: FloatArray) -> int:
     return sampled
 
 def random_sample_discrete_distribution(prob: FloatArray) -> int:
+    # prob_exp = np.exp(prob-prob.max())
+    # prob_exp[prob==0] = 0
     # np.random.choice is somehow slow
     cumprob = np.cumsum(prob)
     sampled = np.searchsorted(cumprob, next(uniform_generator)*cumprob[-1]).item()
@@ -58,7 +60,7 @@ class ACO(object):
                  n_ants=20, 
                  decay=0.95,
                  alpha=1,
-                 beta=2,
+                 beta=1,
                  greedy = False
                  ):
         
@@ -74,7 +76,7 @@ class ACO(object):
         
         self.pheromone: FloatArray = np.ones((self.problem_size, self.problem_size)) # problem_size x self.problem_size
         heuristic[heuristic > 1e6] = 1e6
-        heuristic += heuristic.T
+        heuristic[heuristic < 1e-6] = 1e-6
         heuristic = heuristic/heuristic.max() # normalize
         heuristic[heuristic < 1e-6] = 1e-6
         self.heuristic: FloatArray = heuristic # problem_size x self.problem_size
@@ -95,6 +97,9 @@ class ACO(object):
                 self.shortest_path = paths[best_index]
                 self.best_cost = best_cost
             self.update_pheronome(paths, fitnesses)
+        assert self.is_valid_path(self.shortest_path)
+        # cost, path = organize_path(self.shortest_path)
+        # assert cost >= np.ceil(np.sum(self.demand).astype(float)/self.capacity).item()
         return organize_path(self.shortest_path)
 
     def sample_only(self, count: int) -> Tuple[int, IntArray]:
@@ -102,6 +107,7 @@ class ACO(object):
         paths, costs, _ = self.gen_paths(count, self.heuristic)
         best_index = costs.argmin()
         best_path = paths[best_index]
+        assert self.is_valid_path(best_path)
         return organize_path(best_path)
 
     def update_pheronome(self, paths: List[IntArray], fitnesses: FloatArray):
