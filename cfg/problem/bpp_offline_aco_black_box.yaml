@@ -1,0 +1,6 @@
+problem_name: bpp_offline_aco
+problem_type: black_box
+obj_type: min
+problem_size: 500 # problem size for validation
+func_name: heuristics
+description: Solving a black-box combinatorial optimization problem via stochastic solution sampling following "heuristics".

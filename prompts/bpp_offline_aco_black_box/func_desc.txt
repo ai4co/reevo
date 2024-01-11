@@ -1,0 +1,1 @@
+Suppose `n` represents the scale of the problem. The heuristics function takes as input an `item_attr` array of shape (n,) and an integer as a certain constraint imposed on the item attributes. The heuristics function returns a `heuristics` array of shape (n, n). `heuristics[i][j]` indicates how promising it is to group item i and item j.
