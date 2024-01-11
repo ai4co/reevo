@@ -17,7 +17,7 @@ class ReEvo:
         self.iteration = 0
         self.function_evals = 0
         self.elitist = None
-        self.best_obj_overall = float("inf") if cfg.problem.obj_type == "min" else -float("inf")
+        self.best_obj_overall = float("inf")
         self.long_term_reflection_str = ""
         self.best_obj_overall = None
         self.best_code_overall = None
@@ -91,6 +91,7 @@ class ReEvo:
             "code": code,
             "response_id": 0,
         }
+        self.seed_ind = seed_ind
         self.population = self.evaluate_population([seed_ind])
         self.update_iter()
         
@@ -152,15 +153,14 @@ class ReEvo:
         Mark an individual as invalid.
         """
         individual["exec_success"] = False
-        individual["obj"] = float("inf") if self.obj_type == "min" else -float("inf")
-        individual["fitness"] = 0
+        individual["obj"] = float("inf")
         individual["traceback_msg"] = traceback_msg
         return individual
 
 
     def evaluate_population(self, population: list[dict]) -> list[float]:
         """
-        Evaluate population by running code in parallel and computing objective values and fitness.
+        Evaluate population by running code in parallel and computing objective values.
         """
         inner_runs = []
         # Run code to evaluate
@@ -182,7 +182,7 @@ class ReEvo:
                 population[response_id] = self.mark_invalid_individual(population[response_id], str(e))
                 inner_runs.append(None)
         
-        # Update population with objective values and fitness
+        # Update population with objective values
         for response_id, inner_run in enumerate(inner_runs):
             if inner_run is None: # If code execution fails, skip
                 continue
@@ -201,12 +201,10 @@ class ReEvo:
             traceback_msg = filter_traceback(stdout_str)
             
             individual = population[response_id]
-            # Store objective value and fitness for each individual
+            # Store objective value for each individual
             if traceback_msg == '': # If execution has no error
                 try:
-                    individual["obj"] = float(stdout_str.split('\n')[-2])
-                    assert individual["obj"] > 0, "Objective value <= 0 is not supported."
-                    individual["fitness"] = 1 / individual["obj"] if self.obj_type == "min" else individual["obj"]
+                    individual["obj"] = float(stdout_str.split('\n')[-2]) if self.obj_type == "min" else -float(stdout_str.split('\n')[-2])
                     individual["exec_success"] = True
                 except:
                     population[response_id] = self.mark_invalid_individual(population[response_id], "Invalid std out / objective value!")
@@ -241,19 +239,16 @@ class ReEvo:
         """
         population = self.population
         objs = [individual["obj"] for individual in population]
-        if self.obj_type == "min":
-            best_obj, best_sample_idx = min(objs), np.argmin(np.array(objs))
-        else:
-            best_obj, best_sample_idx = max(objs), np.argmax(np.array(objs))
+        best_obj, best_sample_idx = min(objs), np.argmin(np.array(objs))
         
         # update best overall
-        if self.best_obj_overall is None or (self.obj_type == "min" and best_obj < self.best_obj_overall) or (self.obj_type == "max" and best_obj > self.best_obj_overall):
+        if self.best_obj_overall is None or best_obj < self.best_obj_overall:
             self.best_obj_overall = best_obj
             self.best_code_overall = population[best_sample_idx]["code"]
             self.best_code_path_overall = population[best_sample_idx]["code_path"]
         
         # update elitist
-        if self.elitist is None or (self.obj_type == "min" and best_obj < self.elitist["obj"]) or (self.obj_type == "max" and best_obj > self.elitist["obj"]):
+        if self.elitist is None or best_obj < self.elitist["obj"]:
             self.elitist = population[best_sample_idx]
             logging.info(f"Iteration {self.iteration}: Elitist: {self.elitist['obj']}")
         
@@ -269,7 +264,9 @@ class ReEvo:
         """
         selected_population = []
         # Eliminate invalid individuals
-        population = [individual for individual in population if individual["exec_success"]]
+        population = [individual for individual in population if individual["exec_success"] and individual["obj"] < self.seed_ind["obj"]]
+        if len(population) < 2:
+            return None
         trial = 0
         while len(selected_population) < 2 * self.cfg.pop_size:
             trial += 1
@@ -278,7 +275,7 @@ class ReEvo:
             if parents[0]["obj"] != parents[1]["obj"]:
                 selected_population.extend(parents)
             if trial > 1000:
-                raise ValueError("Random selection failed!")
+                return None
         return selected_population
 
 
@@ -289,16 +286,10 @@ class ReEvo:
         if ind1["obj"] == ind2["obj"]:
             raise ValueError("Two individuals to crossover have the same objective value!")
         # Determine which individual is better or worse
-        if self.obj_type == "min":
-            if ind1["obj"] < ind2["obj"]:
-                better_ind, worse_ind = ind1, ind2
-            elif ind1["obj"] > ind2["obj"]:
-                better_ind, worse_ind = ind2, ind1
-        elif self.obj_type == "max":
-            if ind1["obj"] > ind2["obj"]:
-                better_ind, worse_ind = ind1, ind2
-            elif ind1["obj"] < ind2["obj"]:
-                better_ind, worse_ind = ind2, ind1
+        if ind1["obj"] < ind2["obj"]:
+            better_ind, worse_ind = ind1, ind2
+        elif ind1["obj"] > ind2["obj"]:
+            better_ind, worse_ind = ind2, ind1
 
         worse_code = filter_code(worse_ind["code"])
         better_code = filter_code(better_ind["code"])
@@ -437,16 +428,17 @@ class ReEvo:
             # Select
             population_to_select = self.population if self.elitist is None else [self.elitist] + self.population # add elitist to population for selection
             selected_population = self.random_select(population_to_select)
-            # Short-term reflection
-            short_term_reflection_tuple = self.short_term_reflection(selected_population) # (responses_lst, worse_code_lst, better_code_lst)
-            # Crossover
-            crossed_population = self.crossover(short_term_reflection_tuple)
-            # Evaluate
-            self.population = self.evaluate_population(crossed_population)
-            # Update
-            self.update_iter()
-            # Long-term reflection
-            self.long_term_reflection([response[0].message.content for response in short_term_reflection_tuple[0]])
+            if selected_population is not None:
+                # Short-term reflection
+                short_term_reflection_tuple = self.short_term_reflection(selected_population) # (responses_lst, worse_code_lst, better_code_lst)
+                # Crossover
+                crossed_population = self.crossover(short_term_reflection_tuple)
+                # Evaluate
+                self.population = self.evaluate_population(crossed_population)
+                # Update
+                self.update_iter()
+                # Long-term reflection
+                self.long_term_reflection([response[0].message.content for response in short_term_reflection_tuple[0]])
             # Mutate
             mutated_population = self.mutate()
             # Evaluate
