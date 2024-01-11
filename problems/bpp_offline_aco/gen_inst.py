@@ -14,8 +14,8 @@ DEMAND_HIGH = 100
 CAPACITY = 150
 dataset_conf = {
     'train': (500,),
-    'val':   (500, 1000, 5000),
-    'test':  (500, 1000, 5000),
+    'val':   (120, 500, 1000),
+    'test':  (120, 500, 1000),
 }
 
 def generate_dataset(filepath, n, batch_size=64):
