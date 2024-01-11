@@ -1,0 +1,16 @@
+Task: Solving Bin Packing Problem (BPP). BPP requires packing a set of items of various sizes into the smallest number of fixed-sized bins.
+
+I have 2 algorithms for this task.
+The first algorithm and the corresponding code are:
+<Algorithm description>: {alg_desc1}
+<Code>: {alg_code1}
+The second algorithm and the corresponding code are:
+<Algorithm description>: {alg_desc2}
+<Code>: {alg_code2}
+
+Please help me create a new algorithm that is motivated by the given algorithms. Please provide a brief description of the new algorithm and its corresponding code. The code function must be named 'heuristics'. Suppose `n` represents the number of items in the problem. The heuristics function takes as input a `demand` array of shape (n,) and an integer as the capacity of every bin, and it returns a `heuristics` array of shape (n,n). `heuristics[i][j]` indicates how promising it is to put item i and item j in the same bin.
+
+Your code description must start with ‘<start>’ and end with ‘<end>’. 
+Your Python code should be formatted as a Python code string: "```python ... ```"
+
+Be creative and do not give additional explanation.
