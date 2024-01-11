@@ -264,7 +264,10 @@ class ReEvo:
         """
         selected_population = []
         # Eliminate invalid individuals
-        population = [individual for individual in population if individual["exec_success"] and individual["obj"] < self.seed_ind["obj"]]
+        if self.problem_type == "black_box":
+            population = [individual for individual in population if individual["exec_success"] and individual["obj"] < self.seed_ind["obj"]]
+        else:
+            population = [individual for individual in population if individual["exec_success"]]
         if len(population) < 2:
             return None
         trial = 0
