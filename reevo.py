@@ -3,13 +3,13 @@ from sklearn.metrics.pairwise import cosine_similarity
 import logging
 import subprocess
 import numpy as np
+import os
 
 from utils.utils import *
 
 
 class ReEvo:
     def __init__(self, cfg, root_dir) -> None:
-        self.client = OpenAI()
         self.cfg = cfg
         self.root_dir = root_dir
         
@@ -93,6 +93,11 @@ class ReEvo:
         }
         self.seed_ind = seed_ind
         self.population = self.evaluate_population([seed_ind])
+
+        # If seed function is invalid, stop
+        if not self.seed_ind["exec_success"]:
+            raise RuntimeError(f"Seed function is invalid. Please check the stdout file in {os.getcwd()}.")
+
         self.update_iter()
         
         # Generate responses
@@ -428,6 +433,9 @@ class ReEvo:
 
     def evolve(self):
         while self.function_evals < self.cfg.max_fe:
+            # If all individuals are invalid, stop
+            if all([not individual["exec_success"] for individual in self.population]):
+                raise RuntimeError(f"All individuals are invalid. Please check the stdout files in {os.getcwd()}.")
             # Select
             population_to_select = self.population if self.elitist is None else [self.elitist] + self.population # add elitist to population for selection
             selected_population = self.random_select(population_to_select)
