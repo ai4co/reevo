@@ -1,6 +1,6 @@
 problem_name: tsp_gls
 problem_type: gls
 obj_type: min
-problem_size: 100 # problem size for validation
+problem_size: 200 # problem size for validation
 func_name: heuristics
 description: Solving Traveling Salesman Problem (TSP) via guided local search. TSP requires finding the shortest path that visits all given nodes and returns to the starting node.
