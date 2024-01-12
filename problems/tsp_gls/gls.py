@@ -4,9 +4,12 @@ import time
 import numba as nb
 import concurrent.futures
 
+FloatArray = npt.NDArray[np.float_]
+IntArray = npt.NDArray[np.int_]
+usecache = True
 
-@nb.njit(nb.float32(nb.float32[:,:], nb.uint16[:], nb.uint16), nogil=True)
-def two_opt_once(distmat, tour, fixed_i = 0):
+@nb.njit(nb.float32(nb.float32[:,:], nb.uint16[:], nb.uint16), nogil=True, cache = usecache)
+def _two_opt_once(distmat, tour, fixed_i = 0):
     '''in-place operation'''
     n = tour.shape[0]
     p = q = 0
@@ -29,8 +32,8 @@ def two_opt_once(distmat, tour, fixed_i = 0):
     else:
         return 0.0
 
-@nb.njit(nb.float32(nb.float32[:,:], nb.uint16[:], nb.uint16), nogil=True)
-def relocate_once(distmat, tour, fixed_i = 0):
+@nb.njit(nb.float32(nb.float32[:,:], nb.uint16[:], nb.uint16), nogil=True, cache = usecache)
+def _relocate_once(distmat, tour, fixed_i = 0):
     n = distmat.shape[0]
     delta = p = q = 0
     for i in range(1, n) if fixed_i==0 else range(fixed_i, fixed_i+1):
@@ -58,27 +61,27 @@ def relocate_once(distmat, tour, fixed_i = 0):
         tour[q:p+1] = np.roll(tour[q:p+1], 1)
     return delta
 
-@nb.njit(nb.float32(nb.float32[:,:], nb.uint16[:]), nogil=True)
-def calculate_cost(distmat, tour):
+@nb.njit(nb.float32(nb.float32[:,:], nb.uint16[:]), nogil=True, cache = usecache)
+def _calculate_cost(distmat, tour):
     cost = distmat[tour[-1], tour[0]]
     for i in range(len(tour) - 1):
         cost += distmat[tour[i], tour[i+1]]
     return cost
 
-@nb.njit(nb.float32(nb.float32[:,:], nb.uint16[:], nb.uint16, nb.uint16), nogil=True)
-def local_search(distmat, cur_tour, fixed_i = 0, count = 1000):
+@nb.njit(nb.float32(nb.float32[:,:], nb.uint16[:], nb.uint16, nb.uint16), nogil=True, cache = usecache)
+def _local_search(distmat, cur_tour, fixed_i = 0, count = 1000):
     sum_delta = 0.0
     delta = -1
     while delta < -1e-6 and count > 0:
         delta = 0
-        delta += two_opt_once(distmat, cur_tour, fixed_i)
-        delta += relocate_once(distmat, cur_tour, fixed_i)
+        delta += _two_opt_once(distmat, cur_tour, fixed_i)
+        delta += _relocate_once(distmat, cur_tour, fixed_i)
         count -= 1
         sum_delta += delta
     return sum_delta
 
-@nb.njit(nb.void(nb.float32[:,:], nb.float32[:,:], nb.float32[:,:], nb.uint16[:], nb.float32, nb.uint32), nogil=True)
-def perturbation(distmat, guide, penalty, cur_tour, k, perturbation_moves = 30):
+@nb.njit(nb.void(nb.float32[:,:], nb.float32[:,:], nb.float32[:,:], nb.uint16[:], nb.float32, nb.uint32), nogil=True, cache = usecache)
+def _perturbation(distmat, guide, penalty, cur_tour, k, perturbation_moves = 30):
     moves = 0
     n = distmat.shape[0]
     while moves < perturbation_moves:
@@ -98,46 +101,44 @@ def perturbation(distmat, guide, penalty, cur_tour, k, perturbation_moves = 30):
         for fixed_i in (max_util_idx, max_util_idx+1):
             if fixed_i == 0 or fixed_i + 1 == n:
                 continue
-            delta = local_search(edge_weight_guided, cur_tour, fixed_i, 1)
+            delta = _local_search(edge_weight_guided, cur_tour, fixed_i, 1)
             if delta < 0:
                 moves += 1
 
 
-@nb.njit(nb.uint16[:](nb.float32[:,:], nb.float32[:,:], nb.uint16[:], nb.int32, nb.float32), nogil = True)
+@nb.njit(nb.uint16[:](nb.float32[:,:], nb.float32[:,:], nb.uint16[:], nb.int32, nb.float32), nogil = True, cache = usecache)
 def _guided_local_search(
     distmat, guide, init_tour, perturbation_moves = 30, time_limit = 1.0
 ) -> npt.NDArray[np.uint16]:
-    init_cost = calculate_cost(distmat, init_tour)
+    init_cost = _calculate_cost(distmat, init_tour)
     k = 0.1 * init_cost / distmat.shape[0]
     penalty = np.zeros_like(distmat)
 
-    with nb.objmode(t_lim=nb.float32):
-        t_lim = time.time() + time_limit
-
     cur_tour = init_tour.copy()
-    local_search(distmat, cur_tour, 0, 1000)
-    cur_cost = calculate_cost(distmat, cur_tour)
+    _local_search(distmat, cur_tour, 0, 1000)
+    cur_cost = _calculate_cost(distmat, cur_tour)
     best_tour, best_cost = cur_tour, cur_cost
-
-    with nb.objmode(now=nb.float32):
+    
+    with nb.objmode(now = nb.float64):
         now = time.time()
+    
+    t_lim = now + time_limit
 
     while now < t_lim:
-        perturbation(distmat, guide, penalty, cur_tour, k, perturbation_moves)
-
-        local_search(distmat, cur_tour, 0, 1000)
-        cur_cost = calculate_cost(distmat, cur_tour)
+        _perturbation(distmat, guide, penalty, cur_tour, k, perturbation_moves)
+        _local_search(distmat, cur_tour, 0, 1000)
+        cur_cost = _calculate_cost(distmat, cur_tour)
         if cur_cost < best_cost:
             best_tour, best_cost = cur_tour.copy(), cur_cost
 
-        with nb.objmode(now=nb.float32):
+        with nb.objmode(now=nb.float64):
             now = time.time()
     return best_tour
 
 def guided_local_search(
-    distmat: npt.NDArray[np.float_], 
-    guide: npt.NDArray[np.float_], 
-    init_tour: npt.NDArray[np.int_], 
+    distmat: FloatArray, 
+    guide: FloatArray, 
+    init_tour: IntArray, 
     perturbation_moves: int = 30, 
     time_limit: float = 1.0
 ) -> npt.NDArray[np.uint16]:
@@ -149,7 +150,13 @@ def guided_local_search(
         time_limit = time_limit,
     )
 
-def batched_guided_local_search(dist, guide, tours, perturbation_moves = 30, time_limit = 1.0):
+def batched_guided_local_search(
+    dist: FloatArray, 
+    guide: FloatArray, 
+    tours: IntArray, 
+    perturbation_moves = 30, 
+    time_limit = 1.0
+):
     dist = dist.astype(np.float32)
     guide = guide.astype(np.float32)
     tours = tours.astype(np.uint16)
@@ -160,20 +167,3 @@ def batched_guided_local_search(dist, guide, tours, perturbation_moves = 30, tim
             future = executor.submit(_guided_local_search, dist, guide, tour, perturbation_moves = perturbation_moves, time_limit = time_limit)
             futures.append(future)
         return np.stack([f.result() for f in futures])
-
-if __name__ == "__main__":
-    import torch
-    n = 50
-    input = torch.rand(size=(n, 2))
-    distances = torch.norm(input[:, None] - input, dim=2, p=2)
-    distances[torch.arange(len(distances)), torch.arange(len(distances))] = 1e10
-    distances = distances.numpy().astype(np.float32)
-    tour = np.arange(n, dtype = np.uint16)
-    tours = []
-    for i in range(3):
-        np.random.shuffle(tour)
-        tours.append(tour.copy())
-    tours = np.stack(tours)
-    print(tours)
-    tours = batched_guided_local_search(distances, distances, tours)
-    print(tours)

@@ -20,6 +20,7 @@ def solve(inst: TSPInstance) -> float:
     heu[heu < 1e-6] = 1e-6
     inittour = np.arange(inst.n) # todo
     result = guided_local_search(inst.distmat, heu, inittour, perturbation_moves, time_limit)
+    # print(result)
     return calculate_cost(inst, result)
 
 if __name__ == "__main__":
