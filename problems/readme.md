@@ -1,3 +1,5 @@
+See */test.ipynb for examples of evaluating our heuristics.
+
 ACO implementations are adapted from [*DeepACO: Neural-enhanced Ant Systems for Combinatorial Optimization*](https://github.com/henry-yeh/DeepACO)
 
 
