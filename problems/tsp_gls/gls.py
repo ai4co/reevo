@@ -105,11 +105,29 @@ def _perturbation(distmat, guide, penalty, cur_tour, k, perturbation_moves = 30)
             if delta < 0:
                 moves += 1
 
+@nb.njit(nb.uint16[:](nb.float32[:,:], nb.uint16), nogil=True, cache = usecache)
+def _init_nearest_neighbor(distmat, start):
+    n = distmat.shape[0]
+    tour = np.zeros(n, dtype=np.uint16)
+    visited = np.zeros(n, dtype=np.bool_)
+    visited[start] = True
+    tour[0] = start
+    for i in range(1, n):
+        min_dist = np.inf
+        min_idx = -1
+        for j in range(n):
+            if not visited[j] and distmat[tour[i-1], j] < min_dist:
+                min_dist = distmat[tour[i-1], j]
+                min_idx = j
+        tour[i] = min_idx
+        visited[min_idx] = True
+    return tour
 
-@nb.njit(nb.uint16[:](nb.float32[:,:], nb.float32[:,:], nb.uint16[:], nb.int32, nb.float32), nogil = True, cache = usecache)
+@nb.njit(nb.uint16[:](nb.float32[:,:], nb.float32[:,:], nb.uint, nb.int32, nb.float32), nogil = True, cache = usecache)
 def _guided_local_search(
-    distmat, guide, init_tour, perturbation_moves = 30, time_limit = 1.0
+    distmat, guide, start, perturbation_moves = 30, time_limit = 1.0
 ) -> npt.NDArray[np.uint16]:
+    init_tour = _init_nearest_neighbor(distmat, start)
     init_cost = _calculate_cost(distmat, init_tour)
     k = 0.1 * init_cost / distmat.shape[0]
     penalty = np.zeros_like(distmat)
@@ -138,32 +156,35 @@ def _guided_local_search(
 def guided_local_search(
     distmat: FloatArray, 
     guide: FloatArray, 
-    init_tour: IntArray, 
     perturbation_moves: int = 30, 
     time_limit: float = 1.0
 ) -> npt.NDArray[np.uint16]:
     return _guided_local_search(
         distmat = distmat.astype(np.float32),
         guide = guide.astype(np.float32),
-        init_tour = init_tour.astype(np.uint16),
+        start = 0,
         perturbation_moves = perturbation_moves,
         time_limit = time_limit,
     )
 
-def batched_guided_local_search(
+def multi_start_guided_local_search(
     dist: FloatArray, 
     guide: FloatArray, 
-    tours: IntArray, 
+    n_starts: int = 10,
     perturbation_moves = 30, 
     time_limit = 1.0
 ):
     dist = dist.astype(np.float32)
     guide = guide.astype(np.float32)
-    tours = tours.astype(np.uint16)
+    start_nodes = np.arange(n_starts).astype(np.uint16)
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = []
-        for tour in tours:
-            future = executor.submit(_guided_local_search, dist, guide, tour, perturbation_moves = perturbation_moves, time_limit = time_limit)
+        for start in start_nodes:
+            future = executor.submit(_guided_local_search, dist, guide, start, perturbation_moves = perturbation_moves, time_limit = time_limit)
             futures.append(future)
-        return np.stack([f.result() for f in futures])
+        tours = [f.result() for f in futures]
+        # Calculate costs and return the best tour
+        costs = np.array([_calculate_cost(dist, tour) for tour in tours])
+        best_tour = tours[np.argmin(costs)]
+        return best_tour

@@ -18,8 +18,7 @@ def solve(inst: TSPInstance) -> float:
     heu = heuristics(inst.distmat.copy())
     assert tuple(heu.shape) == (inst.n, inst.n)
     heu[heu < 1e-6] = 1e-6
-    inittour = np.arange(inst.n) # todo
-    result = guided_local_search(inst.distmat, heu, inittour, perturbation_moves, time_limit)
+    result = guided_local_search(inst.distmat, heu, perturbation_moves, time_limit)
     # print(result)
     return calculate_cost(inst, result)
 
