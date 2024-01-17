@@ -1,1 +1,0 @@
-- Try combining various factors to determine how promising it is to select an edge.

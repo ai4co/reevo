@@ -1,6 +1,5 @@
 import numpy as np
 import numpy.typing as npt
-import time
 import numba as nb
 import concurrent.futures
 
@@ -121,13 +120,6 @@ def _init_nearest_neighbor(distmat, start):
                 min_idx = j
         tour[i] = min_idx
         visited[min_idx] = True
-    return tour
-
-@nb.njit(nb.uint16[:](nb.uint16), nogil=True, cache = usecache)
-def _init_ordinal(n):
-    tour = np.zeros(n, dtype=np.uint16)
-    for i in range(n):
-        tour[i] = i
     return tour
 
 
