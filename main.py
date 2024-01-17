@@ -1,6 +1,5 @@
 import hydra
 import logging 
-import matplotlib.pyplot as plt
 import os
 from pathlib import Path
 import subprocess

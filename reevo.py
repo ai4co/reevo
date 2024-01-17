@@ -1,5 +1,4 @@
 from openai import OpenAI
-from sklearn.metrics.pairwise import cosine_similarity
 import logging
 import subprocess
 import numpy as np
