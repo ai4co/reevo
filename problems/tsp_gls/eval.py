@@ -10,7 +10,7 @@ except:
     from gpt import heuristics
 
 perturbation_moves = 30
-iter_limit = 400
+iter_limit = 1200
 
 def calculate_cost(inst: TSPInstance, path: np.ndarray) -> float:
     return inst.distmat[path, np.roll(path, 1)].sum().item()
