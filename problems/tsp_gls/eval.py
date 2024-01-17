@@ -2,6 +2,7 @@ import numpy as np
 import logging
 from gen_inst import TSPInstance, load_dataset, dataset_conf
 from gls import guided_local_search
+from tqdm import tqdm
 
 try:
     from gpt import heuristics_v2 as heuristics
@@ -9,7 +10,7 @@ except:
     from gpt import heuristics
 
 perturbation_moves = 30
-time_limit = 1.0 # seconds
+iter_limit = 400
 
 def calculate_cost(inst: TSPInstance, path: np.ndarray) -> float:
     return inst.distmat[path, np.roll(path, 1)].sum().item()
@@ -17,8 +18,7 @@ def calculate_cost(inst: TSPInstance, path: np.ndarray) -> float:
 def solve(inst: TSPInstance) -> float:
     heu = heuristics(inst.distmat.copy())
     assert tuple(heu.shape) == (inst.n, inst.n)
-    heu[heu < 1e-6] = 1e-6
-    result = guided_local_search(inst.distmat, heu, perturbation_moves, time_limit)
+    result = guided_local_search(inst.distmat, heu, perturbation_moves, iter_limit)
     # print(result)
     return calculate_cost(inst, result)
 
@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     problem_size = int(sys.argv[1])
     mood = sys.argv[3]
-    assert mood in ['train', 'val']
+    assert mood in ['train', 'val', "test"]
 
     basepath = os.path.dirname(__file__)
     # automacially generate dataset if nonexists
@@ -62,7 +62,7 @@ if __name__ == "__main__":
             logging.info(f"[*] Evaluating {dataset_path}")
 
             objs = []
-            for i, instance in enumerate(dataset):
+            for i, instance in enumerate(tqdm(dataset)):
                 obj = solve(instance)
                 objs.append(obj)
             
