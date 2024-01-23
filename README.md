@@ -2,30 +2,40 @@
 
 🥳 **Welcome!** This is a codebase that accompanies the paper [*ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution*](). Give ReEvo 5 minutes, and get a state-of-the-art algorithm in return!
 
-TODO: add a diagram
 
-TODO: introduce ReEvo
+![Diagram of ReEvo](./assets/reevo.png)
+
+We introduce **Language Hyper-Heuristics (LHHs)**, an emerging variant of Hyper-Heuristics (HHs) that leverages LLMs for heuristic generation, featured by **minimal manual intervention and open-ended heuristic spaces**.
+
+To empower LHHs, we present **Reflective Evolution (ReEvo)**, a generic searching framework that emulates the reflective design approach of human experts while much surpassing human capabilities with its scalable LLM inference, Internet-scale domain knowledge, and powerful evolutionary search.
+
 
 ### Highlights
 
-- TODO: highlights
+- State-of-the-art Guided Local Search (GLS) obtained within 20 minutes of ReEvo run. We present an efficient Python implementation of GLS using Numba (`./problems/tsp_gls/gls.py`).
+- Better Ant Colony Optimization (ACO) heuristics than [DeepACO](https://github.com/henry-yeh/DeepACO) and human designs.
+- 13 combinatorial optimization problem settings.
+- Emergent capabilities to evolve heuristics under black-box prompting.
+
+---
 
 ### Usage
 
 - Set your OpenAI API key as an environment variable `OPENAI_API_KEY`.
 - Running logs and intermediate results are saved in `./outputs/main/` by default.
 - Datasets are generated on the fly.
+- Some test notebooks are provided in `./problems/*/test.ipynb`.
 
 #### To run ReEvo
 ```bash
 # e.g., for tsp_aco
 python main.py problem=tsp_aco
 ```
+Check out `./cfg/` for more options.
 
-#### To run AEL
+You can try a baseline LHH [AEL](https://arxiv.org/abs/2311.15249) by setting `algorithm=ael`:
 ```bash
-# e.g., for tsp_constructive
-python main.py problem=tsp_constructive algorithm=ael mutation_rate=0.2
+python main.py problem=tsp_aco algorithm=ael mutation_rate=0.2
 ```
 
 #### Available problems
@@ -35,10 +45,13 @@ python main.py problem=tsp_constructive algorithm=ael mutation_rate=0.2
 - Multiple Knapsack Problems (MKP): `mkp_aco`, `mkp_aco_black_box`
 - Orienteering Problem (OP): `op_aco`, `op_aco_black_box`
 
-#### How to apply ReEvo to your problem
+#### Simple steps to apply ReEvo to your problem
 
-TODO
+- Define your problem in `./cfg/problem/`.
+- Generate instances and implement the evaluation pipeline in `./problems/`.
+- Add function_description, function_signature, and seed_function in `./prompts/`.
 
+---
 
 ### Dependency
 
@@ -55,6 +68,17 @@ Problem-specific dependencies:
 - `cvrp_aco(_black_box)` / `mkp_aco(_black_box)` / `op_aco(_black_box)`: pytorch
 - `tsp_gls`: numba==0.58
 
+---
+
+### Citation
+
+🤩 If you encounter any difficulty using our code, please do not hesitate to submit an issue or directly contact us! If you do find our work helpful (or if you would be so kind as to offer us some encouragement), please consider kindly giving a star, and citing our paper.
+
+```bibtex
+TODO
+```
+
+---
 
 ### Acknowledgments
 - [DeepACO: Neural-enhanced Ant Systems for Combinatorial Optimization](https://github.com/henry-yeh/DeepACO)
