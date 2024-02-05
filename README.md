@@ -1,6 +1,6 @@
 # ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution
 
-🥳 **Welcome!** This is a codebase that accompanies the paper [*ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution*](./assets/ReEvo_LLMs_as_HHs.pdf).
+🥳 **Welcome!** This is a codebase that accompanies the paper [*ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution*](https://arxiv.org/abs/2402.01145).
 
 **Give ReEvo 5 minutes, and get a state-of-the-art algorithm in return!**
 
@@ -79,7 +79,14 @@ python main.py problem=tsp_aco algorithm=ael mutation_rate=0.2
 If you encounter any difficulty using our code, please do not hesitate to submit an issue or directly contact us! If you find our work helpful (or if you would be so kind as to offer us some encouragement), please consider kindly giving us a star, and citing our paper.
 
 ```bibtex
-TODO
+@misc{ye2024reevo,
+      title={ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution}, 
+      author={Haoran Ye and Jiarui Wang and Zhiguang Cao and Guojie Song},
+      year={2024},
+      eprint={2402.01145},
+      archivePrefix={arXiv},
+      primaryClass={cs.NE}
+}
 ```
 
 ## 🫡 Acknowledgments
