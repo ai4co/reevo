@@ -3,6 +3,7 @@ import logging
 import os
 from pathlib import Path
 import subprocess
+from utils.utils import init_client
 
 
 ROOT_DIR = os.getcwd()
@@ -16,7 +17,8 @@ def main(cfg):
     logging.info(f"Project Root: {ROOT_DIR}")
     logging.info(f"Using LLM: {cfg.model}")
     logging.info(f"Using Algorithm: {cfg.algorithm}")
-    
+
+    init_client(cfg)
     if cfg.algorithm == "reevo":
         from reevo import ReEvo as ga
     elif cfg.algorithm == "ael":
