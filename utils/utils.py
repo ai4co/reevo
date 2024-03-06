@@ -2,8 +2,7 @@ import subprocess
 import os
 import json
 import logging
-
-import multiprocessing
+import concurrent.futures
 import time
 import re
 
@@ -79,11 +78,9 @@ def multi_chat_completion(messages_list: list[list[dict]], n=1, model: str="gpt-
     ]
     param: n: number of responses to generate for each message in messages_list
     """
-    with multiprocessing.Pool() as executor:
-        # Create a list of arguments to pass to get_chat_completion
+    with concurrent.futures.ThreadPoolExecutor() as executor:
         args = [(n, messages, model, temperature) for messages in messages_list]
-        # Use executor.starmap to pass the list of arguments
-        contents = executor.starmap(chat_completion, args)
+        contents = executor.map(lambda p: chat_completion(*p), args)
     return list(contents)
 
 
