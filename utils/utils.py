@@ -7,7 +7,6 @@ import multiprocessing
 import time
 import re
 
-client = None
 def init_client(cfg):
     global client
     if cfg.model.startswith("gpt"):
@@ -58,19 +57,6 @@ def extract_description(response: str) -> tuple[str, str]:
         if desc_string is not None:
             break
     return desc_string
-
-
-def get_chat_completion(client, message, model="gpt-3.5-turbo-1106", temperature=0.):
-    """
-    Deprecated. Use chat_completion instead.
-    """
-    raise NotImplementedError
-    completion = client.chat.completions.create(
-        model=model,
-        messages=message,
-        temperature=temperature,
-    )
-    return completion.choices[0].message.content
 
 
 def multi_chat_completion(messages_list: list[list[dict]], n=1, model: str="gpt-3.5-turbo-1106", temperature: float=0.):
