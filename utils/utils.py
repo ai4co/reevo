@@ -2,12 +2,24 @@ import subprocess
 import os
 import json
 import logging
-from openai import OpenAI
+
 import multiprocessing
 import time
 import re
 
-client = OpenAI()
+client = None
+def init_client(cfg):
+    global client
+    if cfg.model.startswith("gpt"):
+        from openai import OpenAI
+        client = OpenAI()
+    elif cfg.model.startswith("GLM"):
+        from zhipuai import ZhipuAI 
+        zhipu_api_key = os.getenv('ZHIPU_AI_API_KEY')
+        client = ZhipuAI(api_key=zhipu_api_key)
+    else:
+        raise NotImplementedError
+
 
 def file_to_string(filename):
     with open(filename, 'r') as file:
@@ -95,13 +107,22 @@ def chat_completion(n: int, messages: list[dict], model: str, temperature: float
     """
     total_samples = 0
     responses = []
-    chunk_size = n if "gpt-3.5" in model else min(4, n)
+    if "gpt-3.5" in model:
+        chunk_size = n 
+    elif "GLM" in model:
+        chunk_size = 1
+    else: 
+        chunk_size = min(4, n)
+
     while True:
         if total_samples >= n:
             break
         for attempt in range(1000):
             try:
-                response_cur = client.chat.completions.create(model=model, messages=messages, temperature=temperature, n=min(chunk_size, n-total_samples))
+                if "gpt" in model:
+                    response_cur = client.chat.completions.create(model=model, messages=messages, temperature=temperature, n=min(chunk_size, n-total_samples))
+                elif "GLM" in model:
+                    response_cur = client.chat.completions.create(model=model, messages=messages)
                 total_samples += chunk_size
                 break
             except Exception as e:
