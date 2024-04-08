@@ -33,7 +33,7 @@ def main(cfg):
     logging.info(f"Best Code Path Overall: {best_code_path_overall}")
     
     # Run validation and redirect stdout to a file "best_code_overall_stdout.txt"
-    with open(f"{ROOT_DIR}/problems/{cfg.problem.problem_name}/{cfg.suffix.lower()}.py", 'w') as file:
+    with open(f"{ROOT_DIR}/problems/{cfg.problem.problem_name}/gpt.py", 'w') as file:
         file.writelines(best_code_overall + '\n')
     test_script = f"{ROOT_DIR}/problems/{cfg.problem.problem_name}/eval.py"
     test_script_stdout = "best_code_overall_val_stdout.txt"

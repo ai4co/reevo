@@ -39,7 +39,7 @@ class ReEvo:
         logging.info("Function name: " + self.func_name)
         
         self.prompt_dir = f"{self.root_dir}/prompts"
-        self.output_file = f"{self.root_dir}/problems/{self.problem}/{self.cfg.suffix.lower()}.py"
+        self.output_file = f"{self.root_dir}/problems/{self.problem}/gpt.py"
         
         # Loading all text prompts
         # Problem-specific prompt components

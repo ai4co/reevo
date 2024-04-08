@@ -13,7 +13,6 @@ algorithm: reevo # another option is "ael"
 # LLM parameters
 model: gpt-3.5-turbo  # LLM model (other options include gpt-4-turbo-preview, GLM-3-Turbo, GLM-4)
 temperature: 1  # temperature for chat completion
-suffix: GPT  # suffix for generated files (indicates LLM model)
 
 # Main GA loop parameters
 max_fe: 100 # maximum number of function evaluations
