@@ -4,8 +4,27 @@
 
 **Give ReEvo 5 minutes, and get a state-of-the-art algorithm in return!**
 
+## Table of Contents
 
-## 🚀 Introduction
+* 1. [ News 📰](#News)
+* 2. [ Introduction 🚀](#Introduction)
+* 3. [ Exciting Highlights 🌟](#ExcitingHighlights)
+* 4. [ Usage 🔑](#Usage)
+		* 4.1. [Dependency](#Dependency)
+		* 4.2. [To run ReEvo](#TorunReEvo)
+		* 4.3. [Available problems](#Availableproblems)
+		* 4.4. [Simple steps to apply ReEvo to your problem](#SimplestepstoapplyReEvotoyourproblem)
+* 5. [ Citation 🤩](#Citation)
+* 6. [ Acknowledgments 🫡](#Acknowledgments)
+
+
+##  1. <a name='News'></a> News 📰
+
+- **Apr 2024**: We are looking for collaborators to further this work! Please reach out if you are interested.
+- **Feb 2024**: We are excited to release ReEvo! 🚀
+
+
+##  2. <a name='Introduction'></a> Introduction 🚀
 
 ![Diagram of ReEvo](./assets/reevo.png)
 
@@ -14,7 +33,7 @@ We introduce **Language Hyper-Heuristics (LHHs)**, an emerging variant of Hyper-
 To empower LHHs, we present **Reflective Evolution (ReEvo)**, a generic searching framework that emulates the reflective design approach of human experts while much surpassing human capabilities with its scalable LLM inference, Internet-scale domain knowledge, and powerful evolutionary search.
 
 
-## 🌟 Exciting Highlights!
+##  3. <a name='ExcitingHighlights'></a> Exciting Highlights 🌟
 
 - State-of-the-art Guided Local Search (GLS) delivered by 20 minutes of ReEvo. We present an efficient Python implementation of GLS using Numba (`./problems/tsp_gls/gls.py`).
 - Better Ant Colony Optimization (ACO) heuristics than [DeepACO](https://github.com/henry-yeh/DeepACO) and human designs.
@@ -25,14 +44,14 @@ To empower LHHs, we present **Reflective Evolution (ReEvo)**, a generic searchin
 - Maybe we can interpret and verbalize genetic cues in Evolutionary Algorithms (EAs) with LLMs.
 
 
-## 🔑 Usage
+##  4. <a name='Usage'></a> Usage 🔑
 
 - Set your OpenAI API key as an environment variable `OPENAI_API_KEY`.
 - Running logs and intermediate results are saved in `./outputs/main/` by default.
 - Datasets are generated on the fly.
 - Some test notebooks are provided in `./problems/*/test.ipynb`.
 
-#### Dependency
+####  4.1. <a name='Dependency'></a>Dependency
 
 - Python >= 3.11
 - openai >= 1.0.0
@@ -48,33 +67,28 @@ Problem-specific dependencies:
 - `tsp_gls`: numba==0.58
 
 
-#### To run ReEvo
+####  4.2. <a name='TorunReEvo'></a>To run ReEvo
 ```bash
 # e.g., for tsp_aco
 python main.py problem=tsp_aco
 ```
 Check out `./cfg/` for more options.
 
-You can try a baseline LHH [AEL](https://arxiv.org/abs/2311.15249) by setting `algorithm=ael`. E.g.,
-```bash
-python main.py problem=tsp_aco algorithm=ael mutation_rate=0.2
-```
-
-#### Available problems
+####  4.3. <a name='Availableproblems'></a>Available problems
 - Traveling Salesman Problem (TSP): `tsp_aco`, `tsp_aco_black_box`, `tsp_constructive`, `tsp_gls` *(ReEvo only)*
 - Capacitated Vehicle Routing Problem (CVRP): `cvrp_aco`, `cvrp_aco_black_box`
 - Bin Packing Problem (BPP): `bpp_offline_aco`, `bpp_offline_aco_black_box`, `bpp_online` *(ReEvo only)*
 - Multiple Knapsack Problems (MKP): `mkp_aco`, `mkp_aco_black_box`
 - Orienteering Problem (OP): `op_aco`, `op_aco_black_box`
 
-#### Simple steps to apply ReEvo to your problem
+####  4.4. <a name='SimplestepstoapplyReEvotoyourproblem'></a>Simple steps to apply ReEvo to your problem
 
 - Define your problem in `./cfg/problem/`.
 - Generate problem instances and implement the evaluation pipeline in `./problems/`.
 - Add function_description, function_signature, and seed_function in `./prompts/`.
 
 
-## 🤩 Citation
+##  5. <a name='Citation'></a> Citation 🤩
 
 If you encounter any difficulty using our code, please do not hesitate to submit an issue or directly contact us! If you find our work helpful (or if you would be so kind as to offer us some encouragement), please consider kindly giving us a star, and citing our paper.
 
@@ -89,7 +103,7 @@ If you encounter any difficulty using our code, please do not hesitate to submit
 }
 ```
 
-## 🫡 Acknowledgments
+##  6. <a name='Acknowledgments'></a> Acknowledgments 🫡
 We are very grateful to [Federico Berto](https://github.com/fedebotu), [Yuan Jiang](https://github.com/jiang-yuan), [Yining Ma](https://github.com/yining043), [Chuanbo Hua](https://github.com/cbhua), and [AI4CO community](https://github.com/ai4co) for valuable discussions and feedback.
 
 Also, our work is built upon the following projects, among others:
