@@ -1,6 +1,6 @@
 problem_name: bpp_offline_aco
 problem_type: aco
 obj_type: min
-problem_size: 500 # problem size for validation
+problem_size: 500 # problem size for training
 func_name: heuristics
 description: Solving Bin Packing Problem (BPP). BPP requires packing a set of items of various sizes into the smallest number of fixed-sized bins.

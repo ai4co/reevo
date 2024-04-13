@@ -1,6 +1,6 @@
 problem_name: tsp_aco
 problem_type: aco
 obj_type: min
-problem_size: 50 # problem size for validation
+problem_size: 50 # problem size for training
 func_name: heuristics
 description: Solving Traveling Salesman Problem (TSP) via stochastic solution sampling following "heuristics". TSP requires finding the shortest path that visits all given nodes and returns to the starting node.

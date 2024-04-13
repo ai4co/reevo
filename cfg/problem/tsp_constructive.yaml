@@ -1,6 +1,6 @@
 problem_name: tsp_constructive
 problem_type: constructive
 obj_type: min
-problem_size: 50 # problem size for validation
+problem_size: 50 # problem size for training
 func_name: select_next_node
 description: Solving Traveling Salesman Problem (TSP) with constructive heuristics. TSP requires finding the shortest path that visits all given nodes and returns to the starting node.

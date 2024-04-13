@@ -1,6 +1,6 @@
 problem_name: mkp_aco
 problem_type: black_box
 obj_type: max
-problem_size: 100 # problem size for validation
+problem_size: 100 # problem size for training
 func_name: heuristics
 description: Solving a black-box combinatorial optimization problem via stochastic solution sampling following "heuristics".

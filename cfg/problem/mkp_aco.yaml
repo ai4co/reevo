@@ -1,6 +1,6 @@
 problem_name: mkp_aco
 problem_type: aco
 obj_type: max
-problem_size: 100 # problem size for validation
+problem_size: 100 # problem size for training
 func_name: heuristics
 description: Solving Multiple Knapsack Problems (MKP) through stochastic solution sampling based on "heuristics". MKP involves selecting a subset of items to maximize the total prize collected, subject to multi-dimensional maximum weight constraints.

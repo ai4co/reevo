@@ -1,6 +1,6 @@
 problem_name: bpp_online
 problem_type: online
 obj_type: min
-problem_size: 5000 # problem size for validation
+problem_size: 5000 # problem size for training
 func_name: priority
 description: Solving online Bin Packing Problem (BPP). BPP requires packing a set of items of various sizes into the smallest number of fixed-sized bins. Online BPP requires packing an item as soon as it is received.
