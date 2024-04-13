@@ -144,7 +144,10 @@ def extract_code_from_generator(content):
         return None
     # Add import statements if not present
     if "import" not in code_string:
-        code_string = "import numpy as np\n" + code_string
+        if "np" in code_string:
+            code_string = "import numpy as np\n" + code_string
+        if "torch" in code_string:
+            code_string = "import torch\n" + code_string
     return code_string
 
 
