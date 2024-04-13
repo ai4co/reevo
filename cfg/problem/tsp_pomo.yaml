@@ -1,0 +1,6 @@
+problem_name: tsp_pomo
+problem_type: nco
+obj_type: min
+problem_size: 200 # problem size for training
+func_name: heuristics
+description: Assisting in solving the Traveling Salesman Problem (TSP) with some prior heuristics. TSP requires finding the shortest path that visits all given nodes and returns to the starting node.
