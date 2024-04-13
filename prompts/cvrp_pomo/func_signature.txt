@@ -1,0 +1,1 @@
+def heuristics_v{version}(distance_matrix: torch.Tensor, demands: torch.Tensor) -> torch.Tensor:
