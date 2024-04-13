@@ -16,6 +16,7 @@ def seed_heuristics(distance_matrix: torch.Tensor) -> torch.Tensor:
     """
     heu_ij = - log(dis_ij) if j is the topK nearest neighbor of i, else - dis_ij
     """
+    distance_matrix[distance_matrix == 0] = 1e5
     K = 100
     # Compute top-k nearest neighbors (smallest distances)
     values, indices = torch.topk(distance_matrix, k=K, largest=False, dim=1)
