@@ -1,0 +1,1 @@
+Download the checkpoints from its [official repository](https://github.com/yd-kwon/POMO) and place them in the corresponding directories. For example, place `checkpoint-3100.pt` for TSP at `problems/tsp_pomo/checkpoints/checkpoint-3100.pt`.

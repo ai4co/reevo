@@ -107,6 +107,8 @@ if __name__ == "__main__":
         from gen_inst import generate_datasets, dataset_conf
         generate_datasets()
 
+    if not os.path.isfile(os.path.join(basepath, "checkpoints/checkpoint-3100.pt")):
+        raise FileNotFoundError("No checkpoints found. Please see the readme.md and download the checkpoints.")
 
     if mood == 'train':
         dataset_path = os.path.join(basepath, f"dataset/{mood}{problem_size}_dataset.pt")
