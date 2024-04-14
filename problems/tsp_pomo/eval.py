@@ -32,7 +32,7 @@ from gen_inst import dataset_conf
 
 env_params = {
     'problem_size': 100,
-    'pomo_size': 10,
+    'pomo_size': 1,
 }
 
 model_params = {
