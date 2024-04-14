@@ -4,7 +4,7 @@ import torch
 dataset_conf = {
     'train': (200, 500, 1000),
     'val':   (200, 500, 1000),
-    'test':  (200, 500, 1000),
+    'test':  (200, 500, 1000, 5000),
 }
 
 
@@ -22,8 +22,14 @@ def get_random_problems(batch_size, problem_size):
         demand_scaler = 40
     elif problem_size == 100:
         demand_scaler = 50
-    elif problem_size > 100:
-        demand_scaler = 50
+    elif problem_size == 200:
+        demand_scaler = 80
+    elif problem_size == 500:
+        demand_scaler = 100
+    elif problem_size == 1000:
+        demand_scaler = 250
+    elif problem_size == 5000:
+        demand_scaler = 500
     else:
         raise NotImplementedError
 
