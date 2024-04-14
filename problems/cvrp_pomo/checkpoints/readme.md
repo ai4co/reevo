@@ -1,0 +1,1 @@
+Download the checkpoints from its [official repository](https://github.com/yd-kwon/POMO) and place them in the corresponding directories. For example, place `checkpoint-30500.pt` for CVRP at `problems/cvrp_pomo/checkpoints/checkpoint-30500.pt`.
