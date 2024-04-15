@@ -151,6 +151,8 @@ if __name__ == "__main__":
     if not os.path.isfile(os.path.join(basepath, "checkpoints/checkpoint-40.pt")):
         raise FileNotFoundError("No checkpoints found. Please see the readme.md and download the checkpoints.")
 
+    if not os.path.isfile(os.path.join(basepath, "data/vrp200_test_lkh.txt")):
+        raise FileNotFoundError("No test data found. Please see the readme.md and download the data.")
 
     if mood == 'train':
         test_paras = {
