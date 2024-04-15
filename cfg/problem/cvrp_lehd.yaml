@@ -1,0 +1,6 @@
+problem_name: cvrp_lehd
+problem_type: nco
+obj_type: min
+problem_size: 200 # problem size for training
+func_name: heuristics
+description: Assisting in solving Capacitated Vehicle Routing Problem (CVRP) with some prior heuristics. CVRP requires finding the shortest path that visits all given nodes and returns to the starting node. Each node has a demand and each vehicle has a capacity. The total demand of the nodes visited by a vehicle cannot exceed the vehicle capacity. When the total demand exceeds the vehicle capacity, the vehicle must return to the starting node.
