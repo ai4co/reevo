@@ -25,8 +25,8 @@ class VRPTester():
         USE_CUDA = self.tester_params['use_cuda']
         if USE_CUDA:
             cuda_device_num = self.tester_params['cuda_device_num']
-            torch.cuda.set_device(cuda_device_num)
-            device = torch.device('cuda', cuda_device_num)
+            # torch.cuda.set_device(cuda_device_num)
+            device = torch.device('cuda:0')
             torch.set_default_tensor_type('torch.cuda.FloatTensor')
         else:
             device = torch.device('cpu')

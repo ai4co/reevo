@@ -2,13 +2,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# try:
-#     from gpt import heuristics_v2 as heuristics
-# except:
-#     from gpt import heuristics
+try:
+    from gpt import heuristics_v2 as heuristics
+except:
+    from gpt import heuristics
 
 
-IMPL_REEVO = False
+IMPL_REEVO = True
 
 def heuristics_seed(distance_matrix: torch.Tensor, demands) -> torch.Tensor:
     """
