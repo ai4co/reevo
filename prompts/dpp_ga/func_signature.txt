@@ -1,0 +1,1 @@
+def crossover_v{version}(parents: np.ndarray, n_pop: int) -> np.ndarray:

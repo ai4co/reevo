@@ -1,0 +1,6 @@
+problem_name: dpp_ga
+problem_type: ga
+obj_type: max
+problem_size: 0 # not used
+func_name: crossover
+description: Assisting in solving black-box decap placement problem with genetic algorithm. The problem requires finding the optimal placement of decaps in a given power grid.

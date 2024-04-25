@@ -1,0 +1,15 @@
+def crossover_v1(parents: np.ndarray, n_pop: int) -> np.ndarray:
+    n_parents, n_decap = parents.shape
+
+    # Split genomes into two halves
+    left_halves = parents[:, :n_decap // 2]
+    right_halves = parents[:, n_decap // 2:]
+
+    # Create parent pairs
+    parents_idx = np.stack([np.random.choice(range(n_parents), 2, replace=False) for _ in range(n_pop)])
+    parents_left = left_halves[parents_idx[:, 0]]
+    parents_right = right_halves[parents_idx[:, 1]]
+
+    # Create offspring
+    offspring = np.concatenate([parents_left, parents_right], axis=1)
+    return offspring
