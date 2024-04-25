@@ -39,7 +39,7 @@ def block_until_running(stdout_filepath, log_status=False, iter_num=-1, response
     # Ensure that the evaluation has started before moving on
     while True:
         log = file_to_string(stdout_filepath)
-        if "[*] Running ..." in log or "Traceback" in log:
+        if  len(log) > 0:
             if log_status and "Traceback" in log:
                 logging.info(f"Iteration {iter_num}: Code Run {response_id} execution error!")
             else:
