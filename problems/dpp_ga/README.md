@@ -1,8 +1,8 @@
-# ReEvo for the Decap Placement Problem (DPP)
+# LLM-as-HH for the Decap Placement Problem (DPP)
 
-Decoupling capacitors are used in electronic circuits to suppress noise and to provide a stable voltage supply. The DPP is to determine the optimal placement of decoupling capacitors in a circuit to minimize the noise. The DPP is a combinatorial optimization problem that is NP-hard.
+Decoupling capacitors are used in electronic circuits to suppress noise and provide a stable voltage supply. The DPP seeks to optimally place decoupling capacitors in a circuit to minimize the noise. The DPP is a combinatorial optimization problem that is NP-hard.
 
-PDF: https://proceedings.mlr.press/v202/kim23h/kim23h.pdf
+Paper: https://proceedings.mlr.press/v202/kim23h/kim23h.pdf
 
 Code (DevFormer): https://github.com/kaist-silab/devformer
 
