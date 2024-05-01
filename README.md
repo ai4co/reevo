@@ -1,4 +1,4 @@
-# ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution
+# Large Language Models as Hyper-Heuristics for Combinatorial Optimization
 
 🥳 **Welcome!** This is a codebase that accompanies the paper [*ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution*](https://arxiv.org/abs/2402.01145).
 
@@ -20,7 +20,7 @@
 
 ##  1. <a name='News'></a> News 📰
 
-- **Apr 2024**: We are looking for collaborators to further this work! Please reach out if you are interested.
+- **Apr 2024**: Added use cases for Neural Combinatorial Optimization (NCO) and Electronic Design Automation (EDA). The paper will be updated soon.
 - **Feb 2024**: We are excited to release ReEvo! 🚀
 
 
@@ -28,21 +28,29 @@
 
 ![Diagram of ReEvo](./assets/reevo.png)
 
-We introduce **Language Hyper-Heuristics (LHHs)**, an emerging variant of Hyper-Heuristics (HHs) that leverages LLMs for heuristic generation, featured by **minimal manual intervention and open-ended heuristic spaces**.
+We introduce **Language Hyper-Heuristics (LHHs)**, an emerging variant of Hyper-Heuristics (HHs) that leverages LLMs for heuristic generation, featuring **minimal manual intervention and open-ended heuristic spaces**.
 
 To empower LHHs, we present **Reflective Evolution (ReEvo)**, a generic searching framework that emulates the reflective design approach of human experts while much surpassing human capabilities with its scalable LLM inference, Internet-scale domain knowledge, and powerful evolutionary search.
 
 
 ##  3. <a name='ExcitingHighlights'></a> Exciting Highlights 🌟
 
-- State-of-the-art Guided Local Search (GLS) delivered by 20 minutes of ReEvo. We present an efficient Python implementation of GLS using Numba (`./problems/tsp_gls/gls.py`).
-- Better Ant Colony Optimization (ACO) heuristics than [DeepACO](https://github.com/henry-yeh/DeepACO) and human designs.
-- We include 13 Combinatorial Optimization Problem settings in this repo.
-- Emergent capabilities to evolve heuristics under black-box prompting.
-- Maybe we no longer need to predefine a heuristic space for future HH research.
-- Maybe we can beat Neural Combinatorial Optimization solvers using ten lines of ReEvo-generated heuristics.
-- Maybe we can interpret and verbalize genetic cues in Evolutionary Algorithms (EAs) with LLMs.
+We can improve the following types of algorithms:
+- Neural Combinatorial Optimization (NCO)
+- Genetic Algorithm (GA)
+- Ant Colony Optimization (ACO)
+- Guided Local Search (GLS)
+- Constructive Heuristics
 
+on the following problems:
+- Traveling Salesman Problem (TSP)
+- Capacitated Vehicle Routing Problem (CVRP)
+- Orienteering Problem (OP)
+- Multiple Knapsack Problems (MKP)
+- Bin Packing Problem (BPP)
+- Decap Placement Problem (DPP)
+
+with both black-box and white-box settings.
 
 ##  4. <a name='Usage'></a> Usage 🔑
 
@@ -63,7 +71,7 @@ You may install the dependencies above via `pip install -r requirements.txt`.
 Problem-specific dependencies:
 
 - `tsp_aco(_black_box)`: pytorch, scikit-learn
-- `cvrp_aco(_black_box)` / `mkp_aco(_black_box)` / `op_aco(_black_box)`: pytorch
+- `cvrp_aco(_black_box)` / `mkp_aco(_black_box)` / `op_aco(_black_box)` / `NCO`: pytorch
 - `tsp_gls`: numba==0.58
 
 
@@ -75,11 +83,12 @@ python main.py problem=tsp_aco
 Check out `./cfg/` for more options.
 
 ####  4.3. <a name='Availableproblems'></a>Available problems
-- Traveling Salesman Problem (TSP): `tsp_aco`, `tsp_aco_black_box`, `tsp_constructive`, `tsp_gls` *(ReEvo only)*
-- Capacitated Vehicle Routing Problem (CVRP): `cvrp_aco`, `cvrp_aco_black_box`
-- Bin Packing Problem (BPP): `bpp_offline_aco`, `bpp_offline_aco_black_box`, `bpp_online` *(ReEvo only)*
+- Traveling Salesman Problem (TSP): `tsp_aco`, `tsp_aco_black_box`, `tsp_constructive`, `tsp_gls`, `tsp_pomo`, `tsp_lehd`
+- Capacitated Vehicle Routing Problem (CVRP): `cvrp_aco`, `cvrp_aco_black_box`, `cvrp_pomo`, `cvrp_lehd`
+- Bin Packing Problem (BPP): `bpp_offline_aco`, `bpp_offline_aco_black_box`, `bpp_online`
 - Multiple Knapsack Problems (MKP): `mkp_aco`, `mkp_aco_black_box`
 - Orienteering Problem (OP): `op_aco`, `op_aco_black_box`
+- Decap Placement Problem (DPP): `dpp_ga`
 
 ####  4.4. <a name='SimplestepstoapplyReEvotoyourproblem'></a>Simple steps to apply ReEvo to your problem
 
@@ -112,3 +121,4 @@ Also, our work is built upon the following projects, among others:
 - [Algorithm Evolution Using Large Language Model](https://arxiv.org/abs/2311.15249)
 - [Mathematical discoveries from program search with large language models](https://github.com/google-deepmind/funsearch)
 - [An Example of Evolutionary Computation + Large Language Model Beating Human: Design of Efficient Guided Local Search](https://arxiv.org/abs/2401.02051)
+- [DevFormer: A Symmetric Transformer for Context-Aware Device Placement](https://arxiv.org/abs/2205.13225)
