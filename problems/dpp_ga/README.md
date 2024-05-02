@@ -6,6 +6,8 @@ Paper: https://proceedings.mlr.press/v202/kim23h/kim23h.pdf
 
 Code (DevFormer): https://github.com/kaist-silab/devformer
 
+Diagram from the original paper:
+
 <p align="center">
     <img src="https://raw.githubusercontent.com/kaist-silab/devformer/main/pages/assets/objective.png" width="500"/>
 </p> 

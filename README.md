@@ -1,6 +1,6 @@
 # Large Language Models as Hyper-Heuristics for Combinatorial Optimization
 
-🥳 **Welcome!** This is a codebase that accompanies the paper [*ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution*](https://arxiv.org/abs/2402.01145).
+🥳 **Welcome!** This is a codebase that accompanies the paper [*ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution*]().
 
 **Give ReEvo 5 minutes, and get a state-of-the-art algorithm in return!**
 
@@ -15,13 +15,11 @@
 		* 4.3. [Available problems](#Availableproblems)
 		* 4.4. [Simple steps to apply ReEvo to your problem](#SimplestepstoapplyReEvotoyourproblem)
 * 5. [ Citation 🤩](#Citation)
-* 6. [ Acknowledgments 🫡](#Acknowledgments)
 
 
 ##  1. <a name='News'></a> News 📰
 
-- **Apr 2024**: Added use cases for Neural Combinatorial Optimization (NCO) and Electronic Design Automation (EDA). The paper will be updated soon.
-- **Feb 2024**: We are excited to release ReEvo! 🚀
+- **May 2024**: Anonymized codebase released!
 
 
 ##  2. <a name='Introduction'></a> Introduction 🚀
@@ -104,21 +102,10 @@ If you encounter any difficulty using our code, please do not hesitate to submit
 ```bibtex
 @misc{ye2024reevo,
       title={ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution}, 
-      author={Haoran Ye and Jiarui Wang and Zhiguang Cao and Guojie Song},
+      author={},
       year={2024},
-      eprint={2402.01145},
-      archivePrefix={arXiv},
-      primaryClass={cs.NE}
+      eprint={},
+      archivePrefix={},
+      primaryClass={}
 }
 ```
-
-##  6. <a name='Acknowledgments'></a> Acknowledgments 🫡
-We are very grateful to [Federico Berto](https://github.com/fedebotu), [Yuan Jiang](https://github.com/jiang-yuan), [Yining Ma](https://github.com/yining043), [Chuanbo Hua](https://github.com/cbhua), and [AI4CO community](https://github.com/ai4co) for valuable discussions and feedback.
-
-Also, our work is built upon the following projects, among others:
-- [DeepACO: Neural-enhanced Ant Systems for Combinatorial Optimization](https://github.com/henry-yeh/DeepACO)
-- [Eureka: Human-Level Reward Design via Coding Large Language Models](https://github.com/eureka-research/Eureka)
-- [Algorithm Evolution Using Large Language Model](https://arxiv.org/abs/2311.15249)
-- [Mathematical discoveries from program search with large language models](https://github.com/google-deepmind/funsearch)
-- [An Example of Evolutionary Computation + Large Language Model Beating Human: Design of Efficient Guided Local Search](https://arxiv.org/abs/2401.02051)
-- [DevFormer: A Symmetric Transformer for Context-Aware Device Placement](https://arxiv.org/abs/2205.13225)
