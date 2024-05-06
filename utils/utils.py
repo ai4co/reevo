@@ -58,7 +58,7 @@ def extract_description(response: str) -> tuple[str, str]:
     return desc_string
 
 
-def multi_chat_completion(messages_list: list[list[dict]], n, cfg):
+def multi_chat_completion(messages_list: list[list[dict]], n, model, temperature):
     """
     An example of messages_list:
     
@@ -85,9 +85,6 @@ def multi_chat_completion(messages_list: list[list[dict]], n, cfg):
     
     if len(messages_list) > 1:
         assert n == 1, "Currently, only n=1 is supported for multi-chat completion."
-    
-    model = cfg.model
-    temperature = cfg.temperature
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         args = [(n, messages, model, temperature) for messages in messages_list]
