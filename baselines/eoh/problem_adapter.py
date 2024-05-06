@@ -68,6 +68,9 @@ class Problem:
         if self.problem_type == "tsp_constructive":
             from .original.prompts.tsp_greedy import GetPrompts
             self.prompts = GetPrompts()
+        elif self.problem_type == "bpp_online":
+            from .original.prompts.bpp_online import GetPrompts
+            self.prompts = GetPrompts()
         else:
             self.prompts = Prompts(self.config, root_dir)
 

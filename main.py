@@ -23,6 +23,8 @@ def main(cfg):
         from reevo import ReEvo as ga
     elif cfg.algorithm == "ael":
         from baselines.ael.ga import AEL as ga
+    elif cfg.algorithm == "eoh":
+        from baselines.eoh import EoH as ga
     else:
         raise NotImplementedError
 
