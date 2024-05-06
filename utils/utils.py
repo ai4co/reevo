@@ -58,7 +58,7 @@ def extract_description(response: str) -> tuple[str, str]:
     return desc_string
 
 
-def multi_chat_completion(messages_list: list[list[dict]], n=1, model: str="gpt-3.5-turbo-1106", temperature: float=0.):
+def multi_chat_completion(messages_list: list[list[dict]], n, cfg):
     """
     An example of messages_list:
     
@@ -78,10 +78,26 @@ def multi_chat_completion(messages_list: list[list[dict]], n=1, model: str="gpt-
     ]
     param: n: number of responses to generate for each message in messages_list
     """
+    # If messages_list is not a list of list (i.e., only one conversation), convert it to a list of list
+    assert isinstance(messages_list, list), "messages_list should be a list."
+    if not isinstance(messages_list[0], list):
+        messages_list = [messages_list]
+    
+    if len(messages_list) > 1:
+        assert n == 1, "Currently, only n=1 is supported for multi-chat completion."
+    
+    model = cfg.model
+    temperature = cfg.temperature
+
     with concurrent.futures.ThreadPoolExecutor() as executor:
         args = [(n, messages, model, temperature) for messages in messages_list]
-        contents = executor.map(lambda p: chat_completion(*p), args)
-    return list(contents)
+        choices = executor.map(lambda p: chat_completion(*p), args)
+
+    contents: list[str] = []
+    for choice in choices:
+        for c in choice:
+            contents.append(c.message.content)
+    return contents
 
 
 def chat_completion(n: int, messages: list[dict], model: str, temperature: float) -> list[dict]:
@@ -102,10 +118,10 @@ def chat_completion(n: int, messages: list[dict], model: str, temperature: float
             break
         for attempt in range(1000):
             try:
-                if "gpt" in model:
-                    response_cur = client.chat.completions.create(model=model, messages=messages, temperature=temperature, n=min(chunk_size, n-total_samples))
-                elif "GLM" in model:
+                if "GLM" in model:
                     response_cur = client.chat.completions.create(model=model, messages=messages)
+                else:
+                    response_cur = client.chat.completions.create(model=model, messages=messages, temperature=temperature, n=min(chunk_size, n-total_samples))
                 total_samples += chunk_size
                 break
             except Exception as e:
