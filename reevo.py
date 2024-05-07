@@ -3,6 +3,7 @@ import logging
 import subprocess
 import numpy as np
 import os
+from time import time
 
 from utils.utils import *
 
@@ -247,6 +248,25 @@ class ReEvo:
         logging.info(f"Best obj: {self.best_obj_overall}, Best Code Path: {self.best_code_path_overall}")
         logging.info(f"Function Evals: {self.function_evals}")
         self.iteration += 1
+        
+    def rank_select(self, population: list[dict]) -> list[dict]:
+        """
+        Rank-based selection, select individuals with probability proportional to their rank.
+        """
+        population = [individual for individual in population if individual["exec_success"]]
+        if len(population) < 2:
+            return None
+        # Sort population by objective value
+        population = sorted(population, key=lambda x: x["obj"])
+        ranks = [i for i in range(len(population))]
+        probs = [1 / (rank + 1 + len(population)) for rank in ranks]
+        # Normalize probabilities
+        probs = [prob / sum(probs) for prob in probs]
+        selected_population = []
+        while len(selected_population) < 2 * self.cfg.pop_size:
+            parents = np.random.choice(population, size=2, replace=False, p=probs)
+            selected_population.extend(parents)
+        return selected_population
     
     
     def random_select(self, population: list[dict]) -> list[dict]:
@@ -277,6 +297,7 @@ class ReEvo:
         Short-term reflection before crossovering two individuals.
         """
         if ind1["obj"] == ind2["obj"]:
+            print(ind1["code"], ind2["code"])
             raise ValueError("Two individuals to crossover have the same objective value!")
         # Determine which individual is better or worse
         if ind1["obj"] < ind2["obj"]:
@@ -356,7 +377,6 @@ class ReEvo:
 
     def crossover(self, short_term_reflection_tuple: tuple[list[list[dict]], list[str], list[str]]) -> list[dict]:
         reflection_content_lst, worse_code_lst, better_code_lst = short_term_reflection_tuple
-        crossed_population = []
         messages_lst = []
         for reflection, worse_code, better_code in zip(reflection_content_lst, worse_code_lst, better_code_lst):
             # Crossover
@@ -382,11 +402,7 @@ class ReEvo:
         
         # Asynchronously generate responses
         response_lst = multi_chat_completion(messages_lst, 1, self.cfg.model, self.cfg.temperature)
-        response_id = 0
-        for i in range(len(response_lst)):
-            individual = self.response_to_individual(response_lst[i][0], response_id)
-            crossed_population.append(individual)
-            response_id += 1
+        crossed_population = [self.response_to_individual(response, response_id) for response_id, response in enumerate(response_lst)]
 
         assert len(crossed_population) == self.cfg.pop_size
         return crossed_population
@@ -418,19 +434,20 @@ class ReEvo:
             if all([not individual["exec_success"] for individual in self.population]):
                 raise RuntimeError(f"All individuals are invalid. Please check the stdout files in {os.getcwd()}.")
             # Select
-            population_to_select = self.population if self.elitist is None else [self.elitist] + self.population # add elitist to population for selection
-            selected_population = self.random_select(population_to_select)
-            if selected_population is not None:
-                # Short-term reflection
-                short_term_reflection_tuple = self.short_term_reflection(selected_population) # (response_lst, worse_code_lst, better_code_lst)
-                # Crossover
-                crossed_population = self.crossover(short_term_reflection_tuple)
-                # Evaluate
-                self.population = self.evaluate_population(crossed_population)
-                # Update
-                self.update_iter()
-                # Long-term reflection
-                self.long_term_reflection([response for response in short_term_reflection_tuple[0]])
+            population_to_select = self.population if (self.elitist is None or self.elitist in self.population) else [self.elitist] + self.population # add elitist to population for selection
+            selected_population = self.rank_select(population_to_select)
+            if selected_population is None:
+                raise RuntimeError("Selection failed. Please check the population.")
+            # Short-term reflection
+            short_term_reflection_tuple = self.short_term_reflection(selected_population) # (response_lst, worse_code_lst, better_code_lst)
+            # Crossover
+            crossed_population = self.crossover(short_term_reflection_tuple)
+            # Evaluate
+            self.population = self.evaluate_population(crossed_population)
+            # Update
+            self.update_iter()
+            # Long-term reflection
+            self.long_term_reflection([response for response in short_term_reflection_tuple[0]])
             # Mutate
             mutated_population = self.mutate()
             # Evaluate
