@@ -151,51 +151,26 @@ class InterfaceEC():
                 if n_retry > 1:
                     break
                 
-            fitness = self.interface_eval.batch_evaluate([code],0)[0]
-            offspring['objective'] = np.round(fitness, 5)
+            # obj = self.interface_eval.batch_evaluate([code],0)[0]
+            # offspring['objective'] = np.round(obj, 5)
                 
         except Exception as e:
             print(e)
 
-            offspring = {
-                'algorithm': None,
-                'code': None,
-                'objective': None,
-                'other_inf': None
-            }
-            p = None
-
-        # Round the objective values
         return p, offspring
-    # def process_task(self,pop, operator):
-    #     result =  None, {
-    #             'algorithm': None,
-    #             'code': None,
-    #             'objective': None,
-    #             'other_inf': None
-    #         }
-    #     with concurrent.futures.ThreadPoolExecutor() as executor:
-    #         future = executor.submit(self.get_offspring, pop, operator)
-    #         try:
-    #             result = future.result(timeout=self.timeout)
-    #             future.cancel()
-    #             #print(result)
-    #         except:
-    #             future.cancel()
-                
-    #     return result
 
     
     def get_algorithm(self, pop, operator):
-        results = []
-        try:
-            results = Parallel(n_jobs=self.n_p,timeout=self.timeout+15)(delayed(self.get_offspring)(pop, operator) for _ in range(self.pop_size))
-        except Exception as e:
-            if self.debug:
-                print(f"Error: {e}")
-            print("Parallel time out .")
+        offspring_list = []
+        for _ in range(self.pop_size):
+            offspring = self.get_offspring(pop, operator)
+            offspring_list.append(offspring)
             
-        time.sleep(2)
+        objs = self.interface_eval.batch_evaluate([offspring['code'] for _, offspring in offspring_list], 0)
+        for i, (p, offspring) in enumerate(offspring_list):
+            offspring['objective'] = np.round(objs[i], 5)
+        
+        results = offspring_list
 
 
         out_p = []
@@ -207,38 +182,3 @@ class InterfaceEC():
             if self.debug:
                 print(f">>> check offsprings: \n {off}")
         return out_p, out_off
-    # def get_algorithm(self,pop,operator, pop_size, n_p):
-        
-    #     # perform it pop_size times with n_p processes in parallel
-    #     p,offspring = self._get_alg(pop,operator)
-    #     while self.check_duplicate(pop,offspring['code']):
-    #         if self.debug:
-    #             print("duplicated code, wait 1 second and retrying ... ")
-    #         time.sleep(1)
-    #         p,offspring = self._get_alg(pop,operator)
-    #     self.code2file(offspring['code'])
-    #     try:
-    #         fitness= self.interface_eval.evaluate()
-    #     except:
-    #         fitness = None
-    #     offspring['objective'] =  fitness
-    #     #offspring['other_inf'] =  first_gap
-    #     while (fitness == None):
-    #         if self.debug:
-    #             print("warning! error code, retrying ... ")
-    #         p,offspring = self._get_alg(pop,operator)
-    #         while self.check_duplicate(pop,offspring['code']):
-    #             if self.debug:
-    #                 print("duplicated code, wait 1 second and retrying ... ")
-    #             time.sleep(1)
-    #             p,offspring = self._get_alg(pop,operator)
-    #         self.code2file(offspring['code'])
-    #         try:
-    #             fitness= self.interface_eval.evaluate()
-    #         except:
-    #             fitness = None
-    #         offspring['objective'] =  fitness
-    #         #offspring['other_inf'] =  first_gap
-    #     offspring['objective'] = np.round(offspring['objective'],5) 
-    #     #offspring['other_inf'] = np.round(offspring['other_inf'],3)
-    #     return p,offspring

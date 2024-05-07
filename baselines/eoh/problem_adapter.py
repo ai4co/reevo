@@ -135,7 +135,8 @@ class Problem:
 
                 # Execute the python file with flags
                 with open(individual["stdout_filepath"], 'w') as f:
-                    inner_run = process = subprocess.Popen(['python', '-u', f'{self.root_dir}/problems/{self.problem}/eval.py', f'{self.problem_size}', self.root_dir, "train"], stdout=f, stderr=f)
+                    file_path = f'{self.root_dir}/problems/{self.problem}/eval.py' if self.problem_type != "black_box" else f'{self.root_dir}/problems/{self.problem}/eval_black_box.py'
+                    inner_run = process = subprocess.Popen(['python', '-u', file_path, f'{self.problem_size}', self.root_dir, "train"], stdout=f, stderr=f)
                 
                 block_until_running(individual["stdout_filepath"], log_status=True)
                 inner_runs.append(process)
@@ -166,7 +167,8 @@ class Problem:
                 try:
                     individual["obj"] = float(stdout_str.split('\n')[-2])
                     assert individual["obj"] > 0, "Objective value <= 0 is not supported."
-                    individual["fitness"] = 1 / individual["obj"] if self.obj_type == "min" else individual["obj"]
+                    individual["obj"] = -individual["obj"] if self.obj_type == "max" else individual["obj"]
+                    # individual["fitness"] = 1 / individual["obj"] if self.obj_type == "min" else individual["obj"]
                     individual["exec_success"] = True
                 except:
                     population[response_id] = self.mark_invalid_individual(population[response_id], "Invalid std out / objective value!")
