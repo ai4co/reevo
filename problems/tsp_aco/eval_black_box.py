@@ -19,11 +19,10 @@ def solve(node_pos):
     dist_mat = distance_matrix(node_pos, node_pos)
     dist_mat[np.diag_indices_from(dist_mat)] = 1 # set diagonal to a large number
     # Reshape it to (n_edges, 1)
-    heu = heuristics(dist_mat.reshape(-1, 1))
+    heu = heuristics(dist_mat.reshape(-1, 1).copy())
     heu = np.where(heu < 1e-9, 1e-9, heu)
     # Reshape it back to (n_nodes, n_nodes)
     heu = heu.reshape(node_pos.shape[0], node_pos.shape[0])
-    print(heu.shape)
     aco = ACO(dist_mat, heu, n_ants=N_ANTS)
     obj = aco.run(N_ITERATIONS)
     return obj
