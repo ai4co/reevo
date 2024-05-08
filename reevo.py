@@ -106,7 +106,7 @@ class ReEvo:
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
         logging.info("Initial Population Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
 
-        responses = multi_chat_completion([messages], self.cfg.pop_size, self.cfg.model, self.cfg.temperature + 0.3) # Increase the temperature for diverse initial population
+        responses = multi_chat_completion([messages], self.cfg.init_pop_size, self.cfg.model, self.cfg.temperature + 0.3) # Increase the temperature for diverse initial population
         population = [self.response_to_individual(response, response_id) for response_id, response in enumerate(responses)]
 
         # Run code and evaluate population
@@ -253,7 +253,10 @@ class ReEvo:
         """
         Rank-based selection, select individuals with probability proportional to their rank.
         """
-        population = [individual for individual in population if individual["exec_success"]]
+        if self.problem_type == "black_box":
+            population = [individual for individual in population if individual["exec_success"] and individual["obj"] < self.seed_ind["obj"]]
+        else:
+            population = [individual for individual in population if individual["exec_success"]]
         if len(population) < 2:
             return None
         # Sort population by objective value
@@ -263,9 +266,14 @@ class ReEvo:
         # Normalize probabilities
         probs = [prob / sum(probs) for prob in probs]
         selected_population = []
+        trial = 0
         while len(selected_population) < 2 * self.cfg.pop_size:
+            trial += 1
             parents = np.random.choice(population, size=2, replace=False, p=probs)
-            selected_population.extend(parents)
+            if parents[0]["obj"] != parents[1]["obj"]:
+                selected_population.extend(parents)
+            if trial > 1000:
+                return None
         return selected_population
     
     
@@ -435,7 +443,7 @@ class ReEvo:
                 raise RuntimeError(f"All individuals are invalid. Please check the stdout files in {os.getcwd()}.")
             # Select
             population_to_select = self.population if (self.elitist is None or self.elitist in self.population) else [self.elitist] + self.population # add elitist to population for selection
-            selected_population = self.rank_select(population_to_select)
+            selected_population = self.random_select(population_to_select)
             if selected_population is None:
                 raise RuntimeError("Selection failed. Please check the population.")
             # Short-term reflection
