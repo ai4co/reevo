@@ -121,7 +121,10 @@ def chat_completion(n: int, messages: list[dict], model: str, temperature: float
                 response_cur = client.chat.completions.create(model=model, messages=messages, temperature=temperature, n=n)
             else:
                 assert n == 1
-                response_cur = client.chat.completions.create(model=model, messages=messages)
+                if "GLM" in model:
+                    response_cur = client.chat.completions.create(model=model, messages=messages, temperature=min(temperature, 1.))
+                else:
+                    response_cur = client.chat.completions.create(model=model, messages=messages, temperature=temperature)
             break
         except Exception as e:
             logging.info(f"Attempt {attempt+1} failed with error: {e}")
