@@ -20,17 +20,17 @@ def main(cfg):
 
     init_client(cfg)
     if cfg.algorithm == "reevo":
-        from reevo import ReEvo as ga
+        from reevo import ReEvo as LHH
     elif cfg.algorithm == "ael":
-        from baselines.ael.ga import AEL as ga
+        from baselines.ael.ga import AEL as LHH
     elif cfg.algorithm == "eoh":
-        from baselines.eoh import EoH as ga
+        from baselines.eoh import EoH as LHH
     else:
         raise NotImplementedError
 
     # Main algorithm
-    reevo = ga(cfg, ROOT_DIR)
-    best_code_overall, best_code_path_overall = reevo.evolve()
+    lhh = LHH(cfg, ROOT_DIR)
+    best_code_overall, best_code_path_overall = lhh.evolve()
     logging.info(f"Best Code Overall: {best_code_overall}")
     logging.info(f"Best Code Path Overall: {best_code_path_overall}")
     
