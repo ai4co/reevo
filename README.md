@@ -26,7 +26,7 @@
 
 ##  2. <a name='Introduction'></a> Introduction 🚀
 
-![Diagram of ReEvo](./assets/reevo.png)
+![Diagram of ReEvo](./assets/reevo.jpg)
 
 We introduce **Language Hyper-Heuristics (LHHs)**, an emerging variant of Hyper-Heuristics (HHs) that leverages LLMs for heuristic generation, featuring **minimal manual intervention and open-ended heuristic spaces**.
 
@@ -54,7 +54,7 @@ with both black-box and white-box settings.
 
 ##  4. <a name='Usage'></a> Usage 🔑
 
-- Set your OpenAI API key as an environment variable `OPENAI_API_KEY`.
+- Set your LLM API key (OpenAI API, ZhiPu API, Llama API) [here](https://github.com/ai4co/LLM-as-HH/blob/5fa30b9da3ecb80b8a658352d26df08893f88a6c/utils/utils.py#L9-L27) or as an environment variable.
 - Running logs and intermediate results are saved in `./outputs/main/` by default.
 - Datasets are generated on the fly.
 - Some test notebooks are provided in `./problems/*/test.ipynb`.
