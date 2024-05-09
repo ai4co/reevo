@@ -55,14 +55,14 @@ class Prompts:
 
 class Problem:
     def __init__(self, cfg, root_dir):
-        self.config = cfg.problem
+        self.config = cfg
         self.root_dir = root_dir
 
-        self.problem = self.config.problem_name
-        self.problem_description = self.config.description
-        self.problem_size = self.config.problem_size
-        self.obj_type = self.config.obj_type
-        self.problem_type = self.config.problem_type
+        self.problem = self.config.problem.problem_name
+        self.problem_description = self.config.problem.description
+        self.problem_size = self.config.problem.problem_size
+        self.obj_type = self.config.problem.obj_type
+        self.problem_type = self.config.problem.problem_type
         self.output_file = f"{self.root_dir}/problems/{self.problem}/gpt.py"
 
         if self.problem_type == "tsp_constructive":
@@ -72,7 +72,7 @@ class Problem:
             from .original.prompts.bpp_online import GetPrompts
             self.prompts = GetPrompts()
         else:
-            self.prompts = Prompts(self.config, root_dir)
+            self.prompts = Prompts(self.config.problem, root_dir)
 
     def response_to_individual(self, code, response_id, file_name=None) -> dict:
         """
@@ -149,7 +149,7 @@ class Problem:
             if inner_run is None: # If code execution fails, skip
                 continue
             try:
-                inner_run.communicate(timeout=10) # Wait for code execution to finish
+                inner_run.communicate(timeout=self.config.timeout) # Wait for code execution to finish
             except subprocess.TimeoutExpired as e:
                 logging.info(f"Error for response_id {response_id}: {e}")
                 population[response_id] = self.mark_invalid_individual(population[response_id], str(e))
