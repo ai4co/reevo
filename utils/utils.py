@@ -10,14 +10,22 @@ def init_client(cfg):
     global client
     if cfg.model.startswith("gpt"):
         from openai import OpenAI
-        client = OpenAI()
+        assert os.getenv('OPENAI_API_KEY') is not None, "Please set the environment variable OPENAI_API_KEY"
+        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
     elif cfg.model.startswith("GLM"):
         from zhipuai import ZhipuAI 
+        assert os.getenv('ZHIPU_AI_API_KEY') is not None, "Please set the environment variable ZHIPU_AI_API_KEY"
         zhipu_api_key = os.getenv('ZHIPU_AI_API_KEY')
         client = ZhipuAI(api_key=zhipu_api_key)
     else:
-        raise NotImplementedError
-
+        from openai import OpenAI
+        # We use llama api here. See the available models at https://docs.llama-api.com/quickstart#available-models
+        assert os.getenv('LLAMA_API_KEY') is not None, "Please set the environment variable LLAMA_API_KEY"
+        client = OpenAI(
+        api_key = os.getenv('LLAMA_API_KEY'),
+        base_url = "https://api.llama-api.com"
+        )
+        
 
 def file_to_string(filename):
     with open(filename, 'r') as file:
@@ -85,6 +93,11 @@ def multi_chat_completion(messages_list: list[list[dict]], n, model, temperature
     
     if len(messages_list) > 1:
         assert n == 1, "Currently, only n=1 is supported for multi-chat completion."
+    
+    if "gpt" not in model:
+        # Transform messages if n > 1
+        messages_list *= n
+        n = 1
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         args = [(n, messages, model, temperature) for messages in messages_list]
@@ -101,37 +114,23 @@ def chat_completion(n: int, messages: list[dict], model: str, temperature: float
     """
     Generate n responses using OpenAI Chat Completions API
     """
-    total_samples = 0
-    responses = []
-    if "gpt-3.5" in model:
-        chunk_size = n 
-    elif "GLM" in model:
-        chunk_size = 1
-    else: 
-        chunk_size = min(4, n)
 
-    while True:
-        if total_samples >= n:
+    for attempt in range(1000):
+        try:
+            if "gpt" in model:
+                response_cur = client.chat.completions.create(model=model, messages=messages, temperature=temperature, n=n)
+            else:
+                assert n == 1
+                response_cur = client.chat.completions.create(model=model, messages=messages)
             break
-        for attempt in range(1000):
-            try:
-                if "GLM" in model:
-                    response_cur = client.chat.completions.create(model=model, messages=messages)
-                else:
-                    response_cur = client.chat.completions.create(model=model, messages=messages, temperature=temperature, n=min(chunk_size, n-total_samples))
-                total_samples += chunk_size
-                break
-            except Exception as e:
-                chunk_size = max(int(chunk_size / 2), 1)
-                logging.info(f"Current Chunk Size: {chunk_size}")
-                logging.info(f"Attempt {attempt+1} failed with error: {e}")
-                time.sleep(1)
-        if response_cur is None:
-            logging.info("Code terminated due to too many failed attempts!")
-            exit()
+        except Exception as e:
+            logging.info(f"Attempt {attempt+1} failed with error: {e}")
+            time.sleep(1)
+    if response_cur is None:
+        logging.info("Code terminated due to too many failed attempts!")
+        exit()
             
-        responses.extend(response_cur.choices)
-    return responses
+    return response_cur.choices
 
 
 def extract_code_from_generator(content):
