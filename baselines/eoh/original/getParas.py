@@ -27,7 +27,7 @@ class Paras():
         self.llm_use_local = False  # if use local model
         self.llm_local_url = None  # your local server 'http://127.0.0.1:11012/completions'
         self.llm_api_endpoint = "chat.openai.com"
-        self.llm_api_key = "XXX"  # use your key
+        self.llm_api_key = "Not used"  # Not used
         self.llm_model = "gpt-3.5-turbo-1106"
 
 
@@ -77,7 +77,7 @@ class Paras():
                 setattr(self, key, value)
               
         # Identify and set parallel 
-        self.set_parallel()
+        # self.set_parallel()
         
         # Initialize method and ec settings
         # self.set_ec()
@@ -85,7 +85,7 @@ class Paras():
         # Initialize evaluation settings
         # self.set_evaluation()
 
-        assert self.llm_api_key!="XXX", "Please set the environment variable `OPENAI_API_KEY`"
+        # assert self.llm_api_key!="XXX", "Please set the environment variable `OPENAI_API_KEY`"
 
 
 
