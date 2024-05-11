@@ -4,12 +4,17 @@ import sys
 import numpy as np
 from scipy.spatial import distance_matrix
 import logging
+import sys
+sys.path.insert(0, "../../../")
 
-try:
-    from gpt import heuristics_v2 as heuristics
-except:
-    from gpt import heuristics
+import gpt
+from utils.utils import get_heuristic_name
 
+
+possible_func_names = ["heuristics", "heuristics_v1", "heuristics_v2", "heuristics_v3"]
+
+heuristic_name = get_heuristic_name(gpt, possible_func_names)
+heuristics = getattr(gpt, heuristic_name)
 
 N_ITERATIONS = 100
 N_ANTS = 30

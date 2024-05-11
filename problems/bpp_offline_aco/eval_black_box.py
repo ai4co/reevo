@@ -2,11 +2,18 @@ from aco import ACO
 import numpy as np
 import logging
 from gen_inst import BPPInstance, load_dataset, dataset_conf
+import sys
+sys.path.insert(0, "../../../")
 
-try:
-    from gpt import heuristics_v2 as heuristics
-except:
-    from gpt import heuristics
+import gpt
+from utils.utils import get_heuristic_name
+
+
+possible_func_names = ["heuristics", "heuristics_v1", "heuristics_v2", "heuristics_v3"]
+
+heuristic_name = get_heuristic_name(gpt, possible_func_names)
+heuristics = getattr(gpt, heuristic_name)
+
 
 N_ITERATIONS = 15
 N_ANTS = 20

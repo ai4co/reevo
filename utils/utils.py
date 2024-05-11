@@ -5,6 +5,7 @@ import logging
 import concurrent.futures
 import time
 import re
+import inspect
 
 def init_client(cfg):
     global client
@@ -183,3 +184,10 @@ def filter_code(code_string):
             filtered_lines.append(line)
     code_string = '\n'.join(filtered_lines)
     return code_string
+
+
+def get_heuristic_name(module, possible_names: list[str]):
+    for func_name in possible_names:
+        if hasattr(module, func_name):
+            if inspect.isfunction(getattr(module, func_name)):
+                return func_name
