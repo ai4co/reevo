@@ -1,2 +1,2 @@
 def heuristics_v1(edge_attr: np.ndarray) -> np.ndarray:
-    return np.ones_like(edge_attr)
+    return np.ones(edge_attr.shape[0])

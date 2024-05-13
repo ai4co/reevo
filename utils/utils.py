@@ -5,19 +5,28 @@ import logging
 import concurrent.futures
 import time
 import re
+import inspect
 
 def init_client(cfg):
     global client
     if cfg.model.startswith("gpt"):
         from openai import OpenAI
-        client = OpenAI()
+        assert os.getenv('OPENAI_API_KEY') is not None, "Please set the environment variable OPENAI_API_KEY"
+        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
     elif cfg.model.startswith("GLM"):
         from zhipuai import ZhipuAI 
+        assert os.getenv('ZHIPU_AI_API_KEY') is not None, "Please set the environment variable ZHIPU_AI_API_KEY"
         zhipu_api_key = os.getenv('ZHIPU_AI_API_KEY')
         client = ZhipuAI(api_key=zhipu_api_key)
     else:
-        raise NotImplementedError
-
+        from openai import OpenAI
+        # We use llama api here. See the available models at https://docs.llama-api.com/quickstart#available-models
+        assert os.getenv('LLAMA_API_KEY') is not None, "Please set the environment variable LLAMA_API_KEY"
+        client = OpenAI(
+        api_key = os.getenv('LLAMA_API_KEY'),
+        base_url = "https://api.llama-api.com"
+        )
+        
 
 def file_to_string(filename):
     with open(filename, 'r') as file:
@@ -58,7 +67,7 @@ def extract_description(response: str) -> tuple[str, str]:
     return desc_string
 
 
-def multi_chat_completion(messages_list: list[list[dict]], n=1, model: str="gpt-3.5-turbo-1106", temperature: float=0.):
+def multi_chat_completion(messages_list: list[list[dict]], n, model, temperature):
     """
     An example of messages_list:
     
@@ -78,47 +87,54 @@ def multi_chat_completion(messages_list: list[list[dict]], n=1, model: str="gpt-
     ]
     param: n: number of responses to generate for each message in messages_list
     """
+    # If messages_list is not a list of list (i.e., only one conversation), convert it to a list of list
+    assert isinstance(messages_list, list), "messages_list should be a list."
+    if not isinstance(messages_list[0], list):
+        messages_list = [messages_list]
+    
+    if len(messages_list) > 1:
+        assert n == 1, "Currently, only n=1 is supported for multi-chat completion."
+    
+    if "gpt" not in model:
+        # Transform messages if n > 1
+        messages_list *= n
+        n = 1
+
     with concurrent.futures.ThreadPoolExecutor() as executor:
         args = [(n, messages, model, temperature) for messages in messages_list]
-        contents = executor.map(lambda p: chat_completion(*p), args)
-    return list(contents)
+        choices = executor.map(lambda p: chat_completion(*p), args)
+
+    contents: list[str] = []
+    for choice in choices:
+        for c in choice:
+            contents.append(c.message.content)
+    return contents
 
 
 def chat_completion(n: int, messages: list[dict], model: str, temperature: float) -> list[dict]:
     """
     Generate n responses using OpenAI Chat Completions API
     """
-    total_samples = 0
-    responses = []
-    if "gpt-3.5" in model:
-        chunk_size = n 
-    elif "GLM" in model:
-        chunk_size = 1
-    else: 
-        chunk_size = min(4, n)
 
-    while True:
-        if total_samples >= n:
+    for attempt in range(1000):
+        try:
+            if "gpt" in model:
+                response_cur = client.chat.completions.create(model=model, messages=messages, temperature=temperature, n=n)
+            else:
+                assert n == 1
+                if "GLM" in model:
+                    response_cur = client.chat.completions.create(model=model, messages=messages, temperature=min(temperature, 1.))
+                else:
+                    response_cur = client.chat.completions.create(model=model, messages=messages, temperature=temperature)
             break
-        for attempt in range(1000):
-            try:
-                if "gpt" in model:
-                    response_cur = client.chat.completions.create(model=model, messages=messages, temperature=temperature, n=min(chunk_size, n-total_samples))
-                elif "GLM" in model:
-                    response_cur = client.chat.completions.create(model=model, messages=messages)
-                total_samples += chunk_size
-                break
-            except Exception as e:
-                chunk_size = max(int(chunk_size / 2), 1)
-                logging.info(f"Current Chunk Size: {chunk_size}")
-                logging.info(f"Attempt {attempt+1} failed with error: {e}")
-                time.sleep(1)
-        if response_cur is None:
-            logging.info("Code terminated due to too many failed attempts!")
-            exit()
+        except Exception as e:
+            logging.info(f"Attempt {attempt+1} failed with error: {e}")
+            time.sleep(1)
+    if response_cur is None:
+        logging.info("Code terminated due to too many failed attempts!")
+        exit()
             
-        responses.extend(response_cur.choices)
-    return responses
+    return response_cur.choices
 
 
 def extract_code_from_generator(content):
@@ -143,11 +159,10 @@ def extract_code_from_generator(content):
     if code_string is None:
         return None
     # Add import statements if not present
-    if "import" not in code_string:
-        if "np" in code_string:
-            code_string = "import numpy as np\n" + code_string
-        if "torch" in code_string:
-            code_string = "import torch\n" + code_string
+    if "np" in code_string:
+        code_string = "import numpy as np\n" + code_string
+    if "torch" in code_string:
+        code_string = "import torch\n" + code_string
     return code_string
 
 
@@ -162,7 +177,17 @@ def filter_code(code_string):
             continue
         elif line.startswith('from'):
             continue
+        elif line.startswith('return'):
+            filtered_lines.append(line)
+            break
         else:
             filtered_lines.append(line)
     code_string = '\n'.join(filtered_lines)
     return code_string
+
+
+def get_heuristic_name(module, possible_names: list[str]):
+    for func_name in possible_names:
+        if hasattr(module, func_name):
+            if inspect.isfunction(getattr(module, func_name)):
+                return func_name

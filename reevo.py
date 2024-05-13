@@ -3,6 +3,7 @@ import logging
 import subprocess
 import numpy as np
 import os
+from time import time
 
 from utils.utils import *
 
@@ -104,11 +105,10 @@ class ReEvo:
         user = self.user_generator_prompt + "\n" + self.seed_prompt + "\n" + self.long_term_reflection_str
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
         logging.info("Initial Population Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
-        responses = chat_completion(self.cfg.pop_size, messages, self.cfg.model, self.cfg.temperature)
-        
-        # Responses to population
-        population = self.responses_to_population(responses)
-        
+
+        responses = multi_chat_completion([messages], self.cfg.init_pop_size, self.cfg.model, self.cfg.temperature + 0.3) # Increase the temperature for diverse initial population
+        population = [self.response_to_individual(response, response_id) for response_id, response in enumerate(responses)]
+
         # Run code and evaluate population
         population = self.evaluate_population(population)
 
@@ -117,17 +117,16 @@ class ReEvo:
         self.update_iter()
 
     
-    def response_to_individual(self, response, response_id, file_name=None) -> dict:
+    def response_to_individual(self, response: str, response_id: int, file_name: str=None) -> dict:
         """
         Convert response to individual
         """
-        content = response.message.content
         # Write response to file
         file_name = f"problem_iter{self.iteration}_response{response_id}.txt" if file_name is None else file_name + ".txt"
         with open(file_name, 'w') as file:
-            file.writelines(content + '\n')
+            file.writelines(response + '\n')
 
-        code = extract_code_from_generator(content)
+        code = extract_code_from_generator(response)
 
         # Extract code and description from response
         std_out_filepath = f"problem_iter{self.iteration}_stdout{response_id}.txt" if file_name is None else file_name + "_stdout.txt"
@@ -139,18 +138,6 @@ class ReEvo:
             "response_id": response_id,
         }
         return individual
-
-        
-    def responses_to_population(self, responses) -> list[dict]:
-        """
-        Convert responses to population. Applied to the initial population.
-        """
-        population = []
-        for response_id, response in enumerate(responses):
-            individual = self.response_to_individual(response, response_id)
-            population.append(individual)
-        return population
-
 
     def mark_invalid_individual(self, individual: dict, traceback_msg: str) -> dict:
         """
@@ -230,7 +217,8 @@ class ReEvo:
 
         # Execute the python file with flags
         with open(individual["stdout_filepath"], 'w') as f:
-            process = subprocess.Popen(['python', '-u', f'{self.root_dir}/problems/{self.problem}/eval.py', f'{self.problem_size}', self.root_dir, "train"],
+            eval_file_path = f'{self.root_dir}/problems/{self.problem}/eval.py' if self.problem_type != "black_box" else f'{self.root_dir}/problems/{self.problem}/eval_black_box.py' 
+            process = subprocess.Popen(['python', '-u', eval_file_path, f'{self.problem_size}', self.root_dir, "train"],
                                         stdout=f, stderr=f)
 
         block_until_running(individual["stdout_filepath"], log_status=True, iter_num=self.iteration, response_id=response_id)
@@ -260,6 +248,33 @@ class ReEvo:
         logging.info(f"Best obj: {self.best_obj_overall}, Best Code Path: {self.best_code_path_overall}")
         logging.info(f"Function Evals: {self.function_evals}")
         self.iteration += 1
+        
+    def rank_select(self, population: list[dict]) -> list[dict]:
+        """
+        Rank-based selection, select individuals with probability proportional to their rank.
+        """
+        if self.problem_type == "black_box":
+            population = [individual for individual in population if individual["exec_success"] and individual["obj"] < self.seed_ind["obj"]]
+        else:
+            population = [individual for individual in population if individual["exec_success"]]
+        if len(population) < 2:
+            return None
+        # Sort population by objective value
+        population = sorted(population, key=lambda x: x["obj"])
+        ranks = [i for i in range(len(population))]
+        probs = [1 / (rank + 1 + len(population)) for rank in ranks]
+        # Normalize probabilities
+        probs = [prob / sum(probs) for prob in probs]
+        selected_population = []
+        trial = 0
+        while len(selected_population) < 2 * self.cfg.pop_size:
+            trial += 1
+            parents = np.random.choice(population, size=2, replace=False, p=probs)
+            if parents[0]["obj"] != parents[1]["obj"]:
+                selected_population.extend(parents)
+            if trial > 1000:
+                return None
+        return selected_population
     
     
     def random_select(self, population: list[dict]) -> list[dict]:
@@ -285,12 +300,12 @@ class ReEvo:
                 return None
         return selected_population
 
-
     def gen_short_term_reflection_prompt(self, ind1: dict, ind2: dict) -> tuple[list[dict], str, str]:
         """
         Short-term reflection before crossovering two individuals.
         """
         if ind1["obj"] == ind2["obj"]:
+            print(ind1["code"], ind2["code"])
             raise ValueError("Two individuals to crossover have the same objective value!")
         # Determine which individual is better or worse
         if ind1["obj"] < ind2["obj"]:
@@ -336,9 +351,9 @@ class ReEvo:
             worse_code_lst.append(worse_code)
             better_code_lst.append(better_code)
         
-        # Multi-processed chat completion
-        responses_lst = multi_chat_completion(messages_lst, 1, self.cfg.model, self.cfg.temperature)
-        return responses_lst, worse_code_lst, better_code_lst
+        # Asynchronously generate responses
+        response_lst = multi_chat_completion(messages_lst, 1, self.cfg.model, self.cfg.temperature)
+        return response_lst, worse_code_lst, better_code_lst
     
     def long_term_reflection(self, short_term_reflections: list[str]) -> None:
         """
@@ -356,8 +371,7 @@ class ReEvo:
             logging.info("Long-term Reflection Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
             self.print_long_term_reflection_prompt = False
         
-        response = chat_completion(1, messages, self.cfg.model, self.cfg.temperature)
-        self.long_term_reflection_str = response[0].message.content
+        self.long_term_reflection_str = multi_chat_completion([messages], 1, self.cfg.model, self.cfg.temperature)[0]
         
         # Write reflections to file
         file_name = f"problem_iter{self.iteration}_short_term_reflections.txt"
@@ -370,12 +384,9 @@ class ReEvo:
 
 
     def crossover(self, short_term_reflection_tuple: tuple[list[list[dict]], list[str], list[str]]) -> list[dict]:
-        reflection_responses_lst, worse_code_lst, better_code_lst = short_term_reflection_tuple
-        crossed_population = []
+        reflection_content_lst, worse_code_lst, better_code_lst = short_term_reflection_tuple
         messages_lst = []
-        for response, worse_code, better_code in zip(reflection_responses_lst, worse_code_lst, better_code_lst):
-            reflection = response[0].message.content
-            
+        for reflection, worse_code, better_code in zip(reflection_content_lst, worse_code_lst, better_code_lst):
             # Crossover
             system = self.system_generator_prompt
             func_signature0 = self.func_signature.format(version=0)
@@ -397,13 +408,9 @@ class ReEvo:
                 logging.info("Crossover Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
                 self.print_crossover_prompt = False
         
-        # Multi-processed chat completion
-        responses_lst = multi_chat_completion(messages_lst, 1, self.cfg.model, self.cfg.temperature)
-        response_id = 0
-        for i in range(len(responses_lst)):
-            individual = self.response_to_individual(responses_lst[i][0], response_id)
-            crossed_population.append(individual)
-            response_id += 1
+        # Asynchronously generate responses
+        response_lst = multi_chat_completion(messages_lst, 1, self.cfg.model, self.cfg.temperature)
+        crossed_population = [self.response_to_individual(response, response_id) for response_id, response in enumerate(response_lst)]
 
         assert len(crossed_population) == self.cfg.pop_size
         return crossed_population
@@ -424,9 +431,8 @@ class ReEvo:
         if self.print_mutate_prompt:
             logging.info("Mutation Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
             self.print_mutate_prompt = False
-            
-        responses = chat_completion(int(self.cfg.pop_size * self.mutation_rate), messages, self.cfg.model, self.cfg.temperature)
-        population = self.responses_to_population(responses)
+        responses = multi_chat_completion([messages], int(self.cfg.pop_size * self.mutation_rate), self.cfg.model, self.cfg.temperature)
+        population = [self.response_to_individual(response, response_id) for response_id, response in enumerate(responses)]
         return population
 
 
@@ -436,19 +442,20 @@ class ReEvo:
             if all([not individual["exec_success"] for individual in self.population]):
                 raise RuntimeError(f"All individuals are invalid. Please check the stdout files in {os.getcwd()}.")
             # Select
-            population_to_select = self.population if self.elitist is None else [self.elitist] + self.population # add elitist to population for selection
+            population_to_select = self.population if (self.elitist is None or self.elitist in self.population) else [self.elitist] + self.population # add elitist to population for selection
             selected_population = self.random_select(population_to_select)
-            if selected_population is not None:
-                # Short-term reflection
-                short_term_reflection_tuple = self.short_term_reflection(selected_population) # (responses_lst, worse_code_lst, better_code_lst)
-                # Crossover
-                crossed_population = self.crossover(short_term_reflection_tuple)
-                # Evaluate
-                self.population = self.evaluate_population(crossed_population)
-                # Update
-                self.update_iter()
-                # Long-term reflection
-                self.long_term_reflection([response[0].message.content for response in short_term_reflection_tuple[0]])
+            if selected_population is None:
+                raise RuntimeError("Selection failed. Please check the population.")
+            # Short-term reflection
+            short_term_reflection_tuple = self.short_term_reflection(selected_population) # (response_lst, worse_code_lst, better_code_lst)
+            # Crossover
+            crossed_population = self.crossover(short_term_reflection_tuple)
+            # Evaluate
+            self.population = self.evaluate_population(crossed_population)
+            # Update
+            self.update_iter()
+            # Long-term reflection
+            self.long_term_reflection([response for response in short_term_reflection_tuple[0]])
             # Mutate
             mutated_population = self.mutate()
             # Evaluate
