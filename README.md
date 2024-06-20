@@ -103,13 +103,12 @@ Check out `./cfg/` for more options.
 If you encounter any difficulty using our code, please do not hesitate to submit an issue or directly contact us! If you find our work helpful (or if you are so kind as to offer us some encouragement), please consider giving us a star, and citing our paper.
 
 ```bibtex
-@misc{ye2024large,
+@article{ye2024large,
       title={Large Language Models as Hyper-Heuristics for Combinatorial Optimization}, 
       author={Haoran Ye and Jiarui Wang and Zhiguang Cao and Federico Berto and Chuanbo Hua and Haeyeon Kim and Jinkyoo Park and Guojie Song},
       year={2024},
-      eprint={2402.01145},
-      archivePrefix={arXiv},
-      primaryClass={cs.NE}
+      journal={arXiv preprint arXiv:2402.01145},
+      note={\url{https://github.com/ai4co/LLM-as-HH}}
 }
 ```
 
