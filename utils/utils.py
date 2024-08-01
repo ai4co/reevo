@@ -17,19 +17,16 @@ def init_client(cfg: DictConfig):
         if model.startswith("gpt"):
             from utils.llm_client.openai import OpenAIClient
             client = OpenAIClient(model, temperature)
-            
         elif cfg.model.startswith("GLM"):
-            from zhipuai import ZhipuAI 
-            assert os.getenv('ZHIPU_AI_API_KEY') is not None, "Please set the environment variable ZHIPU_AI_API_KEY"
-            zhipu_api_key = os.getenv('ZHIPU_AI_API_KEY')
-            client = ZhipuAI(api_key=zhipu_api_key)
+            from zhipuai import ZhipuAI
+            client = ZhipuAI(model, temperature)
         else:
-            from openai import OpenAI
+            from utils.llm_client.openai import OpenAIClient
             # We use llama api here. See the available models at https://docs.llama-api.com/quickstart#available-models
-            assert os.getenv('LLAMA_API_KEY') is not None, "Please set the environment variable LLAMA_API_KEY"
-            client = OpenAI(
-                api_key = os.getenv('LLAMA_API_KEY'),
-                base_url = "https://api.llama-api.com"
+            client = OpenAIClient(
+                model, temperature, 
+                api_key = os.getenv('LLAMA_API_KEY'), 
+                base_url = "https://api.llama-api.com",
             )
     else:
         client = hydra.utils.instantiate(cfg.llm_client)

@@ -1,0 +1,8 @@
+_target_: utils.llm_client.openai.OpenAIClient
+
+# Using llama api. See the available models at https://docs.llama-api.com/quickstart#available-models
+model: llama3-70
+temperature: 1.0  # temperature for chat completion
+api_timeout: 10.0 # timeout for the API request, in seconds
+api_key: ${oc.env:LLAMA_API_KEY,null}
+base_url: https://api.llama-api.com

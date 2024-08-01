@@ -6,26 +6,35 @@ import logging
 import concurrent
 
 class OpenAIClient():
-    def __init__(self, model: str, temperature: float = 1.0, api_key: Optional[str] = None, baseurl: Optional[str] = None) -> None:
-        if api_key is None:
-            api_key = os.getenv('OPENAI_API_KEY')
-            assert api_key is not None, "Please set the environment variable OPENAI_API_KEY"
-        
-        print(model)
-        self.client = OpenAI(api_key=api_key, base_url=baseurl)
+
+    ClientClass = OpenAI
+
+    def __init__(
+        self,
+        model: str,
+        temperature: float = 1.0,
+        baseurl: Optional[str] = None,
+        api_key: Optional[str] = None,
+        api_timeout: float = 10.0,
+    ) -> None:
+        self.client = self.ClientClass(api_key=api_key, base_url=baseurl, timeout=api_timeout)
         self.model = model
         self.temperature = temperature
+    
+    def _chat_completion_api(self, messages: list[dict], temperature: float, n: int = 1):
+        return self.client.chat.completions.create(
+            model=self.model, messages=messages, temperature=temperature, n=n,
+        )
     
     def chat_completion(self, n: int, messages: list[dict], temperature: Optional[float] = None) -> list[dict]:
         """
         Generate n responses using OpenAI Chat Completions API
         """
         temperature = temperature or self.temperature
-        for attempt in range(10):
+        for attempt in range(1000):
             try:
-                response_cur = self.client.chat.completions.create(
-                    model=self.model, messages=messages, temperature=temperature, n=n, timeout=10
-                )
+                response_cur = self._chat_completion_api(messages, temperature, n)
+                break
             except Exception as e:
                 logging.info(f"Attempt {attempt+1} failed with error: {e}")
                 time.sleep(1)
@@ -33,7 +42,6 @@ class OpenAIClient():
             logging.info("Code terminated due to too many failed attempts!")
             exit()
         
-        print(response_cur.choices)
         return response_cur.choices
     
     def multi_chat_completion(self, messages_list: list[list[dict]], n: int = 1, temperature: Optional[float] = None):
