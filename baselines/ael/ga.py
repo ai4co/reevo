@@ -53,7 +53,7 @@ class AEL:
         # Generate responses
         messages = [{"role": "user", "content": self.initial_prompt}]
         logging.info("Initial prompt: \nUser Prompt: \n" + self.initial_prompt)
-        responses = chat_completion(self.cfg.pop_size, messages, self.cfg.model, self.cfg.temperature)
+        responses = self.client.chat_completion(self.cfg.pop_size, messages)
         
         # Responses to population
         population = self.responses_to_population(responses)
@@ -284,7 +284,7 @@ class AEL:
                 self.print_cross_prompt = False
         
         # Multi-processed chat completion
-        responses_lst = multi_chat_completion(messages_lst, 1, self.cfg.model, self.cfg.temperature)
+        responses_lst = self.client.multi_chat_completion(messages_lst)
         response_id = 0
         for i in range(len(responses_lst)):
             individual = self.response_to_individual(responses_lst[i][0], response_id)
@@ -318,7 +318,7 @@ class AEL:
                     self.print_mutate_prompt = False
             
         # Multi-processed chat completion
-        responses_lst = multi_chat_completion(messages_lst, 1, self.cfg.model, self.cfg.temperature)
+        responses_lst = self.client.multi_chat_completion(messages_lst)
         for i in range(len(responses_lst)):
             response_id = response_id_lst[i]
             mutated_individual = self.response_to_individual(responses_lst[i][0], response_id)

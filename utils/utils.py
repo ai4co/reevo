@@ -6,27 +6,35 @@ import concurrent.futures
 import time
 import re
 import inspect
+import hydra
+from omegaconf import DictConfig
 
-def init_client(cfg):
+def init_client(cfg: DictConfig):
     global client
-    if cfg.model.startswith("gpt"):
-        from openai import OpenAI
-        assert os.getenv('OPENAI_API_KEY') is not None, "Please set the environment variable OPENAI_API_KEY"
-        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
-    elif cfg.model.startswith("GLM"):
-        from zhipuai import ZhipuAI 
-        assert os.getenv('ZHIPU_AI_API_KEY') is not None, "Please set the environment variable ZHIPU_AI_API_KEY"
-        zhipu_api_key = os.getenv('ZHIPU_AI_API_KEY')
-        client = ZhipuAI(api_key=zhipu_api_key)
+    if cfg.get("model", None): # for compatibility
+        model: str = cfg.get("model")
+        temperature: float = cfg.get("temperature", 1.0)
+        if model.startswith("gpt"):
+            from utils.llm_client.openai import OpenAIClient
+            client = OpenAIClient(model, temperature)
+            
+        elif cfg.model.startswith("GLM"):
+            from zhipuai import ZhipuAI 
+            assert os.getenv('ZHIPU_AI_API_KEY') is not None, "Please set the environment variable ZHIPU_AI_API_KEY"
+            zhipu_api_key = os.getenv('ZHIPU_AI_API_KEY')
+            client = ZhipuAI(api_key=zhipu_api_key)
+        else:
+            from openai import OpenAI
+            # We use llama api here. See the available models at https://docs.llama-api.com/quickstart#available-models
+            assert os.getenv('LLAMA_API_KEY') is not None, "Please set the environment variable LLAMA_API_KEY"
+            client = OpenAI(
+                api_key = os.getenv('LLAMA_API_KEY'),
+                base_url = "https://api.llama-api.com"
+            )
     else:
-        from openai import OpenAI
-        # We use llama api here. See the available models at https://docs.llama-api.com/quickstart#available-models
-        assert os.getenv('LLAMA_API_KEY') is not None, "Please set the environment variable LLAMA_API_KEY"
-        client = OpenAI(
-        api_key = os.getenv('LLAMA_API_KEY'),
-        base_url = "https://api.llama-api.com"
-        )
-        
+        client = hydra.utils.instantiate(cfg.llm_client)
+    return client
+    
 
 def file_to_string(filename):
     with open(filename, 'r') as file:

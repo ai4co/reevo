@@ -15,10 +15,11 @@ def main(cfg):
     # Set logging level
     logging.info(f"Workspace: {workspace_dir}")
     logging.info(f"Project Root: {ROOT_DIR}")
-    logging.info(f"Using LLM: {cfg.model}")
+    logging.info(f"Using LLM: {cfg.get('model', cfg.llm_client.model)}")
     logging.info(f"Using Algorithm: {cfg.algorithm}")
 
-    init_client(cfg)
+    client = init_client(cfg)
+
     if cfg.algorithm == "reevo":
         from reevo import ReEvo as LHH
     elif cfg.algorithm == "ael":
@@ -29,7 +30,7 @@ def main(cfg):
         raise NotImplementedError
 
     # Main algorithm
-    lhh = LHH(cfg, ROOT_DIR)
+    lhh = LHH(cfg, ROOT_DIR, client)
     best_code_overall, best_code_path_overall = lhh.evolve()
     logging.info(f"Best Code Overall: {best_code_overall}")
     logging.info(f"Best Code Path Overall: {best_code_path_overall}")

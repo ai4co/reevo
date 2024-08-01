@@ -1,0 +1,3 @@
+_target_: utils.llm_client.openai.OpenAIClient
+model: gpt-3.5-turbo
+temperature: 1.0

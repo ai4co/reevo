@@ -8,7 +8,7 @@ class InterfaceAPI:
     def __init__(self, api_endpoint, api_key, model_LLM, debug_mode):
         self.api_endpoint = api_endpoint
         self.api_key = api_key
-        self.model_LLM = model_LLM
+        self.client = model_LLM
         self.debug_mode = debug_mode
         self.n_trial = 5
 
@@ -53,6 +53,6 @@ class InterfaceAPI:
 
         # return response
 
-        response = chat_completion(1, [{"role": "user", "content": prompt_content}], self.model_LLM, temperature=1.)
+        response = self.client.chat_completion(1, [{"role": "user", "content": prompt_content}], temperature=1.)
         ret = response[0].message.content
         return ret
