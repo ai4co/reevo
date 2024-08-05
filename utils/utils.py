@@ -13,8 +13,8 @@ def init_client(cfg):
             from utils.llm_client.openai import OpenAIClient
             client = OpenAIClient(model, temperature)
         elif cfg.model.startswith("GLM"):
-            from zhipuai import ZhipuAI
-            client = ZhipuAI(model, temperature)
+            from utils.llm_client.zhipuai import ZhipuAIClient
+            client = ZhipuAIClient(model, temperature)
         else:
             from utils.llm_client.openai import OpenAIClient
             # We use llama api here. See the available models at https://docs.llama-api.com/quickstart#available-models

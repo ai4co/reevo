@@ -26,7 +26,7 @@ class BaseClient(object):
         """
         temperature = temperature or self.temperature
         time.sleep(random())
-        for attempt in range(3):
+        for attempt in range(1000):
             try:
                 response_cur = self._chat_completion_api(messages, temperature, n)
             except Exception as e:
