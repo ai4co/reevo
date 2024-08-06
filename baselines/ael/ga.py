@@ -1,4 +1,3 @@
-from openai import OpenAI
 import logging
 import subprocess
 import numpy as np
@@ -7,8 +6,8 @@ from utils.utils import *
 
 
 class AEL:
-    def __init__(self, cfg, root_dir) -> None:
-        self.client = OpenAI()
+    def __init__(self, cfg, root_dir, client) -> None:
+        self.client = client
         self.cfg = cfg
         self.root_dir = root_dir
         
@@ -42,7 +41,7 @@ class AEL:
         
         prompt_path_suffix = "_black_box" if self.problem_type == "black_box" else ""
         prompt_dir = f'{self.root_dir}/baselines/ael/prompts/{self.problem}{prompt_path_suffix}'
-        self.output_file = f"{self.root_dir}/problems/{self.problem}/{self.cfg.suffix.lower()}.py"
+        self.output_file = f"{self.root_dir}/problems/{self.problem}/{self.cfg.get('suffix', 'gpt').lower()}.py"
         
         # Loading all text prompts
         self.initial_prompt = file_to_string(f'{prompt_dir}/init.txt')
