@@ -1,4 +1,3 @@
-import os
 import logging
 import re
 import inspect
@@ -15,14 +14,9 @@ def init_client(cfg):
         elif cfg.model.startswith("GLM"):
             from utils.llm_client.zhipuai import ZhipuAIClient
             client = ZhipuAIClient(model, temperature)
-        else:
-            from utils.llm_client.openai import OpenAIClient
-            # We use llama api here. See the available models at https://docs.llama-api.com/quickstart#available-models
-            client = OpenAIClient(
-                model, temperature,
-                api_key = os.getenv('LLAMA_API_KEY'), 
-                base_url = "https://api.llama-api.com",
-            )
+        else: # fall back to Llama API
+            from utils.llm_client.llama_api import LlamaAPIClient
+            client = LlamaAPIClient(model, temperature)
     else:
         client = hydra.utils.instantiate(cfg.llm_client)
     return client
