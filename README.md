@@ -6,17 +6,17 @@
 
 ## Table of Contents
 
-* 1. [ News 📰](#News)
-* 2. [ Introduction 🚀](#Introduction)
-* 3. [ Exciting Highlights 🌟](#ExcitingHighlights)
-* 4. [ Usage 🔑](#Usage)
-      * 4.1. [Dependency](#Dependency)
-      * 4.2. [To run ReEvo](#TorunReEvo)
-      * 4.3. [Available problems](#Availableproblems)
-      * 4.4. [Simple steps to apply ReEvo to your problem](#SimplestepstoapplyReEvotoyourproblem)
-      * 4.5. [Use Alternative LLMs](#UseAlternativeLLMs)
-* 5. [ Citation 🤩](#Citation)
-* 6. [ Acknowledgments 🫡](#Acknowledgments)
+* 1\. [ News 📰](#News)
+* 2\. [ Introduction 🚀](#Introduction)
+* 3\. [ Exciting Highlights 🌟](#ExcitingHighlights)
+* 4\. [ Usage 🔑](#Usage)
+  * 4.1. [Dependency](#Dependency)
+  * 4.2. [To run ReEvo](#TorunReEvo)
+  * 4.3. [Available problems](#Availableproblems)
+  * 4.4. [Simple steps to apply ReEvo to your problem](#SimplestepstoapplyReEvotoyourproblem)
+  * 4.5. [Use Alternative LLMs](#UseAlternativeLLMs)
+* 5\. [ Citation 🤩](#Citation)
+* 6\. [ Acknowledgments 🫡](#Acknowledgments)
 
 
 ##  1. <a name='News'></a> News 📰
