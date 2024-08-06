@@ -1,0 +1,7 @@
+_target_: utils.llm_client.litellm.LiteLLMClient
+
+# Using LiteLLM for Chat Completion
+# Some environment variables are required to be set to provide api key to LiteLLM client, which are reported upon running
+# Please refer to its documentation for the full list of supported providers/models (https://docs.litellm.ai/docs/providers)
+model: claude-3-opus
+temperature: 1.0  # temperature for chat completion

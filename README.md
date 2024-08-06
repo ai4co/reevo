@@ -10,10 +10,11 @@
 * 2. [ Introduction 🚀](#Introduction)
 * 3. [ Exciting Highlights 🌟](#ExcitingHighlights)
 * 4. [ Usage 🔑](#Usage)
-		* 4.1. [Dependency](#Dependency)
-		* 4.2. [To run ReEvo](#TorunReEvo)
-		* 4.3. [Available problems](#Availableproblems)
-		* 4.4. [Simple steps to apply ReEvo to your problem](#SimplestepstoapplyReEvotoyourproblem)
+      * 4.1. [Dependency](#Dependency)
+      * 4.2. [To run ReEvo](#TorunReEvo)
+      * 4.3. [Available problems](#Availableproblems)
+      * 4.4. [Simple steps to apply ReEvo to your problem](#SimplestepstoapplyReEvotoyourproblem)
+      * 4.5. [Use Alternative LLMs](#UseAlternativeLLMs)
 * 5. [ Citation 🤩](#Citation)
 * 6. [ Acknowledgments 🫡](#Acknowledgments)
 
@@ -96,6 +97,22 @@ Check out `./cfg/` for more options.
 - Define your problem in `./cfg/problem/`.
 - Generate problem instances and implement the evaluation pipeline in `./problems/`.
 - Add function_description, function_signature, and seed_function in `./prompts/`.
+
+#### 4.5. <a name='UseAlternativeLLMs'></a>Use Alternative LLMs
+
+Use the cli parameter `llm_client` to designate an LLM API provider, and `llm_client.model` to determine the model to use. For example,
+
+```bash
+$ export LLAMA_API_KEY=xxxxxxxxxxxxxxxxxxxx
+$ python main.py llm_client=llama_api llm_client.model=gemma2-9b
+```
+
+Supported LLM API providers and models including (to be noted that only chat models are supported):
+- [**OpenAI**](https://openai.com/api/): gpt-3.5-turbo (default), gpt-4o, gpt-4o-mini, gpt-4-turbo, etc.
+- [**Zhipu AI**](https://open.bigmodel.cn/): GLM-3-Turbo, GLM-4-Air, GLM-4-0520, etc. ([full list](https://open.bigmodel.cn/dev/howuse/model))
+- [**DeepSeek**](https://www.deepseek.com/): deepseek-chat
+- [**Llama API**](https://www.llama-api.com/): llama3.1-8b/70b/405b, gemma2-9b/27b, Qwen2-72B, etc. ([full list](https://docs.llama-api.com/quickstart#available-models))
+- And [more **providers**](https://docs.litellm.ai/docs/providers) supported via [**LiteLLM**](https://docs.litellm.ai/docs/).
 
 
 ##  5. <a name='Citation'></a> Citation 🤩
