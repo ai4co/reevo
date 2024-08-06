@@ -1,32 +1,26 @@
-import subprocess
-import os
-import json
 import logging
-import concurrent.futures
-import time
 import re
 import inspect
+import hydra
 
 def init_client(cfg):
     global client
-    if cfg.model.startswith("gpt"):
-        from openai import OpenAI
-        assert os.getenv('OPENAI_API_KEY') is not None, "Please set the environment variable OPENAI_API_KEY"
-        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
-    elif cfg.model.startswith("GLM"):
-        from zhipuai import ZhipuAI 
-        assert os.getenv('ZHIPU_AI_API_KEY') is not None, "Please set the environment variable ZHIPU_AI_API_KEY"
-        zhipu_api_key = os.getenv('ZHIPU_AI_API_KEY')
-        client = ZhipuAI(api_key=zhipu_api_key)
+    if cfg.get("model", None): # for compatibility
+        model: str = cfg.get("model")
+        temperature: float = cfg.get("temperature", 1.0)
+        if model.startswith("gpt"):
+            from utils.llm_client.openai import OpenAIClient
+            client = OpenAIClient(model, temperature)
+        elif cfg.model.startswith("GLM"):
+            from utils.llm_client.zhipuai import ZhipuAIClient
+            client = ZhipuAIClient(model, temperature)
+        else: # fall back to Llama API
+            from utils.llm_client.llama_api import LlamaAPIClient
+            client = LlamaAPIClient(model, temperature)
     else:
-        from openai import OpenAI
-        # We use llama api here. See the available models at https://docs.llama-api.com/quickstart#available-models
-        assert os.getenv('LLAMA_API_KEY') is not None, "Please set the environment variable LLAMA_API_KEY"
-        client = OpenAI(
-        api_key = os.getenv('LLAMA_API_KEY'),
-        base_url = "https://api.llama-api.com"
-        )
-        
+        client = hydra.utils.instantiate(cfg.llm_client)
+    return client
+    
 
 def file_to_string(filename):
     with open(filename, 'r') as file:
@@ -65,76 +59,6 @@ def extract_description(response: str) -> tuple[str, str]:
         if desc_string is not None:
             break
     return desc_string
-
-
-def multi_chat_completion(messages_list: list[list[dict]], n, model, temperature):
-    """
-    An example of messages_list:
-    
-    messages_list = [
-        [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": "Hello!"},
-        ],
-        [
-            {"role": "system", "content": "You are a knowledgeable guide."},
-            {"role": "user", "content": "How are you?"},
-        ],
-        [
-            {"role": "system", "content": "You are a witty comedian."},
-            {"role": "user", "content": "Tell me a joke."},
-        ]
-    ]
-    param: n: number of responses to generate for each message in messages_list
-    """
-    # If messages_list is not a list of list (i.e., only one conversation), convert it to a list of list
-    assert isinstance(messages_list, list), "messages_list should be a list."
-    if not isinstance(messages_list[0], list):
-        messages_list = [messages_list]
-    
-    if len(messages_list) > 1:
-        assert n == 1, "Currently, only n=1 is supported for multi-chat completion."
-    
-    if "gpt" not in model:
-        # Transform messages if n > 1
-        messages_list *= n
-        n = 1
-
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        args = [(n, messages, model, temperature) for messages in messages_list]
-        choices = executor.map(lambda p: chat_completion(*p), args)
-
-    contents: list[str] = []
-    for choice in choices:
-        for c in choice:
-            contents.append(c.message.content)
-    return contents
-
-
-def chat_completion(n: int, messages: list[dict], model: str, temperature: float) -> list[dict]:
-    """
-    Generate n responses using OpenAI Chat Completions API
-    """
-
-    for attempt in range(1000):
-        try:
-            if "gpt" in model:
-                response_cur = client.chat.completions.create(model=model, messages=messages, temperature=temperature, n=n)
-            else:
-                assert n == 1
-                if "GLM" in model:
-                    response_cur = client.chat.completions.create(model=model, messages=messages, temperature=min(temperature, 1.))
-                else:
-                    response_cur = client.chat.completions.create(model=model, messages=messages, temperature=temperature)
-            break
-        except Exception as e:
-            logging.info(f"Attempt {attempt+1} failed with error: {e}")
-            time.sleep(1)
-    if response_cur is None:
-        logging.info("Code terminated due to too many failed attempts!")
-        exit()
-            
-    return response_cur.choices
 
 
 def extract_code_from_generator(content):

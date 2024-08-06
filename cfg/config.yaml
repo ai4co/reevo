@@ -1,18 +1,16 @@
 defaults:
   - _self_
   - problem: tsp_aco
+  - llm_client: openai
   - override hydra/output: local
 
 hydra:
   job:
+    name: ${problem.problem_name}-${problem.problem_type}
     chdir: True
 
 # The chosen algorithm
 algorithm: reevo # other options are "eoh", "ael"; some problems may not support "ael"
-
-# LLM parameters
-model: gpt-3.5-turbo  # LLM model (other options include gpt-4-turbo-preview; GLM-3-Turbo, GLM-4; llama3-70b and others supported by llama api, see https://docs.llama-api.com/quickstart)
-temperature: 1  # temperature for chat completion
 
 # Main GA loop parameters
 max_fe: 100 # maximum number of function evaluations

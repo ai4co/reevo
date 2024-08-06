@@ -1,16 +1,25 @@
-from openai import OpenAI
+from typing import Optional
 import logging
 import subprocess
 import numpy as np
 import os
-from time import time
+from omegaconf import DictConfig
 
 from utils.utils import *
+from utils.llm_client.base import BaseClient
 
 
 class ReEvo:
-    def __init__(self, cfg, root_dir) -> None:
+    def __init__(
+        self, 
+        cfg: DictConfig, 
+        root_dir: str, 
+        generator_llm: BaseClient, 
+        reflector_llm: Optional[BaseClient] = None,
+    ) -> None:
         self.cfg = cfg
+        self.generator_llm = generator_llm
+        self.reflector_llm = reflector_llm or generator_llm
         self.root_dir = root_dir
         
         self.mutation_rate = cfg.mutation_rate
@@ -105,7 +114,7 @@ class ReEvo:
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
         logging.info("Initial Population Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
 
-        responses = multi_chat_completion([messages], self.cfg.init_pop_size, self.cfg.model, self.cfg.temperature + 0.3) # Increase the temperature for diverse initial population
+        responses = self.generator_llm.multi_chat_completion([messages], self.cfg.init_pop_size, temperature = self.generator_llm.temperature + 0.3) # Increase the temperature for diverse initial population
         population = [self.response_to_individual(response, response_id) for response_id, response in enumerate(responses)]
 
         # Run code and evaluate population
@@ -351,7 +360,7 @@ class ReEvo:
             better_code_lst.append(better_code)
         
         # Asynchronously generate responses
-        response_lst = multi_chat_completion(messages_lst, 1, self.cfg.model, self.cfg.temperature)
+        response_lst = self.reflector_llm.multi_chat_completion(messages_lst)
         return response_lst, worse_code_lst, better_code_lst
     
     def long_term_reflection(self, short_term_reflections: list[str]) -> None:
@@ -370,7 +379,7 @@ class ReEvo:
             logging.info("Long-term Reflection Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
             self.print_long_term_reflection_prompt = False
         
-        self.long_term_reflection_str = multi_chat_completion([messages], 1, self.cfg.model, self.cfg.temperature)[0]
+        self.long_term_reflection_str = self.reflector_llm.multi_chat_completion([messages])[0]
         
         # Write reflections to file
         file_name = f"problem_iter{self.iteration}_short_term_reflections.txt"
@@ -408,7 +417,7 @@ class ReEvo:
                 self.print_crossover_prompt = False
         
         # Asynchronously generate responses
-        response_lst = multi_chat_completion(messages_lst, 1, self.cfg.model, self.cfg.temperature)
+        response_lst = self.generator_llm.multi_chat_completion(messages_lst)
         crossed_population = [self.response_to_individual(response, response_id) for response_id, response in enumerate(response_lst)]
 
         assert len(crossed_population) == self.cfg.pop_size
@@ -430,7 +439,7 @@ class ReEvo:
         if self.print_mutate_prompt:
             logging.info("Mutation Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
             self.print_mutate_prompt = False
-        responses = multi_chat_completion([messages], int(self.cfg.pop_size * self.mutation_rate), self.cfg.model, self.cfg.temperature)
+        responses = self.generator_llm.multi_chat_completion([messages], int(self.cfg.pop_size * self.mutation_rate))
         population = [self.response_to_individual(response, response_id) for response_id, response in enumerate(responses)]
         return population
 

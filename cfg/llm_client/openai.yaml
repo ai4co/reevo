@@ -1,0 +1,5 @@
+_target_: utils.llm_client.openai.OpenAIClient
+
+model: gpt-3.5-turbo # LLM model
+temperature: 1.0  # temperature for chat completion
+api_key: ${oc.env:OPENAI_API_KEY,null}
