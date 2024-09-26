@@ -119,14 +119,13 @@ Supported LLM API providers and models including (to be noted that only chat mod
 ##  5. <a name='Citation'></a> Citation 🤩
 
 If you encounter any difficulty using our code, please do not hesitate to submit an issue or directly contact us! If you find our work helpful (or if you are so kind as to offer us some encouragement), please consider giving us a star, and citing our paper.
-
 ```bibtex
-@article{ye2024large,
-      title={Large Language Models as Hyper-Heuristics for Combinatorial Optimization}, 
-      author={Haoran Ye and Jiarui Wang and Zhiguang Cao and Federico Berto and Chuanbo Hua and Haeyeon Kim and Jinkyoo Park and Guojie Song},
-      year={2024},
-      journal={arXiv preprint arXiv:2402.01145},
-      note={\url{https://github.com/ai4co/LLM-as-HH}}
+@inproceedings{ye2024reevo,
+    title={Large Language Models as Hyper-Heuristics for Combinatorial Optimization}, 
+    author={Haoran Ye and Jiarui Wang and Zhiguang Cao and Federico Berto and Chuanbo Hua and Haeyeon Kim and Jinkyoo Park and Guojie Song},
+    booktitle={Advances in Neural Information Processing Systems},
+    year={2024},
+    note={\url{https://github.com/ai4co/LLM-as-HH}}
 }
 ```
 
@@ -139,4 +138,5 @@ Also, our work is built upon the following projects, among others:
 - [Algorithm Evolution Using Large Language Model](https://arxiv.org/abs/2311.15249)
 - [Mathematical discoveries from program search with large language models](https://github.com/google-deepmind/funsearch)
 - [An Example of Evolutionary Computation + Large Language Model Beating Human: Design of Efficient Guided Local Search](https://arxiv.org/abs/2401.02051)
+- [Evolution of Heuristics: Towards Efficient Automatic Algorithm Design Using Large Language Model](https://openreview.net/forum?id=BwAkaxqiLB)
 - [DevFormer: A Symmetric Transformer for Context-Aware Device Placement](https://arxiv.org/abs/2205.13225)
