@@ -1,4 +1,4 @@
-# Large Language Models as Hyper-Heuristics for Combinatorial Optimization
+# [NeurIPS 2024] Large Language Models as Hyper-Heuristics for Combinatorial Optimization
 
 🥳 **Welcome!** This is a codebase that accompanies the paper [*Large Language Models as Hyper-Heuristics for Combinatorial Optimization*](https://arxiv.org/abs/2402.01145).
 
@@ -21,9 +21,10 @@
 
 ##  1. <a name='News'></a> News 📰
 
-- **2024.05**: We release a new paper version.
-- **2024.04**: Novel use cases for Neural Combinatorial Optimization (NCO) and Electronic Design Automation (EDA).
-- **2024.02**: We are excited to release ReEvo! 🚀
+- **Sep. 2024:** *Large Language Models as Hyper-Heuristics for Combinatorial Optimization* has been accepted at NeurIPS 2024 🥳
+- **May 2024:** We release a new paper version *Large Language Models as Hyper-Heuristics for Combinatorial Optimization*
+- **Apr. 2024:** Novel use cases for Neural Combinatorial Optimization (NCO) and Electronic Design Automation (EDA)
+- **Feb. 2024:** We are excited to release *ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution* 🚀
 
 
 ##  2. <a name='Introduction'></a> Introduction 🚀
