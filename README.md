@@ -1,6 +1,6 @@
-# [NeurIPS 2024] Large Language Models as Hyper-Heuristics for Combinatorial Optimization
+# [NeurIPS 2024] ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution
 
-🥳 **Welcome!** This is a codebase that accompanies the paper [*Large Language Models as Hyper-Heuristics for Combinatorial Optimization*](https://arxiv.org/abs/2402.01145).
+🥳 **Welcome!** This is a codebase that accompanies the paper [*ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution*](https://arxiv.org/abs/2402.01145).
 
 **Give ReEvo 5 minutes, and get a state-of-the-art algorithm in return!**
 
@@ -121,11 +121,11 @@ Supported LLM API providers and models including (to be noted that only chat mod
 If you encounter any difficulty using our code, please do not hesitate to submit an issue or directly contact us! If you find our work helpful (or if you are so kind as to offer us some encouragement), please consider giving us a star, and citing our paper.
 ```bibtex
 @inproceedings{ye2024reevo,
-    title={Large Language Models as Hyper-Heuristics for Combinatorial Optimization}, 
+    title={ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution}, 
     author={Haoran Ye and Jiarui Wang and Zhiguang Cao and Federico Berto and Chuanbo Hua and Haeyeon Kim and Jinkyoo Park and Guojie Song},
     booktitle={Advances in Neural Information Processing Systems},
     year={2024},
-    note={\url{https://github.com/ai4co/LLM-as-HH}}
+    note={\url{https://github.com/ai4co/reevo}}
 }
 ```
 
