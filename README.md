@@ -21,8 +21,8 @@
 
 ##  1. <a name='News'></a> News 📰
 
-- **Sep. 2024:** *Large Language Models as Hyper-Heuristics for Combinatorial Optimization* has been accepted at NeurIPS 2024 🥳
-- **May 2024:** We release a new paper version *Large Language Models as Hyper-Heuristics for Combinatorial Optimization*
+- **Sep. 2024:** *ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution* has been accepted at NeurIPS 2024 🥳
+- **May 2024:** We release a new paper version
 - **Apr. 2024:** Novel use cases for Neural Combinatorial Optimization (NCO) and Electronic Design Automation (EDA)
 - **Feb. 2024:** We are excited to release *ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution* 🚀
 
@@ -99,6 +99,11 @@ Check out `./cfg/` for more options.
 - Generate problem instances and implement the evaluation pipeline in `./problems/`.
 - Add function_description, function_signature, and seed_function in `./prompts/`.
 
+By default:
+
+- The LLM-generated heuristic is written into `f"./problems/YOUR_PROBLEM/gpt.py"`, and will be imported into `./problems/YOUR_PROBLEM/eval.py` (e.g. for [TSP_ACO](https://github.com/ai4co/reevo/blob/e4e479f44b9fc4cd47af91faffc0977a58b635ab/problems/tsp_aco/eval.py#L10)), which is called by [`reevo._run_code`](https://github.com/ai4co/reevo/blob/e4e479f44b9fc4cd47af91faffc0977a58b635ab/reevo.py#L229) during ReEvo.
+- In training mode, `./problems/YOUR_PROBLEM/eval.py` (e.g. for [TSP_ACO](https://github.com/ai4co/reevo/blob/e4e479f44b9fc4cd47af91faffc0977a58b635ab/problems/tsp_aco/eval.py#L58)) should print out the meta-objective value as the last line of stdout, which is parsed by [`reevo.evaluate_population`](https://github.com/ai4co/reevo/blob/e4e479f44b9fc4cd47af91faffc0977a58b635ab/reevo.py#L206) for heuristic evaluation.
+
 #### 4.5. <a name='UseAlternativeLLMs'></a>Use Alternative LLMs
 
 Use the cli parameter `llm_client` to designate an LLM API provider, and `llm_client.model` to determine the model to use. For example,
@@ -108,7 +113,7 @@ $ export LLAMA_API_KEY=xxxxxxxxxxxxxxxxxxxx
 $ python main.py llm_client=llama_api llm_client.model=gemma2-9b
 ```
 
-Supported LLM API providers and models including (to be noted that only chat models are supported):
+Supported LLM API providers and models include (note that only chat models are supported):
 - [**OpenAI**](https://openai.com/api/): gpt-3.5-turbo (default), gpt-4o, gpt-4o-mini, gpt-4-turbo, etc.
 - [**Zhipu AI**](https://open.bigmodel.cn/): GLM-3-Turbo, GLM-4-Air, GLM-4-0520, etc. ([full list](https://open.bigmodel.cn/dev/howuse/model))
 - [**DeepSeek**](https://www.deepseek.com/): deepseek-chat
@@ -118,7 +123,11 @@ Supported LLM API providers and models including (to be noted that only chat mod
 
 ##  5. <a name='Citation'></a> Citation 🤩
 
-If you encounter any difficulty using our code, please do not hesitate to submit an issue or directly contact us! If you find our work helpful (or if you are so kind as to offer us some encouragement), please consider giving us a star, and citing our paper.
+If you encounter any difficulty using our code, please do not hesitate to submit an issue or directly contact us! 
+
+We are also on [Slack](https://join.slack.com/t/rl4co/shared_invite/zt-1ytz2c1v4-0IkQ8NQH4TRXIX8PrRmDhQ) if you have any questions or would like to discuss ReEvo with us. We are open to collaborations and would love to hear from you 🚀
+
+If you find our work helpful (or if you are so kind as to offer us some encouragement), please consider giving us a star, and citing our paper.
 ```bibtex
 @inproceedings{ye2024reevo,
     title={ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution}, 
