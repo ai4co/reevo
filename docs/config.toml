@@ -41,15 +41,16 @@ link = "https://sites.google.com/view/haeyeon-rachel-kim"
 [[paper.authors]]
 name = "Jinkyoo Park"
 symbols = "4"
+link = "https://pure.kaist.ac.kr/en/persons/jinkyoo-park"
 
 [[paper.authors]]
 name = "Guojie Song"
 symbols = "1,5"
+link = "https://www.cis.pku.edu.cn/info/1362/2256.htm"
 
 [[paper.institutions]]
 symbol = '1'
 name = "National Key Laboratory of General Artificial Intelligence, School of Intelligence Science and Technology, Peking University"
-link = ""                  # optional
 
 [[paper.institutions]]
 symbol = '2'
@@ -99,10 +100,10 @@ image = "static/images/show_reflec.png"
 description = 'Examples of reflections for black-box TSP.'
 
 [[code]]
-language="bash"
-title="Get Started"
-copy_button=false
-code="""
+language = "bash"
+title = "Get Started"
+copy_button = false
+code = """
 $ git clone git@github.com:ai4co/reevo.git # download reevo code
 $ cd reevo
 $ python3 -m venv ./venv            # [optional] create virtual environment
@@ -113,7 +114,7 @@ $ export OPENAI_API_KEY=xxxxxxxxxx  # set openAI API key, other service provider
 $ python3 main.py problem=tsp_gls
 
 """
-description='''
+description = '''
 <h5>Available problems</h5>
 <ul dir="auto">
 <li>Traveling Salesman Problem (TSP): <code>tsp_aco</code>, <code>tsp_aco_black_box</code>, <code>tsp_constructive</code>, <code>tsp_gls</code>, <code>tsp_pomo</code>, <code>tsp_lehd</code></li>
@@ -126,14 +127,14 @@ description='''
 '''
 
 [[code]]
-language="bash"
-title="Use Alternative LLMs"
-code="""\
+language = "bash"
+title = "Use Alternative LLMs"
+code = """\
 $ export LLAMA_API_KEY=xxxxxxxxxxxxxxxxxxxx
 $ python3 main.py llm_client=llama_api llm_client.model=gemma2-9b
 
 """
-description='''<h5>Available LLM service providers</h5>
+description = '''<h5>Available LLM service providers</h5>
 <ul dir="auto">
 <li><a href="https://openai.com/api/" rel="nofollow" target="_blank"><b>OpenAI</b></a>: gpt-3.5-turbo (default), gpt-4o, gpt-4o-mini, gpt-4-turbo, etc.</li>
 <li><a href="https://open.bigmodel.cn/" rel="nofollow" target="_blank"><b>Zhipu AI</b></a>: GLM-3-Turbo, GLM-4-Air, GLM-4-0520, etc. (<a href="https://open.bigmodel.cn/dev/howuse/model" rel="nofollow" target="_blank">full list</a>)</li>
@@ -147,22 +148,22 @@ description='''<h5>Available LLM service providers</h5>
 # url="static/pdfs/sample.pdf"
 
 [citation]
-biblatex='''@inproceedings{ye2024reevo,
+biblatex = '''@inproceedings{ye2024reevo,
     title={ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution}, 
     author={Haoran Ye and Jiarui Wang and Zhiguang Cao and Federico Berto and Chuanbo Hua and Haeyeon Kim and Jinkyoo Park and Guojie Song},
     booktitle={Advances in Neural Information Processing Systems},
     year={2024},
     note={\url{https://github.com/ai4co/reevo}}
 }'''
-copy_button=true
+copy_button = true
 
 [page]
-enable_katex=false
-enable_code_highlight=true
+enable_katex = false
+enable_code_highlight = true
 
 [static_file.reevo_img]
-src="../assets/reevo.jpg"
-dest="static/images/reevo.jpg"
+src = "../assets/reevo.jpg"
+dest = "static/images/reevo.jpg"
 
 # [static_file.nojekyll]
 # content=""

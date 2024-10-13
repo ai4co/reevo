@@ -2,8 +2,9 @@
 set -e
 
 tmpfolder=/tmp/reevo-gh-pages
-code_hash="$(git rev-parse HEAD)"
+code_hash="$(git rev-parse --short HEAD)"
 
+rm -rf "${tmpfolder}"
 git clone ssh://git@ssh.github.com:443/ai4co/reevo.git -b gh-pages --single-branch "${tmpfolder}"
 rm -r "${tmpfolder}"/*
 python3 build.py
