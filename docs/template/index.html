@@ -58,7 +58,7 @@
   {%endif%}
 
   <!-- icons -->
-  <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/js/all.min.js" integrity="sha256-gSqw5G+Gss6YqyQlqyIkuQ0IRZUqGsDVq9c0tiF+mL8=" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/js/all.min.js" integrity="sha256-gSqw5G+Gss6YqyQlqyIkuQ0IRZUqGsDVq9c0tiF+mL8=" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/fontawesome.min.css" integrity="sha256-BYjRZhSY2ARUPcFTf5eEh3qWK58O88TM7nZet/JUNhE=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
@@ -83,11 +83,15 @@
     integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"
     onload="renderMathInElement(document.body);"></script>
   {%endif%}
+
+  {%if page.tracking %}{%if page.tracking.type == "umami"%}
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="{{page.tracking.website_id}}"></script>
+  {%endif%}{%endif%}
 </head>
 
 <body>
   <!-- header -->
-  <section class="hero">
+  <section class="hero" id="title">
     <div class="hero-body">
       <div class="container is-max-desktop" style="max-width:1200px">
         <div class="columns is-centered">
@@ -116,11 +120,9 @@
               </span>{%- if loop.first %}<br />{%endif%}
               {%endfor%}<br />
               <b class="author-block is-size-5" style="padding:1ex 0">{{paper.conference}}</b>
-              {% if paper.notes%}
               {%for note in paper.notes %}
               <span class="eql-cntrb"><br><sup>{{note.symbol}}</sup>{{note.message}}</span>
               {%endfor%}
-              {%endif%}
             </div>
 
             <div class="column has-text-centered">
@@ -153,9 +155,7 @@
         <div class="column is-four-fifths">
           <h2 class="title is-3">Abstract</h2>
           <div class="content has-text-justified">
-            <p>
-              {{paper.abstract}}
-            </p>
+            <p>{{paper.abstract}}</p>
           </div>
         </div>
       </div>
@@ -166,13 +166,12 @@
 
   {%-if carousel-%}
   <!-- Image carousel -->
-  <section class="hero is-small">
+  <section class="hero is-small" id="carousel">
     <div class="hero-body">
       <div class="container">
         <div id="results-carousel" class="carousel results-carousel">
           {%for item in carousel%}
           <div class="item">
-            <!-- Your image here -->
             <img src="{{item.image}}" alt="{{item.alt_text|default(item.description)}}" />
             <h2 class="subtitle has-text-centered" style="margin-top:1ex">
               {{item.description}}
@@ -188,9 +187,9 @@
 
   {%if code%}
   <!-- Code Cell with syntax highlighting + copy to clipboard -->
-  <section class="section hero is-light red-link" id="code">
+  <section class="section hero is-light red-link" id="usage">
     <div class="container is-max-desktop content" style="width:100%">
-      <h2 class="title">Usage</h2>
+      <h2 class="title">Usage 🔑</h2>
       {%for item in code%}
       <h3>{{item.title}}</h3>
       {%if item.code%}
@@ -217,7 +216,7 @@
 
   {%if poster%}
   <!-- Paper poster -->
-  <section class="hero is-small">
+  <section class="hero is-small" id="poster">
     <div class="hero-body">
       <div class="container">
         <h2 class="title">Poster</h2>
@@ -232,7 +231,7 @@
   <!-- BibText citation + copy to clipboard -->
   <section class="section" id="citation">
     <div class="container is-max-desktop content">
-      <h2 class="title">BibTeX</h2>
+      <h2 class="title">Citation 🤩</h2>
       <div class="code-container">
         <pre><code class="code-content language-text" id="code-content-bibtex">{{citation.biblatex}}</code></pre>
         {%if citation.copy_button%}
@@ -245,6 +244,26 @@
     </div>
   </section>
   <!--End BibTex citation -->
+  {%endif%}
+
+  {%-if news-%}
+  <section class="section hero is-light red-link" id="news">
+    <div class="container is-max-desktop"style="width:100%">
+      <div class="column">
+        <h2 class="title is-3">News 📰</h2>
+        <div class="content has-text-justified">
+          <p><table><tbody>
+          {%for item in news.contents%}
+          <tr>
+            <th>{{item.date}}</th>
+            <td>{{item.content}}</td>
+          </tr>
+          {%endfor%}
+          </tbody></table></p>
+        </div>
+      </div>
+    </div>
+  </section>
   {%endif%}
 
   <footer class="footer">
@@ -287,11 +306,18 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   if(ClipboardJS){
     let clipboard = new ClipboardJS('.copy-button');
+    let enter_count = 0;
 
     clipboard.on('success', function (e) {
       const element = e.trigger;
       element.classList.add('copied');
-      setTimeout(() => element.classList.remove('copied'), 2000);
+      enter_count++;
+      setTimeout(() => {
+        enter_count--;
+        if(enter_count==0){
+          element.classList.remove('copied');
+        }
+      }, 2000);
       e.clearSelection();
     });
   }

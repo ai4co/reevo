@@ -18,7 +18,7 @@ with open("./config.toml", 'rb') as config_file:
     # pprint(config)
 
 page = env.get_template('index.html').render(config)
-page = minify(page, remove_comments = True)
+page = minify(page, remove_comments = True, remove_all_empty_space=True)
 
 if not os.path.isdir(target_folder):
     os.makedirs(target_folder, exist_ok=True)
