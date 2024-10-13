@@ -1,39 +1,27 @@
 body {
   font-family: 'Noto Sans', sans-serif;
 }
-
 .footer .icon-link {
   font-size: 25px;
   color: #000;
 }
-
 .link-block a {
   margin-top: 5px;
   margin-bottom: 5px;
 }
-
 .dnerf {
   font-variant: small-caps;
 }
-
-
 .teaser .hero-body {
   padding-top: 0;
   padding-bottom: 3rem;
 }
-
 .teaser {
   font-family: 'Google Sans', sans-serif;
 }
-
-
-.publication-title {}
-
 .publication-banner {
   max-height: parent;
-
 }
-
 .publication-banner video {
   position: relative;
   left: auto;
@@ -41,59 +29,39 @@ body {
   transform: none;
   object-fit: fit;
 }
-
-.publication-header .hero-body {}
-
 .publication-title {
   font-family: 'Google Sans', sans-serif;
 }
-
 .publication-authors {
   font-family: 'Google Sans', sans-serif;
 }
-
 .publication-venue {
   color: #555;
   width: fit-content;
   font-weight: bold;
 }
-
 .publication-awards {
   color: #ff3860;
   width: fit-content;
   font-weight: bolder;
 }
-
-.publication-authors {}
-
 .publication-authors a {
   color: hsl(204, 86%, 53%) !important;
 }
-
 .publication-authors a:hover {
   text-decoration: underline;
 }
-
 .author-block {
   display: inline-block;
 }
-
-.publication-banner img {}
-
-.publication-authors {
-  /*color: #4286f4;*/
-}
-
 .publication-video {
   position: relative;
   width: 100%;
   height: 0;
   padding-bottom: 56.25%;
-
   overflow: hidden;
   border-radius: 10px !important;
 }
-
 .publication-video iframe {
   position: absolute;
   top: 0;
@@ -101,32 +69,24 @@ body {
   width: 100%;
   height: 100%;
 }
-
-.publication-body img {}
-
 .results-carousel {
   overflow: hidden;
 }
-
 .results-carousel .item {
   margin: 5px;
   overflow: hidden;
   padding: 20px;
   font-size: 0;
 }
-
 .results-carousel video {
   margin: 0;
 }
-
 .slider-pagination .slider-page {
   background: #000000;
 }
-
 .eql-cntrb {
   font-size: smaller;
 }
-
 
 /* Button styles */
 .button.is-dark {
@@ -135,26 +95,21 @@ body {
   border-color: #363636;
   transition: all 0.3s ease;
 }
-
 .button.is-dark:hover {
   background-color: #fff;
   color: #363636;
   border-color: #363636;
 }
-
 .button.is-dark .icon i {
   color: #fff;
 }
-
 .button.is-dark:hover .icon i {
   color: #363636;
 }
-
 .google-slides-section {
   padding: 3rem 0;
   background-color: #f5f5f5;
 }
-
 .google-slides-container {
   width: 100%;
   max-width: 1200px;
@@ -162,7 +117,6 @@ body {
   margin: 0 auto;
   padding: 0 1rem;
 }
-
 .responsive-iframe-container {
   position: relative;
   overflow: hidden;
@@ -170,7 +124,6 @@ body {
   padding-top: 56.25%;
   /* 16:9 Aspect Ratio */
 }
-
 .responsive-iframe {
   position: absolute;
   top: 0;
@@ -179,12 +132,10 @@ body {
   height: 100%;
   border: none;
 }
-
 @media screen and (min-width: 1024px) {
   .google-slides-section {
     padding: 4rem 0;
   }
-
   .responsive-iframe-container {
     height: 75vh;
     /* Set a large fixed height for larger screens */
@@ -192,12 +143,10 @@ body {
     /* Remove padding-top for larger screens */
   }
 }
-
 section.red-link a {
   text-decoration: underline;
   color: dodgerblue !important;
 }
-
 /* *code container* */
 .code-container {
   position: relative;
@@ -209,7 +158,6 @@ section.red-link a {
   overflow-x: auto;
   overflow-y: hidden;
 }
-
 .code-container pre {
   margin: 0;
   padding: 0;
@@ -217,14 +165,12 @@ section.red-link a {
   white-space: pre;
   word-wrap: normal;
 }
-
 .code-content {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   font-size: 0.85em;
   line-height: 1.45;
   display: inline-block;
 }
-
 .copy-button {
   position: absolute;
   top: 0.5rem;
@@ -238,11 +184,9 @@ section.red-link a {
   transition: background-color 0.2s;
   border-radius: 4px;
 }
-
 .copy-button:hover {
   background-color: #282c34;
 }
-
 .copy-icon {
   width: 16px;
   height: 16px;
@@ -252,24 +196,19 @@ section.red-link a {
   left: 8px;
   color: #282c34;
 }
-
 .copy-button:hover .copy-icon {
   color: #f3f3f3;
 }
-
 .copy-button>.copy-icon.before-copy {
   opacity: 1;
 }
-
 .copy-button>.copy-icon.after-copy {
   opacity: 0;
 }
-
 .copy-button.copied>.copy-icon.before-copy {
   transform: scale(1);
   opacity: 0;
 }
-
 .copy-button.copied>.copy-icon.after-copy {
   transform: scale(1);
   opacity: 1;
