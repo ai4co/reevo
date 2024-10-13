@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+
+{% set require_hljs = page.enable_code_highlight and code %}
+<head>
+  <meta charset="utf-8">
+{#
+  <!-- Meta tags for social media banners, these should be filled in appropriatly as they are your "business card" -->
+  <!-- Replace the content tag with appropriate information -->
+  <meta name="description" content="DESCRIPTION META TAG">
+  <meta property="og:title" content="SOCIAL MEDIA TITLE TAG" />
+  <meta property="og:description" content="SOCIAL MEDIA DESCRIPTION TAG TAG" />
+  <meta property="og:url" content="URL OF THE WEBSITE" />
+  <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X630-->
+  <meta property="og:image" content="static/image/your_banner_image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+#}
+
+{#
+  <meta name="twitter:title" content="TWITTER BANNER TITLE META TAG">
+  <meta name="twitter:description" content="TWITTER BANNER DESCRIPTION META TAG">
+  <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X600-->
+  <meta name="twitter:image" content="static/images/your_twitter_banner_image.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Keywords for your paper to be indexed by-->
+  <meta name="keywords" content="KEYWORDS SHOULD BE PLACED HERE">
+#}
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{paper.title}}</title>
+  <link rel="icon" type="image/svg" href='static/images/icon.svg'/>
+
+  <!-- preconnect -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  {%if poster %}<link rel="preconnect" href="https://documentcloud.adobe.com" crossorigin />{%endif%}
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  {%if require_hljs %}<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />{%endif%}
+  
+  <!-- custom scripts -->
+  <link rel="stylesheet" href="static/index.css">
+
+  <!-- bulma -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" integrity="sha256-WLKGWSIJYerRN8tbNGtXWVYnUM5wMJTXD8eG4NtGcDM=" crossorigin="anonymous">
+  
+  <!-- bulma extensions -->
+  <script src="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.24/dist/js/bulma-carousel.min.js" integrity="sha256-qKR77yzVBkDYKuoSg2BpAIbMtmF8aFjuTHFVnIjkpzI=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.5/dist/js/bulma-slider.min.js" integrity="sha256-22jr4VSiVZeRPFY18xUA/noy5aIF+5qYyWQtDC3kfZ4=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.5/dist/css/bulma-slider.min.css" integrity="sha256-+dlSYn04i4uiZ+E4jWkjJ0z55i51jUWcWgRfOTPp3Io=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.24/dist/css/bulma-carousel.min.css" integrity="sha256-nVhrDZU/ne3I/z6LXWEbyUOEmv79sPGKEbsP7SWLkHI=" crossorigin="anonymous">
+
+  <!-- clipboard -->
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha256-4XodgW4TwIJuDtf+v6vDJ39FVxI0veC/kSCCmnFp7ck=" crossorigin="anonymous"></script>
+
+  {%if poster %}
+  <!-- PDF reader -->
+  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  {%endif%}
+
+  <!-- icons -->
+  <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/js/all.min.js" integrity="sha256-gSqw5G+Gss6YqyQlqyIkuQ0IRZUqGsDVq9c0tiF+mL8=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/fontawesome.min.css" integrity="sha256-BYjRZhSY2ARUPcFTf5eEh3qWK58O88TM7nZet/JUNhE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <!-- custom font -->
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  {%if require_hljs %}
+  <!-- Syntax highlighting for code cells -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  {%endif%}
+
+  {%if page.enable_katex%}
+  <!-- Math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+    integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+    integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg"
+    crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+  {%endif%}
+</head>
+
+<body>
+  <!-- header -->
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop" style="max-width:1200px">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">{{paper.title}}</h1>
+            <div class="is-size-5 publication-authors">
+              <!-- Paper authors -->
+              {% for author in paper.authors %}
+              <span class="author-block">
+                {%- if author.link %}<a href="{{author.link}}" target="_blank">{{author.name}}</a>
+                {%- else %}{{author.name}}
+                {%- endif %}
+                {%- if author.symbols %}<sup>{{author.symbols}}</sup>{%-endif-%}
+                {%- if not loop.last -%},{%-endif-%}
+              </span>
+              {% endfor %}
+            </div>
+
+            <div class="is-size-6 publication-authors">
+              {% for inst in paper.institutions %}
+              <span class="author-block" style="margin-right:.5em">
+                <sup>{{inst.symbol}} </sup>
+                {%- if inst.link %}<a href="{{inst.link}}" target="_blank">{{inst.name}}</a>
+                {%- else %}{{inst.name}}
+                {%- endif -%}
+              </span>{%- if loop.first %}<br />{%endif%}
+              {%endfor%}<br />
+              <b class="author-block is-size-5" style="padding:1ex 0">{{paper.conference}}</b>
+              {% if paper.notes%}
+              {%for note in paper.notes %}
+              <span class="eql-cntrb"><br><sup>{{note.symbol}}</sup>{{note.message}}</span>
+              {%endfor%}
+              {%endif%}
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                {% for key, item in links | items %}
+                <span class="link-block">
+                  <a href="{{item.link}}" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      {%-if item.icon.class %}<i class="{{item.icon.class}}"></i>
+                      {%-elif item.icon.html %}{{item.icon.html}}
+                      {%-endif%}</span>
+                    <span>{{item.caption | default(key)}}</span>
+                  </a>
+                </span>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {%-if paper.abstract-%}
+  <!-- Paper abstract -->
+  <section class="section hero is-light red-link" id="abstract">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              {{paper.abstract}}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End paper abstract -->
+  {%endif%}
+
+  {%-if carousel-%}
+  <!-- Image carousel -->
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <div id="results-carousel" class="carousel results-carousel">
+          {%for item in carousel%}
+          <div class="item">
+            <!-- Your image here -->
+            <img src="{{item.image}}" alt="{{item.alt_text|default(item.description)}}" />
+            <h2 class="subtitle has-text-centered" style="margin-top:1ex">
+              {{item.description}}
+            </h2>
+          </div>
+          {%endfor%}
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End image carousel -->
+  {%-endif-%}
+
+  {%if code%}
+  <!-- Code Cell with syntax highlighting + copy to clipboard -->
+  <section class="section hero is-light red-link" id="code">
+    <div class="container is-max-desktop content" style="width:100%">
+      <h2 class="title">Usage</h2>
+      {%for item in code%}
+      <h3>{{item.title}}</h3>
+      {%if item.code%}
+      <div class="code-container" style="background-color:white">
+        <pre><code class="code-content language-{{item.language}}" style="background-color:white" id="code-content-{{loop.index}}">
+          {{-item.code-}}
+        </code></pre>
+        {%if item.copy_button%}
+        <button class="copy-button" alt="Copy to clipboard" data-clipboard-target="#code-content-bibtex">
+          <span class="copy-icon before-copy"><i class="fa fa-copy"></i></span>
+          <span class="copy-icon after-copy"><i class="fas fa-check"></i></span>
+        </button>
+        {%endif%}
+      </div>
+      {%endif%}
+      {%if item.description%}
+      <p class="content">{{item.description}}</p>
+      {%endif%}
+      {%endfor%}
+    </div>
+  </section>
+  <!-- End code cell -->
+  {%endif%}
+
+  {%if poster%}
+  <!-- Paper poster -->
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <h2 class="title">Poster</h2>
+        <iframe src="{{poster.url}}" width="100%" height="550"></iframe>
+      </div>
+    </div>
+  </section>
+  <!--End paper poster -->
+  {%endif%}
+
+  {%if citation%}
+  <!-- BibText citation + copy to clipboard -->
+  <section class="section" id="citation">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      <div class="code-container">
+        <pre><code class="code-content language-text" id="code-content-bibtex">{{citation.biblatex}}</code></pre>
+        {%if citation.copy_button%}
+        <button class="copy-button" alt="Copy to clipboard" data-clipboard-target="#code-content-bibtex">
+          <span class="copy-icon before-copy"><i class="fa fa-copy"></i></span>
+          <span class="copy-icon after-copy"><i class="fas fa-check"></i></span>
+        </button>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+  <!--End BibTex citation -->
+  {%endif%}
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              This page was built using the <a href="https://github.com/ai4co/research-project-page-template"
+                target="_blank">Research Project Page Template</a> which is based on
+              the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic
+                Project Page Template</a> and the
+              <a href="https://nerfies.github.io" target="_blank">Nerfies project page</a>. You are free to borrow the
+              of this website, we just ask that you link back to this page in the footer.
+              This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"
+                target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+<script>
+window.HELP_IMPROVE_VIDEOJS = false;
+document.addEventListener('DOMContentLoaded', function () {
+  if(hljs){hljs.highlightAll();}
+  let options = {
+    slidesToScroll: 1,
+    slidesToShow: 1,
+    loop: true,
+    infinite: true,
+    autoplay: true,
+    autoplaySpeed: 5000,
+  }
+  // Initialize all div with carousel class
+  if(bulmaCarousel){
+    let carousels = bulmaCarousel.attach('.carousel', options);
+    if(bulmaSlider){bulmaSlider.attach();}
+  }
+  if(ClipboardJS){
+    let clipboard = new ClipboardJS('.copy-button');
+
+    clipboard.on('success', function (e) {
+      const element = e.trigger;
+      element.classList.add('copied');
+      setTimeout(() => element.classList.remove('copied'), 2000);
+      e.clearSelection();
+    });
+  }
+});
+</script>
+</body>
+
+</html>

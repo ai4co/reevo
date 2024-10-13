@@ -1,0 +1,169 @@
+[paper]
+title = "ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution"
+conference = "NeurIPS 2024"
+abstract = """
+The omnipresence of NP-hard combinatorial optimization problems (COPs) compels domain experts to engage in trial-and-error heuristic design. The long-standing endeavor of design automation has gained new momentum with the rise of large language models (LLMs). This paper introduces Language Hyper-Heuristics (LHHs), an emerging variant of Hyper-Heuristics that leverages LLMs for heuristic generation, featuring minimal manual intervention and open-ended heuristic spaces. 
+To empower LHHs, we present <b>Reflective Evolution</b> (<span style="font-family:monospace">ReEvo</span>), a novel integration of evolutionary search for efficiently exploring the heuristic space, and LLM reflections to provide verbal gradients within the space.
+Across five heterogeneous algorithmic types, six different COPs, and both white-box and black-box views of COPs, <span style="font-family:monospace">ReEvo</span> yields state-of-the-art and competitive meta-heuristics, evolutionary algorithms, heuristics, and neural solvers, while being more sample-efficient than prior LHHs.
+Our code is available: <a href='https://github.com/ai4co/reevo' target="_blank">https://github.com/ai4co/reevo</a>.
+"""
+
+[[paper.authors]]
+name = "Haoran Ye"
+symbols = "1"
+link = "https://henry-yeh.github.io/"
+
+[[paper.authors]]
+name = "Jiarui Wang"
+symbols = "2"
+link = "https://github.com/Furffico"
+
+[[paper.authors]]
+name = "Zhiguang Cao"
+symbols = "3"
+link = "https://zhiguangcaosg.github.io/"
+
+[[paper.authors]]
+name = "Federico Berto"
+symbols = "4"
+link = "https://fedebotu.github.io/"
+
+[[paper.authors]]
+name = "Chuanbo Hua"
+symbols = "4"
+link = "https://cbhua.github.io/"
+
+[[paper.authors]]
+name = "Haeyeon Kim"
+symbols = "4"
+link = "https://sites.google.com/view/haeyeon-rachel-kim"
+
+[[paper.authors]]
+name = "Jinkyoo Park"
+symbols = "4"
+
+[[paper.authors]]
+name = "Guojie Song"
+symbols = "1,5"
+
+[[paper.institutions]]
+symbol = '1'
+name = "National Key Laboratory of General Artificial Intelligence, School of Intelligence Science and Technology, Peking University"
+link = ""                  # optional
+
+[[paper.institutions]]
+symbol = '2'
+name = "Southeast University"
+
+[[paper.institutions]]
+symbol = '3'
+name = "Singapore Management University"
+
+[[paper.institutions]]
+symbol = '4'
+name = "KAIST"
+
+[[paper.institutions]]
+symbol = '5'
+name = "PKU-Wuhan Institute for Artificial Intelligence"
+
+[[paper.institutions]]
+symbol = '†'
+name = "AI4CO"
+link = "https://github.com/ai4co"
+
+[[paper.notes]]
+symbol = "†"
+message = "Work made with contributions from the AI4CO open research community."
+
+[links.pdf]
+link = "https://arxiv.org/pdf/2402.01145"
+icon = { class = "fas fa-file-pdf" }
+caption = "Paper"
+
+[links.arXiv]
+link = "https://arxiv.org/abs/2402.01145"
+icon = { class = "ai ai-arxiv" }
+
+[links.github]
+link = "https://github.com/ai4co/reevo"
+icon = { class = "fab fa-github" }
+caption = "Code"
+
+[[carousel]]
+image = "static/images/reevo.jpg"
+description = '<span style="font-family:monospace">ReEvo</span> pipeline.'
+
+[[carousel]]
+image = "static/images/show_reflec.png"
+description = 'Examples of reflections for black-box TSP.'
+
+[[code]]
+language="bash"
+title="Get Started"
+copy_button=false
+code="""
+$ git clone git@github.com:ai4co/reevo.git # download reevo code
+$ cd reevo
+$ python3 -m venv ./venv            # [optional] create virtual environment
+$ source ./venv/bin/activate        # [optional] activate virtual environment
+$ pip install -r requirements.txt   # install dependencies
+$ pip install numba==0.58           # dependency specifically required by `tsp_gls`
+$ export OPENAI_API_KEY=xxxxxxxxxx  # set openAI API key, other service providers are also available
+$ python3 main.py problem=tsp_gls
+
+"""
+description='''
+<h5>Available problems</h5>
+<ul dir="auto">
+<li>Traveling Salesman Problem (TSP): <code>tsp_aco</code>, <code>tsp_aco_black_box</code>, <code>tsp_constructive</code>, <code>tsp_gls</code>, <code>tsp_pomo</code>, <code>tsp_lehd</code></li>
+<li>Capacitated Vehicle Routing Problem (CVRP): <code>cvrp_aco</code>, <code>cvrp_aco_black_box</code>, <code>cvrp_pomo</code>, <code>cvrp_lehd</code></li>
+<li>Bin Packing Problem (BPP): <code>bpp_offline_aco</code>, <code>bpp_offline_aco_black_box</code>, <code>bpp_online</code></li>
+<li>Multiple Knapsack Problems (MKP): <code>mkp_aco</code>, <code>mkp_aco_black_box</code></li>
+<li>Orienteering Problem (OP): <code>op_aco</code>, <code>op_aco_black_box</code></li>
+<li>Decap Placement Problem (DPP): <code>dpp_ga</code></li>
+</ul>
+'''
+
+[[code]]
+language="bash"
+title="Use Alternative LLMs"
+code="""\
+$ export LLAMA_API_KEY=xxxxxxxxxxxxxxxxxxxx
+$ python3 main.py llm_client=llama_api llm_client.model=gemma2-9b
+
+"""
+description='''<h5>Available LLM service providers</h5>
+<ul dir="auto">
+<li><a href="https://openai.com/api/" rel="nofollow" target="_blank"><b>OpenAI</b></a>: gpt-3.5-turbo (default), gpt-4o, gpt-4o-mini, gpt-4-turbo, etc.</li>
+<li><a href="https://open.bigmodel.cn/" rel="nofollow" target="_blank"><b>Zhipu AI</b></a>: GLM-3-Turbo, GLM-4-Air, GLM-4-0520, etc. (<a href="https://open.bigmodel.cn/dev/howuse/model" rel="nofollow" target="_blank">full list</a>)</li>
+<li><a href="https://www.deepseek.com/" rel="nofollow" target="_blank"><b>DeepSeek</b></a>: deepseek-chat</li>
+<li><a href="https://www.llama-api.com/" rel="nofollow" target="_blank"><b>Llama API</b></a>: llama3.1-8b/70b/405b, gemma2-9b/27b, Qwen2-72B, etc. (<a href="https://docs.llama-api.com/quickstart#available-models" rel="nofollow" target="_blank">full list</a>)</li>
+<li>And <a href="https://docs.litellm.ai/docs/providers" rel="nofollow" target="_blank">more providers</a> supported via <a href="https://docs.litellm.ai/docs/" rel="nofollow" target="_blank"><b>LiteLLM</b></a>.</li>
+</ul>
+'''
+
+# [poster]
+# url="static/pdfs/sample.pdf"
+
+[citation]
+biblatex='''@inproceedings{ye2024reevo,
+    title={ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution}, 
+    author={Haoran Ye and Jiarui Wang and Zhiguang Cao and Federico Berto and Chuanbo Hua and Haeyeon Kim and Jinkyoo Park and Guojie Song},
+    booktitle={Advances in Neural Information Processing Systems},
+    year={2024},
+    note={\url{https://github.com/ai4co/reevo}}
+}'''
+copy_button=true
+
+[page]
+enable_katex=false
+enable_code_highlight=true
+
+[static_file.reevo_img]
+src="../assets/reevo.jpg"
+dest="static/images/reevo.jpg"
+
+# [static_file.nojekyll]
+# content=""
+# dest=".nojekyll"
