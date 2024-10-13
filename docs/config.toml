@@ -91,6 +91,9 @@ link = "https://github.com/ai4co/reevo"
 icon = { class = "fab fa-github" }
 caption = "Code"
 
+[teaser]
+content="Give ReEvo 5 minutes, and get a state-of-the-art algorithm in return!"
+
 [[carousel]]
 image = "static/images/reevo.jpg"
 description = '<span style="font-family:monospace">ReEvo</span> pipeline.'
