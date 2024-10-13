@@ -8,6 +8,7 @@ body {
 .link-block a {
   margin-top: 5px;
   margin-bottom: 5px;
+  margin-right: 8px;
 }
 .dnerf {
   font-variant: small-caps;
