@@ -51,6 +51,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.5/dist/css/bulma-slider.min.css" integrity="sha256-+dlSYn04i4uiZ+E4jWkjJ0z55i51jUWcWgRfOTPp3Io=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.24/dist/css/bulma-carousel.min.css" integrity="sha256-nVhrDZU/ne3I/z6LXWEbyUOEmv79sPGKEbsP7SWLkHI=" crossorigin="anonymous">
 
+  <!-- carousel clickable images -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+
   <!-- custom scripts -->
   <link rel="stylesheet" href="static/index.css">
 
@@ -179,7 +183,9 @@
         <div id="results-carousel" class="carousel results-carousel">
           {%for item in carousel%}
           <div class="item">
-            <img src="{{item.image}}" alt="{{item.alt_text|default(item.description)}}" />
+            <a href="{{item.image}}" data-fancybox="carousel" data-caption="{{item.description}}">
+              <img src="{{item.image}}" alt="{{item.alt_text|default(item.description)}}" />
+            </a>
             <h2 class="subtitle has-text-centered" style="margin-top:1ex">
               {{item.description}}
             </h2>
@@ -324,6 +330,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }, 2000);
     });
   }
+  Fancybox.bind("[data-fancybox]", {});
 });
 </script>
 </body>
