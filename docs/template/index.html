@@ -33,7 +33,10 @@
 
   <!-- preconnect -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  {%if poster %}<link rel="preconnect" href="https://documentcloud.adobe.com" crossorigin />{%endif%}
+  {%if poster %}
+    <link rel="preconnect" href="https://documentcloud.adobe.com" crossorigin />
+    <link rel="prefetch" href="{{poster.url}}" />
+  {%endif%}
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
   {%if require_hljs %}<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />{%endif%}
   <link rel="preload" href="static/index.css" as="style">
@@ -71,7 +74,9 @@
   <!-- Syntax highlighting for code cells -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  {%for lang in page.required_languages %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/{{lang}}.min.js"></script>
+  {%endfor%}
   {%endif%}
 
   {%if page.enable_katex%}

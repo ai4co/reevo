@@ -1,3 +1,12 @@
+[page]
+enable_katex = false
+enable_code_highlight = true
+required_languages = ["bash"]
+tracking = { type = "umami", website_id = "c18ebe0b-2d3c-48ff-9cef-62c34bbadb04" }
+
+[page.metadata]
+# todo
+
 [paper]
 title = "ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution"
 conference = "NeurIPS 2024"
@@ -5,7 +14,6 @@ abstract = """
 The omnipresence of NP-hard combinatorial optimization problems (COPs) compels domain experts to engage in trial-and-error heuristic design. The long-standing endeavor of design automation has gained new momentum with the rise of large language models (LLMs). This paper introduces Language Hyper-Heuristics (LHHs), an emerging variant of Hyper-Heuristics that leverages LLMs for heuristic generation, featuring minimal manual intervention and open-ended heuristic spaces. 
 To empower LHHs, we present <b>Reflective Evolution</b> (<span style="font-family:monospace">ReEvo</span>), a novel integration of evolutionary search for efficiently exploring the heuristic space, and LLM reflections to provide verbal gradients within the space.
 Across five heterogeneous algorithmic types, six different COPs, and both white-box and black-box views of COPs, <span style="font-family:monospace">ReEvo</span> yields state-of-the-art and competitive meta-heuristics, evolutionary algorithms, heuristics, and neural solvers, while being more sample-efficient than prior LHHs.
-Our code is available: <a href='https://github.com/ai4co/reevo' target="_blank">https://github.com/ai4co/reevo</a>.
 """
 
 [[paper.authors]]
@@ -172,10 +180,6 @@ contents = [
     { date = "Feb. 2024", content = "We are excited to release <em>ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution</em> 🚀" },
 ]
 
-[page]
-enable_katex = false
-enable_code_highlight = true
-tracking = { type = "umami", website_id = "c18ebe0b-2d3c-48ff-9cef-62c34bbadb04" }
 
 [static_file.reevo_img]
 src = "../assets/reevo.png"
