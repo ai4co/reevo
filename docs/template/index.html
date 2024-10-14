@@ -29,17 +29,16 @@
 #}
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>[{{paper.conference}}] {{paper.title}}</title>
-  <link rel="icon" type="image/svg" href='static/images/icon.svg'/>
+  <link rel="icon" type="image/svg" href='static/icon.svg'/>
 
   <!-- preconnect -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   {%if poster %}<link rel="preconnect" href="https://documentcloud.adobe.com" crossorigin />{%endif%}
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
   {%if require_hljs %}<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />{%endif%}
+  <link rel="preload" href="static/index.css" as="style">
+  {%for item in carousel%}<link rel="preload" href="{{item.image}}" as="image" />{%endfor%}
   
-  <!-- custom scripts -->
-  <link rel="stylesheet" href="static/index.css">
-
   <!-- bulma -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" integrity="sha256-WLKGWSIJYerRN8tbNGtXWVYnUM5wMJTXD8eG4NtGcDM=" crossorigin="anonymous">
   
@@ -48,6 +47,9 @@
   <script src="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.5/dist/js/bulma-slider.min.js" integrity="sha256-22jr4VSiVZeRPFY18xUA/noy5aIF+5qYyWQtDC3kfZ4=" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.5/dist/css/bulma-slider.min.css" integrity="sha256-+dlSYn04i4uiZ+E4jWkjJ0z55i51jUWcWgRfOTPp3Io=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.24/dist/css/bulma-carousel.min.css" integrity="sha256-nVhrDZU/ne3I/z6LXWEbyUOEmv79sPGKEbsP7SWLkHI=" crossorigin="anonymous">
+
+  <!-- custom scripts -->
+  <link rel="stylesheet" href="static/index.css">
 
   <!-- clipboard -->
   <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha256-4XodgW4TwIJuDtf+v6vDJ39FVxI0veC/kSCCmnFp7ck=" crossorigin="anonymous"></script>
@@ -248,19 +250,17 @@
 
   {%-if news-%}
   <section class="section hero is-light red-link" id="news">
-    <div class="container is-max-desktop"style="width:100%">
-      <div class="column">
-        <h2 class="title">News 📰</h2>
-        <div class="content has-text-justified">
-          <p><table><tbody>
-          {%for item in news.contents%}
-          <tr>
-            <th>{{item.date}}</th>
-            <td>{{item.content}}</td>
-          </tr>
-          {%endfor%}
-          </tbody></table></p>
-        </div>
+    <div class="container is-max-desktop content"style="width:100%">
+      <h2 class="title">News 📰</h2>
+      <div class="has-text-justified">
+        <table><tbody>
+        {%for item in news.contents%}
+        <tr>
+          <th>{{item.date}}</th>
+          <td>{{item.content}}</td>
+        </tr>
+        {%endfor%}
+        </tbody></table>
       </div>
     </div>
   </section>
@@ -309,16 +309,14 @@ document.addEventListener('DOMContentLoaded', function () {
     let enter_count = 0;
 
     clipboard.on('success', function (e) {
-      const element = e.trigger;
-      element.classList.add('copied');
-      enter_count++;
-      setTimeout(() => {
-        enter_count--;
-        if(enter_count==0){
-          element.classList.remove('copied');
-        }
-      }, 2000);
       e.clearSelection();
+      const element = e.trigger;
+      if(enter_count===0){element.classList.add('copied');}
+      enter_count++;
+      setTimeout(function(){
+        enter_count--;
+        if(enter_count===0){element.classList.remove('copied');}
+      }, 2000);
     });
   }
 });

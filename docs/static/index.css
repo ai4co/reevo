@@ -214,3 +214,7 @@ section.red-link a {
   transform: scale(1);
   opacity: 1;
 }
+section#news table > tbody > tr > th{
+  white-space: nowrap;
+  width: max-content;
+}

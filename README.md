@@ -29,7 +29,7 @@
 
 ##  2. <a name='Introduction'></a> Introduction 🚀
 
-![Diagram of ReEvo](./assets/reevo.jpg)
+![Diagram of ReEvo](./assets/reevo.png)
 
 We introduce **Language Hyper-Heuristics (LHHs)**, an emerging variant of Hyper-Heuristics (HHs) that leverages LLMs for heuristic generation, featuring **minimal manual intervention and open-ended heuristic spaces**.
 
