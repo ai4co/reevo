@@ -2,6 +2,7 @@
 <html>
 
 {% set require_hljs = page.enable_code_highlight and code %}
+{% set enable_preview = preview_mode and preview_mode.enabled %}
 <head>
   <meta charset="utf-8">
 {#
@@ -45,6 +46,7 @@
   <!-- bulma -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" integrity="sha256-WLKGWSIJYerRN8tbNGtXWVYnUM5wMJTXD8eG4NtGcDM=" crossorigin="anonymous">
   
+  {%if carousel%}
   <!-- bulma extensions -->
   <script src="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.24/dist/js/bulma-carousel.min.js" integrity="sha256-qKR77yzVBkDYKuoSg2BpAIbMtmF8aFjuTHFVnIjkpzI=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.5/dist/js/bulma-slider.min.js" integrity="sha256-22jr4VSiVZeRPFY18xUA/noy5aIF+5qYyWQtDC3kfZ4=" crossorigin="anonymous"></script>
@@ -54,6 +56,7 @@
   <!-- carousel clickable images -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
   <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+  {%endif%}
 
   <!-- custom scripts -->
   <link rel="stylesheet" href="static/index.css">
@@ -83,7 +86,7 @@
   {%endfor%}
   {%endif%}
 
-  {%if page.enable_katex%}
+  {%if page.enable_katex %}
   <!-- Math rendering -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
     integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
@@ -95,7 +98,7 @@
     onload="renderMathInElement(document.body);"></script>
   {%endif%}
 
-  {%if page.tracking %}{%if page.tracking.type == "umami"%}
+  {%if page.tracking and not enable_preview %}{%if page.tracking.type == "umami"%}
   <script defer src="https://cloud.umami.is/script.js" data-website-id="{{page.tracking.website_id}}"></script>
   {%endif%}{%endif%}
 </head>
@@ -330,9 +333,27 @@ document.addEventListener('DOMContentLoaded', function () {
       }, 2000);
     });
   }
-  Fancybox.bind("[data-fancybox]", {});
+  if(Fancybox){
+    Fancybox.bind("[data-fancybox]", {});
+  }
 });
 </script>
+{% if enable_preview %}
+<script> // script for live reload
+(function(){
+  let last_updated = new Date();
+  const dummy_file_path="/{{preview_mode.dummy_file_path}}";
+  const refresh_on_change = () => {
+    fetch(dummy_file_path).then(res => {
+      const last_modified = new Date(res.headers.get("Last-Modified"));
+      if(last_updated<last_modified){
+        window.location.reload();
+      }
+    })
+  }
+  setInterval(refresh_on_change, 1000);
+})();
+</script>{%endif%}
 </body>
 
 </html>
