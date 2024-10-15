@@ -47,32 +47,29 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" integrity="sha256-WLKGWSIJYerRN8tbNGtXWVYnUM5wMJTXD8eG4NtGcDM=" crossorigin="anonymous">
   
   {%if carousel%}
-  <!-- bulma extensions -->
-  <script src="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.24/dist/js/bulma-carousel.min.js" integrity="sha256-qKR77yzVBkDYKuoSg2BpAIbMtmF8aFjuTHFVnIjkpzI=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.5/dist/js/bulma-slider.min.js" integrity="sha256-22jr4VSiVZeRPFY18xUA/noy5aIF+5qYyWQtDC3kfZ4=" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-slider@2.0.5/dist/css/bulma-slider.min.css" integrity="sha256-+dlSYn04i4uiZ+E4jWkjJ0z55i51jUWcWgRfOTPp3Io=" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.24/dist/css/bulma-carousel.min.css" integrity="sha256-nVhrDZU/ne3I/z6LXWEbyUOEmv79sPGKEbsP7SWLkHI=" crossorigin="anonymous">
-
-  <!-- carousel clickable images -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+  <!-- carousel -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/fancybox/fancybox.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/carousel/carousel.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/carousel/carousel.autoplay.umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/carousel/carousel.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/fancybox/fancybox.min.css">
   {%endif%}
 
   <!-- custom scripts -->
   <link rel="stylesheet" href="static/index.css">
 
   <!-- clipboard -->
-  <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha256-4XodgW4TwIJuDtf+v6vDJ39FVxI0veC/kSCCmnFp7ck=" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha256-4XodgW4TwIJuDtf+v6vDJ39FVxI0veC/kSCCmnFp7ck=" crossorigin="anonymous"></script>
 
   {%if poster %}
   <!-- PDF reader -->
-  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
   {%endif%}
 
   <!-- icons -->
   <script defer src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/js/all.min.js" integrity="sha256-gSqw5G+Gss6YqyQlqyIkuQ0IRZUqGsDVq9c0tiF+mL8=" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/fontawesome.min.css" integrity="sha256-BYjRZhSY2ARUPcFTf5eEh3qWK58O88TM7nZet/JUNhE=" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.2/css/academicons.min.css">
 
   <!-- custom font -->
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
@@ -80,9 +77,9 @@
   {%if require_hljs %}
   <!-- Syntax highlighting for code cells -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   {%for lang in page.required_languages %}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/{{lang}}.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/{{lang}}.min.js"></script>
   {%endfor%}
   {%endif%}
 
@@ -184,15 +181,17 @@
   <section class="hero is-small" id="carousel">
     <div class="hero-body">
       <div class="container">
-        <div id="results-carousel" class="carousel results-carousel">
+        <div class="f-carousel" id="paper-carousel">
           {%for item in carousel%}
-          <div class="item">
-            <a href="{{item.image}}" data-fancybox="carousel" data-caption="{{item.description}}">
-              <img src="{{item.image}}" alt="{{item.alt_text|default(item.description)}}" />
-            </a>
-            <h2 class="subtitle has-text-centered" style="margin-top:1ex">
-              {{item.description}}
-            </h2>
+          <div class="f-carousel__slide carousel-slide">
+            <div>
+              <a href="{{item.image}}" data-fancybox="carousel-1" data-caption="{{item.description|escape}}">
+                <img src="{{item.image}}" alt="{{item.alt_text|default(item.description)|escape}}" />
+              </a>
+              <h2 class="subtitle has-text-centered" style="margin-top:1ex">
+                {{item.description}}
+              </h2>
+            </div>
           </div>
           {%endfor%}
         </div>
@@ -305,19 +304,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   if(hljs){hljs.highlightAll();}
-  let options = {
-    slidesToScroll: 1,
-    slidesToShow: 1,
-    loop: true,
-    infinite: true,
-    autoplay: true,
-    autoplaySpeed: 5000,
-  }
-  // Initialize all div with carousel class
-  if(bulmaCarousel){
-    let carousels = bulmaCarousel.attach('.carousel', options);
-    if(bulmaSlider){bulmaSlider.attach();}
-  }
   if(ClipboardJS){
     let clipboard = new ClipboardJS('.copy-button');
     let enter_count = 0;
@@ -332,6 +318,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if(enter_count===0){element.classList.remove('copied');}
       }, 2000);
     });
+  }
+  if(Carousel){
+    const container = document.getElementById("paper-carousel");
+    const options = {
+      Autoplay: { timeout: 4000, },
+    };
+    const carousel = new Carousel(container, options, { Autoplay });
   }
   if(Fancybox){
     Fancybox.bind("[data-fancybox]", {});

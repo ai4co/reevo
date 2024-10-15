@@ -214,7 +214,29 @@ section.red-link a {
   transform: scale(1);
   opacity: 1;
 }
+/* for news */
 section#news table > tbody > tr > th{
   white-space: nowrap;
   width: max-content;
+}
+.carousel-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+/* .f-progress based on /npm/@fancyapps/ui@5.0.36/dist/carousel/carousel.autoplay.css */
+.f-carousel .f-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  transform: scaleX(0);
+  transform-origin: 0;
+  transition-property: transform;
+  transition-timing-function: linear;
+  background: #dd3412;
+  z-index: 30;
+  user-select: none;
+  pointer-events: none
 }

@@ -5,7 +5,6 @@ import shutil
 import tomllib
 
 from jinja2 import Environment, FileSystemLoader
-from htmlmin.main import minify
 
 env = Environment(
     loader=FileSystemLoader("./template"),
@@ -13,14 +12,13 @@ env = Environment(
     auto_reload=True,
 )
 
-def build(preview=False, target_folder="./dist", config_path="./config.toml"):
+def build(preview=False, target_folder="./dist", config_path="./config.toml", minify = True):
     with open(config_path, 'rb') as config_file:
         config = tomllib.load(config_file)
         config['preview_mode']['enabled'] = preview
         # pprint(config)
 
     page = env.get_template('index.html').render(config)
-    page = minify(page, remove_comments=True, remove_all_empty_space=True)
 
     if not os.path.isdir(target_folder):
         os.makedirs(target_folder, exist_ok=True)
@@ -44,15 +42,18 @@ def build(preview=False, target_folder="./dist", config_path="./config.toml"):
             content = file['content']
             with open(dest, 'w') as f:
                 f.write(content)
+
     if preview:
         with open(join(target_folder, config['preview_mode']['dummy_file_path']), 'w') as f:
             f.write("ok")
-    else:
+    if minify:
         for path in all_filepaths(target_folder):
-            if os.path.basename(path).startswith("_"):
-                with open(join(target_folder, ".nojekyll"), 'w') as f:
-                    f.write("")
-                break
+            filename = os.path.basename(path)
+            extension = filename.rsplit(".",1)[-1].lower()
+            if extension == "css":
+                minify_css(path)
+            elif extension in {'html', 'svg'}:
+                minify_html(path)
 
     print("Built at", time.strftime("%Y-%m-%d %H:%M:%S"))
 
@@ -105,6 +106,22 @@ def all_filepaths(*paths):
                 yield root
                 yield from (join(root, file) for file in files)
 
+def minify_css(filepath):
+    import re
+    content = open(filepath,'r').read()
+    minimized = re.sub(r' *\n *|/\*.*?\*/', '', content)
+    minimized = re.sub(r'; *(?=})|(?<=:) +| +(?={)', '', minimized)
+    with open(filepath, 'w') as f:
+        f.write(minimized)
+    print(filepath+":", f'reduced from {len(content)} Bytes to {len(minimized)} Bytes')
+
+def minify_html(filepath):
+    from htmlmin.main import minify
+    content = open(filepath,'r').read()
+    minimized = minify(content, remove_comments=True, remove_all_empty_space=True)
+    with open(filepath, 'w') as f:
+        f.write(minimized)
+    print(filepath+":", f'reduced from {len(content)} Bytes to {len(minimized)} Bytes')
 
 if __name__ == "__main__":
     import argparse
@@ -116,9 +133,12 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--port", type=int, default=8123, help="Preview server port, default to 8123")
     parser.add_argument("-o", "--output", type=Path, default="./dist", help="Build file destination, default to ./dist")
     parser.add_argument("-c", "--config", type=Path, default="./config.toml", help="Config file path, default to ./config.toml")
+    parser.add_argument("-m", "--minify", default=None, action='store_true', 
+                        help="Minify the output files if possible, default to True when live_preview is disabled, otherwise False")
     opts = parser.parse_args()
 
-    build_kwargs = dict(preview=opts.live_preview, target_folder=opts.output, config_path=opts.config)
+    opts.minify = (not opts.live_preview) if opts.minify is None else opts.minify
+    build_kwargs = dict(preview=opts.live_preview, target_folder=opts.output, config_path=opts.config, minify = opts.minify)
     if opts.live_preview:
         start_server_daemon(ip=opts.ip, port=opts.port, directory=opts.output)
         build_on_change("./template", opts.config, "./static",  **build_kwargs)

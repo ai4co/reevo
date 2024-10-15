@@ -6,7 +6,7 @@ commit_hash="$(git rev-parse --short HEAD)"
 origin_url="$(git remote get-url origin)"
 
 rm -rf "${tmpfolder}"
-git clone "$(origin_url)" -b gh-pages --single-branch "${tmpfolder}"
+git clone "${origin_url}" -b gh-pages --single-branch "${tmpfolder}"
 rm -r "${tmpfolder}"/*
 python3 build.py
 cp -r ./dist/* "${tmpfolder}/"
