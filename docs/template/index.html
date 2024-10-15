@@ -98,8 +98,9 @@
     onload="renderMathInElement(document.body);"></script>
   {%endif%}
 
-  {%if page.tracking and not enable_preview %}{%if page.tracking.type == "umami"%}
-  <script defer src="https://cloud.umami.is/script.js" data-website-id="{{page.tracking.website_id}}"></script>
+  {%if page.tracking and not enable_preview %}
+    {%if page.tracking.type == "umami"%}
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="{{page.tracking.website_id}}"></script>
   {%endif%}{%endif%}
 </head>
 
@@ -302,7 +303,6 @@
   </footer>
   
 <script>
-window.HELP_IMPROVE_VIDEOJS = false;
 document.addEventListener('DOMContentLoaded', function () {
   if(hljs){hljs.highlightAll();}
   let options = {
@@ -353,7 +353,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   setInterval(refresh_on_change, 1000);
 })();
-</script>{%endif%}
+</script>
+{%endif%}
 </body>
 
 </html>

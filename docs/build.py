@@ -1,14 +1,11 @@
-from http import HTTPStatus
-from jinja2 import Environment, FileSystemLoader
-from htmlmin.main import minify
-import tomllib
+import time
 import os
 from os.path import join
 import shutil
-import argparse
-import time
+import tomllib
 
-target_folder = "./dist"
+from jinja2 import Environment, FileSystemLoader
+from htmlmin.main import minify
 
 env = Environment(
     loader=FileSystemLoader("./template"),
@@ -16,9 +13,8 @@ env = Environment(
     auto_reload=True,
 )
 
-
-def build(preview=False):
-    with open("./config.toml", 'rb') as config_file:
+def build(preview=False, target_folder="./dist", config_path="./config.toml"):
+    with open(config_path, 'rb') as config_file:
         config = tomllib.load(config_file)
         config['preview_mode']['enabled'] = preview
         # pprint(config)
@@ -37,7 +33,7 @@ def build(preview=False):
 
     shutil.copytree("./static", join(target_folder, "static"))
 
-    for key, file in config.get("static_file", {}).items():
+    for _, file in config.get("static_file", {}).items():
         dest = join(target_folder, file['dest'])
         directory = os.path.dirname(dest)
         if not os.path.exists(directory):
@@ -51,27 +47,32 @@ def build(preview=False):
     if preview:
         with open(join(target_folder, config['preview_mode']['dummy_file_path']), 'w') as f:
             f.write("ok")
+    else:
+        for path in all_filepaths(target_folder):
+            if os.path.basename(path).startswith("_"):
+                with open(join(target_folder, ".nojekyll"), 'w') as f:
+                    f.write("")
+                break
 
-    print("Built at", time.strftime("%y-%m-%d %H:%M:%S"))
+    print("Built at", time.strftime("%Y-%m-%d %H:%M:%S"))
 
-
-def start_server_daemon(ip="127.0.0.1", port=8123):
-    import http.server
-    import socketserver
-    from functools import partial
+def start_server_daemon(ip="127.0.0.1", port=8123, directory="./dist"):
     from threading import Thread
+    import http.server
+    from http import HTTPStatus
+    import socketserver
+    
+    class Handler(http.server.SimpleHTTPRequestHandler):
+        def __init__(self, *args):
+            super().__init__(*args, directory=directory)
+
+        def log_request(self, code='-', size='-'):
+            if isinstance(code, HTTPStatus):
+                code = code.value
+            if code != 304:  # prevent logging requests with status code 304
+                return super().log_request(code, size)
 
     def start_server():
-        class Handler(http.server.SimpleHTTPRequestHandler):
-            def __init__(self, *args):
-                super().__init__(*args, directory=target_folder)
-
-            def log_request(self, code='-', size='-'):
-                if isinstance(code, HTTPStatus):
-                    code = code.value
-                if code != 304:  # filter out requests to dummy page with status code 304
-                    return super().log_request(code, size)
-
         with socketserver.TCPServer((ip, port), Handler) as httpd:
             print(f"Serving live preview at http://{ip}:{port}/")
             httpd.serve_forever()
@@ -80,21 +81,20 @@ def start_server_daemon(ip="127.0.0.1", port=8123):
     t.start()
 
 
-def build_on_change(*paths):
-    build(preview=True)
-    last_update = time.time()
+def build_on_change(*paths, **build_kwargs):
+    last_update = 0.0
     while 1:
-        for filepath in all_filepaths(paths):
+        for filepath in all_filepaths(*paths):
             last_modified_at = os.stat(filepath).st_mtime
             if last_modified_at >= last_update:
-                build(preview=True)
+                build(**build_kwargs)
                 last_update = time.time()
                 break
         else:
             time.sleep(1)
 
 
-def all_filepaths(paths):
+def all_filepaths(*paths):
     for path in paths:
         if not os.path.exists(path):
             pass
@@ -107,14 +107,20 @@ def all_filepaths(paths):
 
 
 if __name__ == "__main__":
+    import argparse
+    from pathlib import Path
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("-l", "--live-preview", action='store_true')
-    parser.add_argument("-i", "--ip", default="127.0.0.1")
-    parser.add_argument("-p", "--port", type=int, default=8123)
+    parser.add_argument("-l", "--live-preview", action='store_true', help="Start live preview server")
+    parser.add_argument("-i", "--ip", default="127.0.0.1", help="Preview server ip, default to 127.0.0.1")
+    parser.add_argument("-p", "--port", type=int, default=8123, help="Preview server port, default to 8123")
+    parser.add_argument("-o", "--output", type=Path, default="./dist", help="Build file destination, default to ./dist")
+    parser.add_argument("-c", "--config", type=Path, default="./config.toml", help="Config file path, default to ./config.toml")
     opts = parser.parse_args()
 
+    build_kwargs = dict(preview=opts.live_preview, target_folder=opts.output, config_path=opts.config)
     if opts.live_preview:
-        start_server_daemon(ip=opts.ip, port=opts.port)
-        build_on_change("./template", "config.toml", "./static")
+        start_server_daemon(ip=opts.ip, port=opts.port, directory=opts.output)
+        build_on_change("./template", opts.config, "./static",  **build_kwargs)
     else:
-        build()
+        build(**build_kwargs)

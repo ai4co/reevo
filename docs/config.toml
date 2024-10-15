@@ -189,10 +189,6 @@ dest = "static/images/reevo.png"
 src = "../assets/show_reflec.png"
 dest = "static/images/show_reflec.png"
 
-# [static_file.nojekyll]
-# content=""
-# dest=".nojekyll"
-
 [preview_mode]
 enabled = false
-dummy_file_path = ".dummy.html"
+dummy_file_path = "_dummy.html"
