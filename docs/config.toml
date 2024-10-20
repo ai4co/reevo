@@ -3,9 +3,14 @@ enable_katex = false
 enable_code_highlight = true
 required_languages = ["bash"]
 tracking = { type = "umami", website_id = "c18ebe0b-2d3c-48ff-9cef-62c34bbadb04" }
+url = "https://ai4co.github.io/reevo"
 
-[page.metadata]
-# todo
+[metadata]
+keywords = ["Automatic Algorithm Generation", "Evolutionary Algorithms", "LLM Agent", "Hyper Heuristics"]
+description = "We introduce ReEvo, a novel approach that harnesses the power of LLMs as Hyper-Heuristics for solving complex combinatorial optimization problems with minimal manual intervention."
+banner_image = "static/images/reevo.png"
+# twitter_banner_image = ""
+# twitter_large_image = ""
 
 [paper]
 title = "ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution"

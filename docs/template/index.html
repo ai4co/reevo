@@ -3,33 +3,32 @@
 
 {% set require_hljs = page.enable_code_highlight and code %}
 {% set enable_preview = preview_mode and preview_mode.enabled %}
+{% set title = '['+paper.conference+'] '+paper.title %}
 <head>
   <meta charset="utf-8">
-{#
-  <!-- Meta tags for social media banners, these should be filled in appropriatly as they are your "business card" -->
-  <!-- Replace the content tag with appropriate information -->
-  <meta name="description" content="DESCRIPTION META TAG">
-  <meta property="og:title" content="SOCIAL MEDIA TITLE TAG" />
-  <meta property="og:description" content="SOCIAL MEDIA DESCRIPTION TAG TAG" />
-  <meta property="og:url" content="URL OF THE WEBSITE" />
-  <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X630-->
-  <meta property="og:image" content="static/image/your_banner_image.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-#}
 
-{#
-  <meta name="twitter:title" content="TWITTER BANNER TITLE META TAG">
-  <meta name="twitter:description" content="TWITTER BANNER DESCRIPTION META TAG">
-  <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X600-->
-  <meta name="twitter:image" content="static/images/your_twitter_banner_image.png">
-  <meta name="twitter:card" content="summary_large_image">
+  {% if metadata %}
+    <!-- See The Open Graph protocol https://ogp.me/ for details -->
+    <meta property="og:url" content="{{page.url}}">
+    <meta property="og:title" content="{{paper.title}}">
+    <meta name="twitter:title" content="{{title}}">
+    {%if metadata.description%}
+      <meta name="description" content="{{metadata.description}}">
+      <meta property="og:description" content="{{metadata.description}}">
+      <meta name="twitter:description" content="{{metadata.description}}">
+    {%endif%}
+    {%if metadata.keywords%}
+      <meta name="keywords" content="{{metadata.keywords | join(', ')}}">
+    {%endif%}
+    {% if metadata.banner_image %}
+      <meta property="og:image" content="{{metadata.banner_image}}">
+      <meta name="twitter:image" content="{{metadata.twitter_banner_image | default(metadata.banner_image)}}">
+      <meta name="twitter:card" content="{{metadata.twitter_large_image | default(metadata.banner_image)}}">
+    {% endif %}
+  {% endif %}
 
-  <!-- Keywords for your paper to be indexed by-->
-  <meta name="keywords" content="KEYWORDS SHOULD BE PLACED HERE">
-#}
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>[{{paper.conference}}] {{paper.title}}</title>
+  <title>{{title}}</title>
   <link rel="icon" type="image/svg" href='static/icon.svg'/>
 
   <!-- preconnect -->
@@ -41,18 +40,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
   {%if require_hljs %}<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />{%endif%}
   <link rel="preload" href="static/index.css" as="style">
-  {%for item in carousel%}<link rel="preload" href="{{item.image}}" as="image" />{%endfor%}
   
   <!-- bulma -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" integrity="sha256-WLKGWSIJYerRN8tbNGtXWVYnUM5wMJTXD8eG4NtGcDM=" crossorigin="anonymous">
   
   {%if carousel%}
-  <!-- carousel -->
-  <script defer src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/fancybox/fancybox.umd.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/carousel/carousel.umd.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/carousel/carousel.autoplay.umd.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/carousel/carousel.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/fancybox/fancybox.min.css">
+    {%for item in carousel%}<link rel="preload" href="{{item.image}}" as="image"/>{%endfor%}
+    <!-- carousel -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/fancybox/fancybox.umd.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/carousel/carousel.umd.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/carousel/carousel.autoplay.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/carousel/carousel.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/fancybox/fancybox.min.css">
   {%endif%}
 
   <!-- custom scripts -->
@@ -62,8 +61,8 @@
   <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha256-4XodgW4TwIJuDtf+v6vDJ39FVxI0veC/kSCCmnFp7ck=" crossorigin="anonymous"></script>
 
   {%if poster %}
-  <!-- PDF reader -->
-  <script defer src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+    <!-- PDF reader -->
+    <script defer src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
   {%endif%}
 
   <!-- icons -->
@@ -75,30 +74,32 @@
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
 
   {%if require_hljs %}
-  <!-- Syntax highlighting for code cells -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-  {%for lang in page.required_languages %}
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/{{lang}}.min.js"></script>
-  {%endfor%}
+    <!-- Syntax highlighting for code cells -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    {%for lang in page.required_languages %}
+      <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/{{lang}}.min.js"></script>
+    {%endfor%}
   {%endif%}
 
   {%if page.enable_katex %}
-  <!-- Math rendering -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
-    integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
-    integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg"
-    crossorigin="anonymous"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
-    integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"
-    onload="renderMathInElement(document.body);"></script>
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+      integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+      integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg"
+      crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+      integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"
+      onload="renderMathInElement(document.body);"></script>
   {%endif%}
 
   {%if page.tracking and not enable_preview %}
     {%if page.tracking.type == "umami"%}
-    <script defer src="https://cloud.umami.is/script.js" data-website-id="{{page.tracking.website_id}}"></script>
-  {%endif%}{%endif%}
+      {% set enable_umami = true %}
+      <script defer src="https://cloud.umami.is/script.js" data-website-id="{{page.tracking.website_id}}"></script>
+    {%endif%}
+  {%endif%}
 </head>
 
 <body>
@@ -108,12 +109,15 @@
       <div class="container is-max-desktop" style="max-width:1200px">
         <div class="columns is-centered">
           <div class="column has-text-centered">
-            <h1 class="title is-1 publication-title">{{paper.title}}</h1>
+            <h1 class="title is-2 publication-title">{{paper.title}}</h1>
             <div class="is-size-5 publication-authors">
               <!-- Paper authors -->
               {% for author in paper.authors %}
               <span class="author-block">
-                {%- if author.link %}<a href="{{author.link}}" target="_blank">{{author.name}}</a>
+                {%- if author.link %}
+                  <a href="{{author.link}}" target="_blank"
+                    {% if enable_umami %}data-umami-event="click-link:{{author.name}}"{%endif%}
+                  >{{author.name}}</a>
                 {%- else %}{{author.name}}
                 {%- endif %}
                 {%- if author.symbols %}<sup>{{author.symbols}}</sup>{%-endif-%}
@@ -126,7 +130,11 @@
               {% for inst in paper.institutions %}
               <span class="author-block" style="margin-right:.5em">
                 <sup>{{inst.symbol}} </sup>
-                {%- if inst.link %}<a href="{{inst.link}}" target="_blank">{{inst.name}}</a>
+                {%- if inst.link %}
+                  <a 
+                    href="{{inst.link}}" target="_blank"
+                    {% if enable_umami %}data-umami-event="click-link:{{inst.name}}"{%endif%}
+                  >{{inst.name}}</a>
                 {%- else %}{{inst.name}}
                 {%- endif -%}
               </span>{%- if loop.first %}<br />{%endif%}
@@ -141,7 +149,10 @@
               <div class="publication-links">
                 {% for key, item in links | items %}
                 <span class="link-block">
-                  <a href="{{item.link}}" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                  <a href="{{item.link}}" target="_blank" 
+                    class="external-link button is-normal is-rounded is-dark" 
+                    {% if enable_umami %}data-umami-event="click-link:{{key}}"{%endif%}
+                  >
                     <span class="icon">
                       {%-if item.icon.class %}<i class="{{item.icon.class}}"></i>
                       {%-elif item.icon.html %}{{item.icon.html}}
@@ -251,7 +262,11 @@
       <div class="code-container">
         <pre><code class="code-content language-text" id="code-content-bibtex">{{citation.biblatex}}</code></pre>
         {%if citation.copy_button%}
-        <button class="copy-button" alt="Copy to clipboard" data-clipboard-target="#code-content-bibtex">
+        <button 
+          class="copy-button" alt="Copy to clipboard" 
+          data-clipboard-target="#code-content-bibtex"
+          {% if enable_umami %}data-umami-event="copy-citation"{%endif%}
+        >
           <span class="copy-icon before-copy"><i class="fa fa-copy"></i></span>
           <span class="copy-icon after-copy"><i class="fas fa-check"></i></span>
         </button>
@@ -308,7 +323,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let clipboard = new ClipboardJS('.copy-button');
     let enter_count = 0;
 
-    clipboard.on('success', function (e) {
+    clipboard.on('success', function(e){
       e.clearSelection();
       const element = e.trigger;
       if(enter_count===0){element.classList.add('copied');}
@@ -321,14 +336,10 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   if(Carousel){
     const container = document.getElementById("paper-carousel");
-    const options = {
-      Autoplay: { timeout: 4000, },
-    };
+    const options = {Autoplay: { timeout: 4000, }};
     const carousel = new Carousel(container, options, { Autoplay });
   }
-  if(Fancybox){
-    Fancybox.bind("[data-fancybox]", {});
-  }
+  if(Fancybox){Fancybox.bind("[data-fancybox]", {})}
 });
 </script>
 {% if enable_preview %}
@@ -336,12 +347,10 @@ document.addEventListener('DOMContentLoaded', function () {
 (function(){
   let last_updated = new Date();
   const dummy_file_path="/{{preview_mode.dummy_file_path}}";
-  const refresh_on_change = () => {
-    fetch(dummy_file_path).then(res => {
+  function refresh_on_change(){
+    fetch(dummy_file_path).then(function(res){
       const last_modified = new Date(res.headers.get("Last-Modified"));
-      if(last_updated<last_modified){
-        window.location.reload();
-      }
+      if(last_updated<last_modified){window.location.reload()}
     })
   }
   setInterval(refresh_on_change, 1000);

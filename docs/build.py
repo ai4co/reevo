@@ -3,6 +3,7 @@ import os
 from os.path import join
 import shutil
 import tomllib
+import traceback
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -85,13 +86,18 @@ def start_server_daemon(ip="127.0.0.1", port=8123, directory="./dist"):
 def build_on_change(*paths, **build_kwargs):
     last_update = 0.0
     while 1:
-        for filepath in all_filepaths(*paths):
-            last_modified_at = os.stat(filepath).st_mtime
-            if last_modified_at >= last_update:
-                build(**build_kwargs)
-                last_update = time.time()
-                break
-        else:
+        try:
+            for filepath in all_filepaths(*paths):
+                last_modified_at = os.stat(filepath).st_mtime
+                if last_modified_at >= last_update:
+                    build(**build_kwargs)
+                    last_update = time.time()
+                    break
+        except KeyboardInterrupt as e:
+            raise e
+        except Exception as e:
+            traceback.print_exc()
+        finally:
             time.sleep(1)
 
 
