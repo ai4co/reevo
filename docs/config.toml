@@ -6,7 +6,12 @@ tracking = { type = "umami", website_id = "c18ebe0b-2d3c-48ff-9cef-62c34bbadb04"
 url = "https://ai4co.github.io/reevo"
 
 [metadata]
-keywords = ["Automatic Algorithm Generation", "Evolutionary Algorithms", "LLM Agent", "Hyper Heuristics"]
+keywords = [
+    "Automatic Algorithm Generation",
+    "Evolutionary Algorithms",
+    "LLM Agent",
+    "Hyper Heuristics",
+]
 description = "We introduce ReEvo, a novel approach that harnesses the power of LLMs as Hyper-Heuristics for solving complex combinatorial optimization problems with minimal manual intervention."
 banner_image = "static/images/reevo.png"
 # twitter_banner_image = ""
@@ -20,6 +25,7 @@ The omnipresence of NP-hard combinatorial optimization problems (COPs) compels d
 To empower LHHs, we present <b>Reflective Evolution</b> (<span style="font-family:monospace">ReEvo</span>), a novel integration of evolutionary search for efficiently exploring the heuristic space, and LLM reflections to provide verbal gradients within the space.
 Across five heterogeneous algorithmic types, six different COPs, and both white-box and black-box views of COPs, <span style="font-family:monospace">ReEvo</span> yields state-of-the-art and competitive meta-heuristics, evolutionary algorithms, heuristics, and neural solvers, while being more sample-efficient than prior LHHs.
 """
+logo = { src = "static/images/reevo-logo.png", alt = "ReEvo Logo", width = "192px" }
 
 [[paper.authors]]
 name = "Haoran Ye"
@@ -185,6 +191,10 @@ contents = [
     { date = "Feb. 2024", content = "We are excited to release <em>ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution</em> 🚀" },
 ]
 
+
+[static_file.reevo_logo]
+src = "../assets/reevo-logo.png"
+dest = "static/images/reevo-logo.png"
 
 [static_file.reevo_img]
 src = "../assets/reevo.png"

@@ -40,6 +40,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
   {%if require_hljs %}<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />{%endif%}
   <link rel="preload" href="static/index.css" as="style">
+  {%if paper.logo%}
+    <link rel="preload" href="{{paper.logo.src}}" as="image" />
+  {%endif%}
   
   <!-- bulma -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" integrity="sha256-WLKGWSIJYerRN8tbNGtXWVYnUM5wMJTXD8eG4NtGcDM=" crossorigin="anonymous">
@@ -164,6 +167,7 @@
               </div>
             </div>
             {%-if teaser %}<div class="column has-text-centered is-size-5"><b>{{teaser.content}}</b></div>{%endif%}
+            {%-if paper.logo %}<img src="{{paper.logo.src}}" alt="{{paper.logo.alt}}" width="{{paper.logo.width|default('128px')}}"/>{%endif%}
           </div>
         </div>
       </div>
