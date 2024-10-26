@@ -1,5 +1,11 @@
 # [NeurIPS 2024] ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution
 
+<p align="center">
+    <img src="./assets/reevo-logo.png" alt="logo" width="25%">
+</p>
+
+
+
 🥳 **Welcome!** This is a codebase that accompanies the paper [*ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution*](https://arxiv.org/abs/2402.01145).
 
 **Give ReEvo 5 minutes, and get a state-of-the-art algorithm in return!**
