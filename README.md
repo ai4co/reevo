@@ -91,7 +91,7 @@ python main.py \
     problem=tsp_aco \  # problem name
     init_pop_size=4 \  # initial population size
     pop_size=4 \  # population size
-    max_fe=20 \  # maximum number of function evaluations
+    max_fe=20 \  # maximum number of heuristic evaluations
     timeout=20  # allowed evaluation time for one generation
 ```
 Check out `./cfg/` for more options.
