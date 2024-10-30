@@ -87,7 +87,12 @@ Problem-specific dependencies:
 ####  4.2. <a name='TorunReEvo'></a>To run ReEvo
 ```bash
 # e.g., for tsp_aco
-python main.py problem=tsp_aco
+python main.py
+    problem=tsp_aco \  # problem name
+    init_pop_size=4 \  # initial population size
+    pop_size=4 \  # population size
+    max_fe=20 \  # maximum number of function evaluations
+    timeout=20  # allowed evaluation time for one generation
 ```
 Check out `./cfg/` for more options.
 
