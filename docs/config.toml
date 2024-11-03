@@ -170,8 +170,8 @@ description = '''<h5>Available LLM service providers</h5>
 </ul>
 '''
 
-# [poster]
-# url="static/pdfs/sample.pdf"
+[poster]
+url="static/reevo-poster.pdf"
 
 [citation]
 biblatex = '''@inproceedings{ye2024reevo,
@@ -203,6 +203,10 @@ dest = "static/images/reevo.png"
 [static_file.show_reflec]
 src = "../assets/show_reflec.png"
 dest = "static/images/show_reflec.png"
+
+[static_file.poster]
+src = "../assets/reevo-poster.pdf"
+dest = "static/reevo-poster.pdf"
 
 # [static_file.nojekyll]
 # content=""

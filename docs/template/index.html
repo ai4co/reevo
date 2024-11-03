@@ -174,9 +174,10 @@
     </div>
   </section>
 
+  {% set blockcount = 0 %}
   {%-if paper.abstract-%}
   <!-- Paper abstract -->
-  <section class="section hero is-light red-link" id="abstract">
+  <section class="section hero red-link {%if blockcount%2==0%}is-light{%endif%}{%set blockcount=blockcount+1%}" id="abstract">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
         <div class="column is-four-fifths">
@@ -193,7 +194,7 @@
 
   {%-if carousel-%}
   <!-- Image carousel -->
-  <section class="hero is-small" id="carousel">
+  <section class="hero is-small {%if blockcount%2==0%}is-light{%endif%}{%set blockcount=blockcount+1%}" id="carousel">
     <div class="hero-body">
       <div class="container">
         <div class="f-carousel" id="paper-carousel">
@@ -218,13 +219,13 @@
 
   {%if code%}
   <!-- Code Cell with syntax highlighting + copy to clipboard -->
-  <section class="section hero is-light red-link" id="usage">
+  <section class="section hero red-link {%if blockcount%2==0%}is-light{%endif%}{%set blockcount=blockcount+1%}" id="usage">
     <div class="container is-max-desktop content" style="width:100%">
       <h2 class="title">Usage 🔑</h2>
       {%for item in code%}
       <h3>{{item.title}}</h3>
       {%if item.code%}
-      <div class="code-container" style="background-color:white">
+      <div class="code-container">
         <pre><code class="code-content language-{{item.language}}" style="background-color:white" id="code-content-{{loop.index}}">
           {{-item.code-}}
         </code></pre>
@@ -247,11 +248,11 @@
 
   {%if poster%}
   <!-- Paper poster -->
-  <section class="hero is-small" id="poster">
+  <section class="hero is-small {%if blockcount%2==0%}is-light{%endif%}{%set blockcount=blockcount+1%}" id="poster">
     <div class="hero-body">
       <div class="container">
         <h2 class="title">Poster</h2>
-        <iframe src="{{poster.url}}" width="100%" height="550"></iframe>
+        <iframe src="{{poster.url}}" width="100%" height="800"></iframe>
       </div>
     </div>
   </section>
@@ -260,7 +261,7 @@
 
   {%if citation%}
   <!-- BibText citation + copy to clipboard -->
-  <section class="section" id="citation">
+  <section class="section hero {%if blockcount%2==0%}is-light{%endif%}{%set blockcount=blockcount+1%}" id="citation">
     <div class="container is-max-desktop content">
       <h2 class="title">Citation 🤩</h2>
       <div class="code-container">
@@ -282,7 +283,7 @@
   {%endif%}
 
   {%-if news-%}
-  <section class="section hero is-light red-link" id="news">
+  <section class="section hero red-link {%if blockcount%2==0%}is-light{%endif%}{%set blockcount=blockcount+1%}" id="news">
     <div class="container is-max-desktop content"style="width:100%">
       <h2 class="title">News 📰</h2>
       <div class="has-text-justified">
