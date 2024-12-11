@@ -1,0 +1,9 @@
+_target_: utils.llm_client.openai.OpenAIClient
+
+# Using Moonshot API
+model: moonshot-v1-8k
+temperature: 0.6  # temperature for chat completion
+# the value must <= 0.7, because it will be added with 0.3 when initializing the population and the temperature limitation of MoonshotAI is [0, 1]
+
+api_key: ${oc.env:MOONSHOT_API_KEY,null}
+base_url: https://api.moonshot.cn/v1
