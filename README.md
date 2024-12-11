@@ -63,7 +63,11 @@ with both black-box and white-box settings.
 
 ##  4. <a name='Usage'></a> Usage 🔑
 
-- Set your LLM API key (OpenAI API, ZhiPu API, Llama API) [here](https://github.com/ai4co/LLM-as-HH/blob/5fa30b9da3ecb80b8a658352d26df08893f88a6c/utils/utils.py#L9-L27) or as an environment variable.
+- Set your LLM API key (OpenAI API, ZhiPu API, Llama API) as an environment variable or like this:
+    ```bash
+    $ python main.py llm_client=openai  # see more options in ./cfg/llm_client
+    llm_client.api_key="<Your API key>"...
+    ```
 - Running logs and intermediate results are saved in `./outputs/main/` by default.
 - Datasets are generated on the fly.
 - Some test notebooks are provided in `./problems/*/test.ipynb`.
@@ -128,6 +132,7 @@ Supported LLM API providers and models include (note that only chat models are s
 - [**OpenAI**](https://openai.com/api/): gpt-3.5-turbo (default), gpt-4o, gpt-4o-mini, gpt-4-turbo, etc.
 - [**Zhipu AI**](https://open.bigmodel.cn/): GLM-3-Turbo, GLM-4-Air, GLM-4-0520, etc. ([full list](https://open.bigmodel.cn/dev/howuse/model))
 - [**DeepSeek**](https://www.deepseek.com/): deepseek-chat
+- [**Moonshot**](https://api.moonshot.cn/v1): moonshot-v1-8k
 - [**Llama API**](https://www.llama-api.com/): llama3.1-8b/70b/405b, gemma2-9b/27b, Qwen2-72B, etc. ([full list](https://docs.llama-api.com/quickstart#available-models))
 - And [more **providers**](https://docs.litellm.ai/docs/providers) supported via [**LiteLLM**](https://docs.litellm.ai/docs/).
 
