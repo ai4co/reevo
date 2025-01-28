@@ -146,7 +146,7 @@ If you find our work helpful (or if you are so kind as to offer us some encourag
 ```bibtex
 @inproceedings{ye2024reevo,
     title={ReEvo: Large Language Models as Hyper-Heuristics with Reflective Evolution}, 
-    author={Haoran Ye and Jiarui Wang and Zhiguang Cao and Federico Berto and Chuanbo Hua and Haeyeon Kim and Jinkyoo Park and Guojie Song},
+    author={Ye, Haoran and Wang, Jiarui and Cao, Zhiguang and Berto, Federico and Hua, Chuanbo and Kim, Haeyeon and Park, Jinkyoo and Song, Guojie},
     booktitle={Advances in Neural Information Processing Systems},
     year={2024},
     note={\url{https://github.com/ai4co/reevo}}
