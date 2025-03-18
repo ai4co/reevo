@@ -1,12 +1,12 @@
 defaults:
   - _self_
   - problem: tsp_aco
-  - llm_client: siliconflow
+  - llm_client: openai
   # [Optional] set different clients for operators
-  - llm_client@llm_long_ref: siliconflow
+  - llm_client@llm_long_ref: null
   - llm_client@llm_short_ref: null
   - llm_client@llm_crossover: null
-  - llm_client@llm_mutation: null 
+  - llm_client@llm_mutation: null
   - override hydra/output: local
 
 hydra:
