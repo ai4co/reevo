@@ -16,10 +16,23 @@ class ReEvo:
         root_dir: str, 
         generator_llm: BaseClient, 
         reflector_llm: Optional[BaseClient] = None,
+        
+        # Support setting different LLMs for each of the four operators: 
+        # Short-term Reflection, Long-term Reflection, Crossover, Mutation
+        short_reflector_llm: Optional[BaseClient] = None,
+        long_reflector_llm: Optional[BaseClient] = None,
+        crossover_llm: Optional[BaseClient] = None,
+        mutation_llm: Optional[BaseClient] = None
     ) -> None:
         self.cfg = cfg
         self.generator_llm = generator_llm
         self.reflector_llm = reflector_llm or generator_llm
+
+        self.short_reflector_llm = short_reflector_llm or self.reflector_llm
+        self.long_reflector_llm = long_reflector_llm or self.reflector_llm
+        self.crossover_llm = crossover_llm or generator_llm
+        self.mutation_llm = mutation_llm or generator_llm
+
         self.root_dir = root_dir
         
         self.mutation_rate = cfg.mutation_rate
@@ -70,7 +83,7 @@ class ReEvo:
         self.user_reflector_st_prompt = file_to_string(f'{self.prompt_dir}/common/user_reflector_st.txt') if self.problem_type != "black_box" else file_to_string(f'{self.prompt_dir}/common/user_reflector_st_black_box.txt') # shrot-term reflection
         self.user_reflector_lt_prompt = file_to_string(f'{self.prompt_dir}/common/user_reflector_lt.txt') # long-term reflection
         self.crossover_prompt = file_to_string(f'{self.prompt_dir}/common/crossover.txt')
-        self.mutataion_prompt = file_to_string(f'{self.prompt_dir}/common/mutation.txt')
+        self.mutation_prompt = file_to_string(f'{self.prompt_dir}/common/mutation.txt')
         self.user_generator_prompt = file_to_string(f'{self.prompt_dir}/common/user_generator.txt').format(
             func_name=self.func_name, 
             problem_desc=self.problem_desc,
@@ -360,7 +373,7 @@ class ReEvo:
             better_code_lst.append(better_code)
         
         # Asynchronously generate responses
-        response_lst = self.reflector_llm.multi_chat_completion(messages_lst)
+        response_lst = self.short_reflector_llm.multi_chat_completion(messages_lst)
         return response_lst, worse_code_lst, better_code_lst
     
     def long_term_reflection(self, short_term_reflections: list[str]) -> None:
@@ -379,7 +392,7 @@ class ReEvo:
             logging.info("Long-term Reflection Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
             self.print_long_term_reflection_prompt = False
         
-        self.long_term_reflection_str = self.reflector_llm.multi_chat_completion([messages])[0]
+        self.long_term_reflection_str = self.long_reflector_llm.multi_chat_completion([messages])[0]
         
         # Write reflections to file
         file_name = f"problem_iter{self.iteration}_short_term_reflections.txt"
@@ -417,7 +430,7 @@ class ReEvo:
                 self.print_crossover_prompt = False
         
         # Asynchronously generate responses
-        response_lst = self.generator_llm.multi_chat_completion(messages_lst)
+        response_lst = self.crossover_llm.multi_chat_completion(messages_lst)
         crossed_population = [self.response_to_individual(response, response_id) for response_id, response in enumerate(response_lst)]
 
         assert len(crossed_population) == self.cfg.pop_size
@@ -428,7 +441,7 @@ class ReEvo:
         """Elitist-based mutation. We only mutate the best individual to generate n_pop new individuals."""
         system = self.system_generator_prompt
         func_signature1 = self.func_signature.format(version=1) 
-        user = self.mutataion_prompt.format(
+        user = self.mutation_prompt.format(
             user_generator = self.user_generator_prompt,
             reflection = self.long_term_reflection_str + self.external_knowledge,
             func_signature1 = func_signature1,
@@ -439,7 +452,7 @@ class ReEvo:
         if self.print_mutate_prompt:
             logging.info("Mutation Prompt: \nSystem Prompt: \n" + system + "\nUser Prompt: \n" + user)
             self.print_mutate_prompt = False
-        responses = self.generator_llm.multi_chat_completion([messages], int(self.cfg.pop_size * self.mutation_rate))
+        responses = self.mutation_llm.multi_chat_completion([messages], int(self.cfg.pop_size * self.mutation_rate))
         population = [self.response_to_individual(response, response_id) for response_id, response in enumerate(responses)]
         return population
 
