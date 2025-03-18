@@ -1,0 +1,8 @@
+_target_: utils.llm_client.openai.OpenAIClient
+
+# Using SILICONFLOW API
+# see more models at https://cloud.siliconflow.cn/models
+model: "deepseek-ai/DeepSeek-V3"
+temperature: 1.0
+api_key: ${oc.env:SILICONFLOW_API_KEY,null}
+base_url: https://api.siliconflow.cn/v1
