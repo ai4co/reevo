@@ -19,7 +19,12 @@ def main(cfg):
     logging.info(f"Using Algorithm: {cfg.algorithm}")
 
     client = init_client(cfg)
-
+    # optional clients for operators (ReEvo)
+    long_ref_llm = hydra.utils.instantiate(cfg.llm_long_ref) if cfg.get("llm_long_ref") else None
+    short_ref_llm = hydra.utils.instantiate(cfg.llm_short_ref) if cfg.get("llm_short_ref") else None
+    crossover_llm = hydra.utils.instantiate(cfg.llm_crossover) if cfg.get("llm_crossover") else None
+    mutation_llm = hydra.utils.instantiate(cfg.llm_mutation) if cfg.get("llm_mutation") else None
+    
     if cfg.algorithm == "reevo":
         from reevo import ReEvo as LHH
     elif cfg.algorithm == "ael":
@@ -30,7 +35,12 @@ def main(cfg):
         raise NotImplementedError
 
     # Main algorithm
-    lhh = LHH(cfg, ROOT_DIR, client)
+    if cfg.algorithm != "reevo":
+        lhh = LHH(cfg, ROOT_DIR, client)
+    else:
+        lhh = LHH(cfg, ROOT_DIR, client, long_reflector_llm=long_ref_llm, short_reflector_llm=short_ref_llm, 
+                  crossover_llm=crossover_llm, mutation_llm=mutation_llm)
+        
     best_code_overall, best_code_path_overall = lhh.evolve()
     logging.info(f"Best Code Overall: {best_code_overall}")
     logging.info(f"Best Code Path Overall: {best_code_path_overall}")
