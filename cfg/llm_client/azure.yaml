@@ -1,0 +1,7 @@
+_target_: utils.llm_client.azure.AzureOpenAIClient
+
+model: "azure-openai" # model name is not
+temperature: 1.0  # temperature for chat completion
+endpoint: ${oc.env:AZURE_ENDPOINT,null}
+deployment: ${oc.env:AZURE_DEPLOYMENT,null}
+api_key: ${oc.env:AZURE_API_KEY,null}
