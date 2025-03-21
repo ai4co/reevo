@@ -71,20 +71,54 @@ with both black-box and white-box settings.
 - Datasets are generated on the fly.
 - Some test notebooks are provided in `./problems/*/test.ipynb`.
 
-####  4.1. <a name='Dependency'></a>Dependency
+####  4.1. <a name='Dependency'></a>Installation
 
-- Python >= 3.11
-- openai >= 1.0.0
-- hydra-core
-- scipy
 
-You may install the dependencies above via `pip install -r requirements.txt`.
+> [!TIP] 
+> We recommend using [uv](https://github.com/astral-sh/uv) for lightning fast installation and dependency management (see below details), otherwise read on!
 
-Problem-specific dependencies:
+<details>
+<summary>See details</summary>
 
-- `tsp_aco(_black_box)`: pytorch, scikit-learn
-- `cvrp_aco(_black_box)` / `mkp_aco(_black_box)` / `op_aco(_black_box)` / `NCO`: pytorch
-- `tsp_gls`: numba==0.58
+We recommend using [uv](https://github.com/astral-sh/uv) for faster installation and dependency management. To install it, run:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Then, clone the repository and cd into it:
+```bash
+git clone git@github.com:ai4co/reevo.git
+cd reevo
+```
+
+Create a new virtual environment and activate it:
+```bash
+uv venv --python 3.12
+source .venv/bin/activate
+```
+
+Then synchronize the dependencies:
+```bash
+uv sync --all-extras
+```
+
+This will install all the optional required dependencies; you can remove `--all-extras` to install only the default dependencies and add e.g. `--extra aco --extra gls` to install only the ACO and GLS problem-specific ones respectively and similarly (see the [`pyproject.toml`](pyproject.toml) for more details).
+
+</details>
+
+
+After cloning the repo, you can install dependencies locally on Python>=3.11 as follows:
+
+```bash
+pip install -e ".[gls,aco,nco]"
+```
+
+where `gls`, `aco` and `nco` are the optional dependencies for GLS, ACO and NCO problems (remove them if not needed). 
+
+
+
+
 
 
 ####  4.2. <a name='TorunReEvo'></a>To run ReEvo
@@ -97,6 +131,7 @@ python main.py \
     max_fe=20 \  # maximum number of heuristic evaluations
     timeout=20  # allowed evaluation time for one generation
 ```
+
 Check out `./cfg/` for more options.
 
 ####  4.3. <a name='Availableproblems'></a>Available problems
