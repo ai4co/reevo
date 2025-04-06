@@ -331,7 +331,7 @@ class ReEvo:
         # Determine which individual is better or worse
         if ind1["obj"] < ind2["obj"]:
             better_ind, worse_ind = ind1, ind2
-        elif ind1["obj"] > ind2["obj"]:
+        else: # robust in rare cases where two individuals have the same objective value
             better_ind, worse_ind = ind2, ind1
 
         worse_code = filter_code(worse_ind["code"])
