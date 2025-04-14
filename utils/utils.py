@@ -2,6 +2,7 @@ import logging
 import re
 import inspect
 import hydra
+import os
 
 def init_client(cfg):
     global client
@@ -25,6 +26,15 @@ def init_client(cfg):
 def file_to_string(filename):
     with open(filename, 'r') as file:
         return file.read()
+    
+    
+def print_hyperlink(path, text=None):
+    """Print hyperlink to file or folder for convenient navigation"""
+    # Format: \033]8;;file:///path/to/file\033\\text\033]8;;\033\\
+    text = text or path
+    full_path = f"file://{os.path.abspath(path)}"
+    return f"\033]8;;{full_path}\033\\{text}\033]8;;\033\\"
+
 
 def filter_traceback(s):
     lines = s.split('\n')
@@ -44,9 +54,13 @@ def block_until_running(stdout_filepath, log_status=False, iter_num=-1, response
         log = file_to_string(stdout_filepath)
         if  len(log) > 0:
             if log_status and "Traceback" in log:
-                logging.info(f"Iteration {iter_num}: Code Run {response_id} execution error!")
+                logging.warning(
+                    f"Iteration {iter_num}: Code Run {response_id} execution error! (see {print_hyperlink(stdout_filepath, 'stdout')}))"
+                )
             else:
-                logging.info(f"Iteration {iter_num}: Code Run {response_id} successful!")
+                logging.info(
+                    f"Iteration {iter_num}: Code Run {response_id} successful! (see {print_hyperlink(stdout_filepath, 'stdout')})"
+                )
             break
 
 
