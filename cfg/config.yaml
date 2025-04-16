@@ -8,6 +8,8 @@ defaults:
   - llm_client@llm_crossover: null
   - llm_client@llm_mutation: null
   - override hydra/output: local
+  - override hydra/job_logging: colorlog
+  - override hydra/hydra_logging: colorlog
 
 hydra:
   job:

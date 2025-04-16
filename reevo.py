@@ -265,8 +265,9 @@ class ReEvo:
             self.elitist = population[best_sample_idx]
             logging.info(f"Iteration {self.iteration}: Elitist: {self.elitist['obj']}")
         
+        best_path = self.best_code_path_overall.replace(".py", ".txt").replace("code", "response")
+        logging.info(f"Best obj: {self.best_obj_overall}, Best Code Path: {print_hyperlink(best_path, self.best_code_path_overall)}")
         logging.info(f"Iteration {self.iteration} finished...")
-        logging.info(f"Best obj: {self.best_obj_overall}, Best Code Path: {self.best_code_path_overall}")
         logging.info(f"Function Evals: {self.function_evals}")
         self.iteration += 1
         
